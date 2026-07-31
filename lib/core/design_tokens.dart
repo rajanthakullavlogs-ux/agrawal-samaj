@@ -288,6 +288,12 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  static const LinearGradient maroonGradient = LinearGradient(
+    colors: [Color(0xFF570000), Color(0xFF800000)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }
 
 class AppSpacing {
