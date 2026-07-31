@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
+import '../data/members_repository.dart';
 
 /// B2 — Members Management Screen (Location Admin)
 class MembersManagementScreen extends ConsumerStatefulWidget {
@@ -20,67 +21,11 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
   _MemberFilter _filter = _MemberFilter.all;
   String _searchQuery = '';
 
-  static const _membersList = [
-    (
-      id: 'NAS-4492',
-      name: 'Rahul Agrawal',
-      status: 'ACTIVE',
-      memberType: 'Lifetime Member',
-      location: 'Kathmandu',
-      phone: '+977-98510XXXXX',
-      email: 'rahul@agrawal.org',
-      avatarBg: Color(0xFFE3EEFD),
-      avatarColor: Color(0xFF2E6FE0),
-    ),
-    (
-      id: 'NAS-9021',
-      name: 'Sneha Mittal',
-      status: 'PENDING',
-      memberType: 'Standard Member',
-      location: 'Kathmandu',
-      phone: '+977-98412XXXXX',
-      email: 'sneha.m@gmail.com',
-      avatarBg: Color(0xFFFCEAE0),
-      avatarColor: Color(0xFFE8622C),
-    ),
-    (
-      id: 'NAS-1205',
-      name: 'Deepak Goyal',
-      status: 'ACTIVE',
-      memberType: 'Trustee Member',
-      location: 'Kathmandu',
-      phone: '+977-98011XXXXX',
-      email: 'deepak.goyal@nabil.com',
-      avatarBg: Color(0xFFE5F5E9),
-      avatarColor: Color(0xFF3E7C4A),
-    ),
-    (
-      id: 'NAS-5510',
-      name: 'Vikram Bansal',
-      status: 'INACTIVE',
-      memberType: 'Standard Member',
-      location: 'Kathmandu',
-      phone: '+977-98600XXXXX',
-      email: 'vikram.bansal@gmail.com',
-      avatarBg: Color(0xFFEFE7FB),
-      avatarColor: Color(0xFF7B4FD6),
-    ),
-    (
-      id: 'NAS-3301',
-      name: 'Pooja Agrawal',
-      status: 'PENDING',
-      memberType: 'Lifetime Member',
-      location: 'Kathmandu',
-      phone: '+977-98130XXXXX',
-      email: 'pooja.a@agrawal.org',
-      avatarBg: Color(0xFFFCEAE0),
-      avatarColor: Color(0xFFE8622C),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final filtered = _membersList.where((m) {
+    final membersList = ref.watch(membersNotifierProvider);
+
+    final filtered = membersList.where((m) {
       final matchesQuery = _searchQuery.isEmpty ||
           m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           m.id.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -100,6 +45,10 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
           return m.memberType.contains('Lifetime');
       }
     }).toList();
+
+    final activeCount = membersList.where((m) => m.status == 'ACTIVE').length;
+    final pendingCount = membersList.where((m) => m.status == 'PENDING').length;
+    final trusteeCount = membersList.where((m) => m.memberType.contains('Trustee')).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -125,34 +74,34 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: 1.6,
-                children: const [
+                children: [
                   _MiniStat(
                     title: 'Total Members',
-                    value: '1,248',
+                    value: '${membersList.length}',
                     icon: Icons.people_alt_rounded,
-                    color: Color(0xFF2E6FE0),
-                    bg: Color(0xFFF3F8FE),
+                    color: const Color(0xFF2E6FE0),
+                    bg: const Color(0xFFF3F8FE),
                   ),
                   _MiniStat(
                     title: 'Active Members',
-                    value: '856',
+                    value: '$activeCount',
                     icon: Icons.check_circle_rounded,
-                    color: Color(0xFF3E7C4A),
-                    bg: Color(0xFFF2FAF4),
+                    color: const Color(0xFF3E7C4A),
+                    bg: const Color(0xFFF2FAF4),
                   ),
                   _MiniStat(
                     title: 'Pending Review',
-                    value: '12',
+                    value: '$pendingCount',
                     icon: Icons.pending_actions_rounded,
-                    color: Color(0xFFE8622C),
-                    bg: Color(0xFFFDF3ED),
+                    color: const Color(0xFFE8622C),
+                    bg: const Color(0xFFFDF3ED),
                   ),
                   _MiniStat(
                     title: 'Trustees',
-                    value: '42',
+                    value: '$trusteeCount',
                     icon: Icons.workspace_premium_rounded,
-                    color: Color(0xFFC4901E),
-                    bg: Color(0xFFFCF7EB),
+                    color: const Color(0xFFC4901E),
+                    bg: const Color(0xFFFCF7EB),
                   ),
                 ],
               ),
@@ -362,9 +311,10 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      ref.read(membersNotifierProvider.notifier).approveMember(m.id);
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${m.name} status updated successfully!')),
+                        SnackBar(content: Text('${m.name} status updated to ACTIVE!')),
                       );
                     },
                     style: ElevatedButton.styleFrom(

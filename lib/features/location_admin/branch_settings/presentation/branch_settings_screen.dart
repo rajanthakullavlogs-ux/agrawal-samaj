@@ -1,31 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
+import '../../../settings/data/settings_repository.dart';
 
 /// B5 — Branch Settings Screen (Location Admin)
-class BranchSettingsScreen extends StatefulWidget {
+class BranchSettingsScreen extends ConsumerStatefulWidget {
   const BranchSettingsScreen({super.key});
 
   @override
-  State<BranchSettingsScreen> createState() => _BranchSettingsScreenState();
+  ConsumerState<BranchSettingsScreen> createState() => _BranchSettingsScreenState();
 }
 
-class _BranchSettingsScreenState extends State<BranchSettingsScreen> {
-  final _branchNameController = TextEditingController(text: 'Kathmandu Central Branch');
-  final _missionController = TextEditingController(
-    text: 'Dedicated to preserving the Agrawal heritage in Nepal, providing unity, business networking, and social welfare.',
-  );
-  final _phoneController = TextEditingController(text: '+977-1-4423XXX');
-  final _emailController = TextEditingController(text: 'kathmandu@nepalagrawal.org');
-  final _websiteController = TextEditingController(text: 'https://kathmandu.agrawalsamaj.org.np');
-  final _addressController = TextEditingController(text: 'Kamaladi, Kathmandu, Ward No. 28');
-  final _leaderNameController = TextEditingController(text: 'Shree Ram Agrawal');
-  final _leaderBioController = TextEditingController(
-    text: 'Respected entrepreneur and community activist with 30+ years in trade and philanthropy.',
-  );
+class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
+  late TextEditingController _branchNameController;
+  late TextEditingController _missionController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _websiteController;
+  late TextEditingController _addressController;
+  late TextEditingController _leaderNameController;
+  late TextEditingController _leaderBioController;
+
+  @override
+  void initState() {
+    super.initState();
+    final settings = ref.read(branchSettingsNotifierProvider);
+    _branchNameController = TextEditingController(text: settings.branchName);
+    _missionController = TextEditingController(text: settings.mission);
+    _phoneController = TextEditingController(text: settings.phone);
+    _emailController = TextEditingController(text: settings.email);
+    _websiteController = TextEditingController(text: settings.website);
+    _addressController = TextEditingController(text: settings.address);
+    _leaderNameController = TextEditingController(text: settings.leaderName);
+    _leaderBioController = TextEditingController(text: settings.leaderBio);
+  }
 
   @override
   void dispose() {
@@ -41,8 +53,20 @@ class _BranchSettingsScreenState extends State<BranchSettingsScreen> {
   }
 
   void _saveSettings() {
+    final updated = BranchSettingsModel(
+      branchName: _branchNameController.text,
+      mission: _missionController.text,
+      phone: _phoneController.text,
+      email: _emailController.text,
+      website: _websiteController.text,
+      address: _addressController.text,
+      leaderName: _leaderNameController.text,
+      leaderBio: _leaderBioController.text,
+    );
+    ref.read(branchSettingsNotifierProvider.notifier).updateSettings(updated);
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Branch settings saved successfully!')),
+      const SnackBar(content: Text('Branch settings saved & synced successfully!')),
     );
   }
 

@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
+import '../../../events/data/events_repository.dart';
+import '../../members/data/members_repository.dart';
 
 /// Location Admin Dashboard — /admin/dashboard
-class AdminDashboardScreen extends StatefulWidget {
+class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
 enum _ActivityFilter { all, registrations, events, donations, announcements }
 
-class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   _ActivityFilter _filter = _ActivityFilter.all;
 
   static const _activities = [
@@ -78,6 +81,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final members = ref.watch(membersNotifierProvider);
+    final events = ref.watch(eventsNotifierProvider);
+
+    final totalMembers = members.length;
+    final activeMembers = members.where((m) => m.status == 'ACTIVE').length;
+    final upcomingEventsCount = events.where((e) => e.isUpcoming).length;
+    final pastEventsCount = events.where((e) => !e.isUpcoming).length;
+
     final filtered = _filter == _ActivityFilter.all
         ? _activities
         : _activities.where((a) => a.category == _filter).toList();
@@ -123,54 +134,54 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.15,
-                children: const [
+                children: [
                   _MetricCard(
                     icon: Icons.people_alt_rounded,
-                    iconBg: Color(0xFFDCEBFD),
-                    iconColor: Color(0xFF2E6FE0),
-                    cardBg: Color(0xFFF3F8FE),
+                    iconBg: const Color(0xFFDCEBFD),
+                    iconColor: const Color(0xFF2E6FE0),
+                    cardBg: const Color(0xFFF3F8FE),
                     title: 'Total Members',
-                    value: '1,248',
+                    value: '$totalMembers',
                     trend: '12.5% from last month',
-                    trendColor: Color(0xFF2E6FE0),
-                    sparkColor: Color(0xFF2E6FE0),
-                    sparkPoints: [2, 4, 3, 5, 4, 6, 8],
+                    trendColor: const Color(0xFF2E6FE0),
+                    sparkColor: const Color(0xFF2E6FE0),
+                    sparkPoints: const [2, 4, 3, 5, 4, 6, 8],
                   ),
                   _MetricCard(
                     icon: Icons.check_circle_rounded,
-                    iconBg: Color(0xFFD8F0DE),
-                    iconColor: Color(0xFF3E7C4A),
-                    cardBg: Color(0xFFF2FAF4),
+                    iconBg: const Color(0xFFD8F0DE),
+                    iconColor: const Color(0xFF3E7C4A),
+                    cardBg: const Color(0xFFF2FAF4),
                     title: 'Active Members',
-                    value: '856',
+                    value: '$activeMembers',
                     trend: '8.3% from last month',
-                    trendColor: Color(0xFF3E7C4A),
-                    sparkColor: Color(0xFF3E7C4A),
-                    sparkPoints: [3, 3, 5, 4, 6, 5, 7],
+                    trendColor: const Color(0xFF3E7C4A),
+                    sparkColor: const Color(0xFF3E7C4A),
+                    sparkPoints: const [3, 3, 5, 4, 6, 5, 7],
                   ),
                   _MetricCard(
                     icon: Icons.event_note_rounded,
-                    iconBg: Color(0xFFFBE0D2),
-                    iconColor: Color(0xFFE8622C),
-                    cardBg: Color(0xFFFDF3ED),
+                    iconBg: const Color(0xFFFBE0D2),
+                    iconColor: const Color(0xFFE8622C),
+                    cardBg: const Color(0xFFFDF3ED),
                     title: 'Upcoming Events',
-                    value: '12',
+                    value: '$upcomingEventsCount',
                     trend: '3 new this week',
-                    trendColor: Color(0xFFE8622C),
-                    sparkColor: Color(0xFFE8622C),
-                    sparkPoints: [4, 3, 5, 3, 6, 5, 8],
+                    trendColor: const Color(0xFFE8622C),
+                    sparkColor: const Color(0xFFE8622C),
+                    sparkPoints: const [4, 3, 5, 3, 6, 5, 8],
                   ),
                   _MetricCard(
                     icon: Icons.history_rounded,
-                    iconBg: Color(0xFFFAE9C6),
-                    iconColor: Color(0xFFC4901E),
-                    cardBg: Color(0xFFFCF7EB),
+                    iconBg: const Color(0xFFFAE9C6),
+                    iconColor: const Color(0xFFC4901E),
+                    cardBg: const Color(0xFFFCF7EB),
                     title: 'Past Events',
-                    value: '342',
+                    value: '$pastEventsCount',
                     trend: '18 this month',
-                    trendColor: Color(0xFFC4901E),
-                    sparkColor: Color(0xFFC4901E),
-                    sparkPoints: [5, 4, 5, 6, 5, 7, 8],
+                    trendColor: const Color(0xFFC4901E),
+                    sparkColor: const Color(0xFFC4901E),
+                    sparkPoints: const [5, 4, 5, 6, 5, 7, 8],
                   ),
                 ],
               ),

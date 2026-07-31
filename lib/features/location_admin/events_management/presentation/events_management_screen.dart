@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
+import '../../../events/data/events_repository.dart';
 
 /// B3 — Events Management Screen (Location Admin)
-class EventsManagementScreen extends StatefulWidget {
+class EventsManagementScreen extends ConsumerStatefulWidget {
   const EventsManagementScreen({super.key});
 
   @override
-  State<EventsManagementScreen> createState() => _EventsManagementScreenState();
+  ConsumerState<EventsManagementScreen> createState() => _EventsManagementScreenState();
 }
 
 enum _EventFilter { all, upcoming, cultural, business, past }
 
-class _EventsManagementScreenState extends State<EventsManagementScreen> {
+class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen> {
   _EventFilter _filter = _EventFilter.all;
 
   static const _eventsList = [
@@ -63,6 +65,10 @@ class _EventsManagementScreenState extends State<EventsManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final events = ref.watch(eventsNotifierProvider);
+    final totalEvents = events.length;
+    final activeEvents = events.where((e) => e.isUpcoming).length;
+
     final filtered = _eventsList.where((e) {
       switch (_filter) {
         case _EventFilter.all:
@@ -102,15 +108,15 @@ class _EventsManagementScreenState extends State<EventsManagementScreen> {
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 childAspectRatio: 1.6,
-                children: const [
+                children: [
                   _MiniStat(
                     title: 'Total Events',
-                    value: '12',
+                    value: '$totalEvents',
                     icon: Icons.event_note_rounded,
-                    color: Color(0xFFE8622C),
-                    bg: Color(0xFFFDF3ED),
+                    color: const Color(0xFFE8622C),
+                    bg: const Color(0xFFFDF3ED),
                   ),
-                  _MiniStat(
+                  const _MiniStat(
                     title: 'New RSVPs',
                     value: '+458',
                     icon: Icons.group_add_rounded,
@@ -119,12 +125,12 @@ class _EventsManagementScreenState extends State<EventsManagementScreen> {
                   ),
                   _MiniStat(
                     title: 'Active Gatherings',
-                    value: '3',
+                    value: '$activeEvents',
                     icon: Icons.celebration_rounded,
-                    color: Color(0xFF3E7C4A),
-                    bg: Color(0xFFF2FAF4),
+                    color: const Color(0xFF3E7C4A),
+                    bg: const Color(0xFFF2FAF4),
                   ),
-                  _MiniStat(
+                  const _MiniStat(
                     title: 'Revenue Generated',
                     value: 'NPR 45k',
                     icon: Icons.payments_rounded,
