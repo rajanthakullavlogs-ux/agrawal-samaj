@@ -1,0 +1,56 @@
+name: nepal_agrawal_samaj
+description: "Nepal Agrawal Samaj — Community Organization Platform"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Routing
+  go_router: ^14.8.1
+
+  # Backend
+  supabase_flutter: ^2.10.0
+
+  # Forms
+  flutter_form_builder: ^10.3.0
+  form_builder_validators: ^11.1.0
+
+  # Images
+  image_picker: ^1.1.2
+  cached_network_image: ^3.4.1
+
+  # Charts (Super Admin analytics)
+  fl_chart: ^0.70.2
+
+  # Date/Time formatting
+  intl: ^0.20.2
+
+  # Environment config
+  flutter_dotenv: ^5.2.1
+
+  # URL launcher (for external links, maps)
+  url_launcher: ^6.3.1
+
+  # Session persistence
+  shared_preferences: ^2.3.4
+
+  # Google Fonts
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
