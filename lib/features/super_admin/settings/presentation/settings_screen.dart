@@ -101,11 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: const Text('Manage Admin Roles & Keys', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                     subtitle: const Text('Assign super admin, location admin, and moderator roles', style: TextStyle(fontSize: 11)),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening RBAC Role Assignment Panel...')),
-                      );
-                    },
+                    onTap: () => _showRbacModal(context),
                   ),
                 ],
               ),
@@ -372,4 +368,59 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showRbacModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      title: Row(
+        children: const [
+          Icon(Icons.security_rounded, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text('RBAC Role & Key Control', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Super Admin Role Key', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: const Color(0xFFF3F8FE), borderRadius: BorderRadius.circular(AppRadius.md)),
+              child: Row(
+                children: const [
+                  Icon(Icons.key_rounded, size: 16, color: Color(0xFF2E6FE0)),
+                  SizedBox(width: 6),
+                  Expanded(child: Text('sb_super_admin_key_9941x28', style: TextStyle(fontSize: 11, fontFamily: 'monospace'))),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text('Active Admin Privileges', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text('• 18 Location Administrators Assigned\n• 3 Super Admin Executive Accounts\n• Row Level Security (RLS) Active',
+                style: TextStyle(fontSize: 11.5, color: Colors.grey.shade700, height: 1.4)),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('RBAC Security Keys re-generated & synchronized!')),
+            );
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+          child: const Text('Regenerate Key', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+      ],
+    ),
+  );
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
+import '../../../../shared/models/event.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 import '../../../events/data/events_repository.dart';
 
@@ -160,7 +161,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
                     bg: const Color(0xFFFBE0D2),
                     color: const Color(0xFFE8622C),
                     label: 'Create New\nEvent',
-                    onTap: () {},
+                    onTap: () => _showCreateEventDialog(context, ref),
                   ),
                   const SizedBox(width: 10),
                   _QuickActionTile(
@@ -168,7 +169,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
                     bg: const Color(0xFFE3EEFD),
                     color: const Color(0xFF2E6FE0),
                     label: 'Scan Ticket\nQR',
-                    onTap: () {},
+                    onTap: () => _showQrScannerModal(context),
                   ),
                   const SizedBox(width: 10),
                   _QuickActionTile(
@@ -176,7 +177,11 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
                     bg: const Color(0xFFE5F5E9),
                     color: const Color(0xFF3E7C4A),
                     label: 'Download\nReport',
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Downloading Events Attendance PDF Report...')),
+                      );
+                    },
                   ),
                   const SizedBox(width: 10),
                   _QuickActionTile(
@@ -184,7 +189,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
                     bg: const Color(0xFFEFE7FB),
                     color: const Color(0xFF7B4FD6),
                     label: 'Broadcast\nNotice',
-                    onTap: () {},
+                    onTap: () => _showBroadcastModal(context),
                   ),
                 ],
               ),
@@ -228,11 +233,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Opening Create Event Wizard...')),
-          );
-        },
+        onPressed: () => _showCreateEventDialog(context, ref),
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -640,4 +641,148 @@ class _AdminBottomNavBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
+  final titleController = TextEditingController();
+  final venueController = TextEditingController();
+  String category = 'Cultural';
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      title: Row(
+        children: const [
+          Icon(Icons.add_box_rounded, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text('Create New Event', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Event Title',
+                hintText: 'e.g. Dashain Cultural Gala 2026',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: venueController,
+              decoration: InputDecoration(
+                labelText: 'Venue Address',
+                hintText: 'e.g. Samaj Bhawan Hall',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+        ElevatedButton(
+          onPressed: () {
+            if (titleController.text.isNotEmpty) {
+              final newEvent = Event(
+                id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
+                title: titleController.text,
+                description: 'Organized by Location Admin',
+                category: category,
+                eventDate: DateTime.now().add(const Duration(days: 10)),
+                eventTime: '05:00 PM',
+                venue: venueController.text.isNotEmpty ? venueController.text : 'Kathmandu Samaj Hall',
+                organizedBy: 'Kathmandu Chapter',
+                status: 'upcoming',
+                createdAt: DateTime.now(),
+              );
+              ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Event "${newEvent.title}" published successfully!')),
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+          child: const Text('Publish Event', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+      ],
+    ),
+  );
+}
+
+void _showQrScannerModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg))),
+    builder: (ctx) => Container(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.qr_code_scanner_rounded, size: 64, color: AppColors.primary),
+          const SizedBox(height: 12),
+          const Text('Scan Attendee Ticket QR', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text('Point camera at member\'s event pass QR code for instant check-in verification.',
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('✅ Ticket Verified: Rahul Agrawal (Kathmandu Chapter)')),
+              );
+            },
+            icon: const Icon(Icons.camera_alt_rounded),
+            label: const Text('Simulate Scan Verification', style: TextStyle(fontWeight: FontWeight.w700)),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+void _showBroadcastModal(BuildContext context) {
+  final messageController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      title: Row(
+        children: const [
+          Icon(Icons.campaign_rounded, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text('Broadcast Event Notice', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        ],
+      ),
+      content: TextField(
+        controller: messageController,
+        maxLines: 3,
+        decoration: InputDecoration(
+          hintText: 'Type announcement message to send to all registered attendees...',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Announcement broadcasted to 1,240 attendees via SMS & App Notification!')),
+            );
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+          child: const Text('Send Broadcast'),
+        ),
+      ],
+    ),
+  );
 }

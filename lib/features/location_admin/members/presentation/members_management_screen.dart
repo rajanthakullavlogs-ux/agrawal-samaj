@@ -261,8 +261,83 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
   }
 
   void _showAddMemberModal(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Opening New Member Application Form...')),
+    final nameController = TextEditingController();
+    final phoneController = TextEditingController();
+    final emailController = TextEditingController();
+    String memberType = 'Standard Member';
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: Row(
+          children: const [
+            Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Add New Member', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  hintText: 'e.g. Anand Agrawal',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  hintText: '+977-98XXXXXXXX',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  hintText: 'anand@agrawal.org',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                final newMember = MemberItem(
+                  id: 'NAS-${1000 + DateTime.now().millisecond}',
+                  name: nameController.text,
+                  status: 'PENDING',
+                  memberType: memberType,
+                  location: 'Kathmandu',
+                  phone: phoneController.text.isNotEmpty ? phoneController.text : '+977-9851XXXXXX',
+                  email: emailController.text.isNotEmpty ? emailController.text : 'newmember@agrawal.org',
+                  avatarBg: const Color(0xFFFCEAE0),
+                  avatarColor: const Color(0xFFE8622C),
+                );
+                ref.read(membersNotifierProvider.notifier).addMember(newMember);
+                Navigator.pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Member "${newMember.name}" registered and added to directory!')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+            child: const Text('Save Member', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
     );
   }
 

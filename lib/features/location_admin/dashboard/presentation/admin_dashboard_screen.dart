@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
+import '../../../../shared/models/event.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 import '../../../events/data/events_repository.dart';
 import '../../members/data/members_repository.dart';
@@ -209,7 +210,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     bg: const Color(0xFFFBE0D2),
                     iconColor: const Color(0xFFE8622C),
                     label: 'Create\nEvent',
-                    onTap: () => context.go(AppConstants.adminEvents),
+                    onTap: () => _showCreateEventDialog(context, ref),
                   ),
                   const SizedBox(width: 10),
                   _ActionTile(
@@ -864,4 +865,77 @@ class _AdminBottomNavBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
+  final titleController = TextEditingController();
+  final venueController = TextEditingController();
+  String selectedCategory = 'Cultural';
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      title: Row(
+        children: const [
+          Icon(Icons.add_box_rounded, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text('Create New Event', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Event Title',
+                hintText: 'e.g. Teej Mahotsav 2026',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: venueController,
+              decoration: InputDecoration(
+                labelText: 'Venue Address',
+                hintText: 'e.g. Samaj Bhawan, Kamaladi',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+        ElevatedButton(
+          onPressed: () {
+            if (titleController.text.isNotEmpty) {
+              final newEvent = Event(
+                id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
+                title: titleController.text,
+                description: 'Organized by Kathmandu Chapter Admin',
+                category: selectedCategory,
+                eventDate: DateTime.now().add(const Duration(days: 14)),
+                eventTime: '04:00 PM',
+                venue: venueController.text.isNotEmpty ? venueController.text : 'Kathmandu Samaj Hall',
+                organizedBy: 'Kathmandu Chapter',
+                status: 'upcoming',
+                createdAt: DateTime.now(),
+              );
+              ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Event "${newEvent.title}" published successfully!')),
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+          child: const Text('Publish Event', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+      ],
+    ),
+  );
 }
