@@ -3,16 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
-import '../../../../shared/widgets/widgets.dart';
+import '../../../../shared/widgets/nas_logo.dart';
 
 /// B5 — Branch Settings Screen (Location Admin)
-/// Matches design b5._settings_location_admin/screen.png:
-/// - Header "Branch Settings" + subtext
-/// - Card 1: Branch Description (Branch Name, Mission Statement)
-/// - Card 2: Contact Details (Primary Phone, Official Email, Website)
-/// - Card 3: Location Info (Map preview, Address, City/Region)
-/// - Card 4: Leader Info (Leader avatar + camera badge, Full Name, Brief Bio)
-/// - Bottom bar: Discard + "Save Changes" primary CTA
 class BranchSettingsScreen extends StatefulWidget {
   const BranchSettingsScreen({super.key});
 
@@ -21,24 +14,17 @@ class BranchSettingsScreen extends StatefulWidget {
 }
 
 class _BranchSettingsScreenState extends State<BranchSettingsScreen> {
-  final _branchNameController =
-      TextEditingController(text: 'Kathmandu Central Branch');
+  final _branchNameController = TextEditingController(text: 'Kathmandu Central Branch');
   final _missionController = TextEditingController(
-    text:
-        'Dedicated to preserving the Agrawal heritage in the heart of Nepal, providing a platform for unity, business networking, and social welfare.',
+    text: 'Dedicated to preserving the Agrawal heritage in Nepal, providing unity, business networking, and social welfare.',
   );
   final _phoneController = TextEditingController(text: '+977-1-4423XXX');
-  final _emailController =
-      TextEditingController(text: 'kathmandu@nepalagrawal.org');
-  final _websiteController =
-      TextEditingController(text: 'https://kathmandu.agrawalsamaj.org.np');
-  final _addressController =
-      TextEditingController(text: 'Kamaladi, Kathmandu, Ward No. 28');
-  final _leaderNameController =
-      TextEditingController(text: 'Shree Ram Agrawal');
+  final _emailController = TextEditingController(text: 'kathmandu@nepalagrawal.org');
+  final _websiteController = TextEditingController(text: 'https://kathmandu.agrawalsamaj.org.np');
+  final _addressController = TextEditingController(text: 'Kamaladi, Kathmandu, Ward No. 28');
+  final _leaderNameController = TextEditingController(text: 'Shree Ram Agrawal');
   final _leaderBioController = TextEditingController(
-    text:
-        'Respected entrepreneur and community activist with over 30 years of experience in trade and philanthropy.',
+    text: 'Respected entrepreneur and community activist with 30+ years in trade and philanthropy.',
   );
 
   @override
@@ -55,262 +41,415 @@ class _BranchSettingsScreenState extends State<BranchSettingsScreen> {
   }
 
   void _saveSettings() {
-    NASToast.success(context, 'Branch settings saved successfully!');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Branch settings saved successfully!')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const NASAppBar(title: 'Branch Settings'),
-      body: SingleChildScrollView(
-        child: Column(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 20),
           children: [
-            NASContentWidth(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            const _AdminTopBar(),
+            const SizedBox(height: 14),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _HeroBanner(),
+            ),
+            const SizedBox(height: 20),
+
+            // Card 1: Branch Description
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _SectionCard(
+                icon: Icons.storefront_rounded,
+                title: 'Branch Description',
                 children: [
-                  const SizedBox(height: NASSpacing.md),
-                  Text(
-                    'Branch Settings',
-                    style: NASTypography.headlineMd.copyWith(
-                      color: NASColors.primary,
-                      fontFamily: NASTypography.headlineFont,
-                    ),
-                  ),
-                  const SizedBox(height: NASSpacing.xs),
-                  Text(
-                    'Manage the Kathmandu Central Branch profile and contact details.',
-                    style: NASTypography.bodyMd.copyWith(
-                      color: NASColors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: NASSpacing.lg),
+                  _inputField('Branch Name', _branchNameController),
+                  const SizedBox(height: 12),
+                  _inputField('Mission Statement', _missionController, maxLines: 3),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
 
-                  // Section 1: Branch Description
-                  NASCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.description_outlined,
-                                color: NASColors.primary),
-                            const SizedBox(width: NASSpacing.xs),
-                            Text(
-                              'Branch Description',
-                              style: NASTypography.titleLg.copyWith(
-                                color: NASColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: NASSpacing.md),
-                        NASInputField(
-                          label: 'Branch Name',
-                          controller: _branchNameController,
-                        ),
-                        const SizedBox(height: NASSpacing.sm),
-                        NASInputField(
-                          label: 'Mission Statement',
-                          maxLines: 3,
-                          controller: _missionController,
-                        ),
-                      ],
+            // Card 2: Contact Details
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _SectionCard(
+                icon: Icons.contact_phone_rounded,
+                title: 'Contact Details',
+                children: [
+                  _inputField('Primary Phone', _phoneController),
+                  const SizedBox(height: 12),
+                  _inputField('Official Email', _emailController),
+                  const SizedBox(height: 12),
+                  _inputField('Website (Optional)', _websiteController),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Card 3: Location Info
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _SectionCard(
+                icon: Icons.location_on_rounded,
+                title: 'Location & Address',
+                children: [
+                  Container(
+                    height: 100,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F8FE),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.map_rounded, color: AppColors.primary, size: 32),
+                          SizedBox(height: 4),
+                          Text('Kamaladi, Kathmandu Map Preview',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: NASSpacing.md),
+                  const SizedBox(height: 12),
+                  _inputField('Physical Address', _addressController),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
 
-                  // Section 2: Contact Details
-                  NASCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            // Card 4: Leader Info
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _SectionCard(
+                icon: Icons.person_rounded,
+                title: 'Branch Leadership Profile',
+                children: [
+                  Center(
+                    child: Stack(
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.contact_phone_outlined,
-                                color: NASColors.primary),
-                            const SizedBox(width: NASSpacing.xs),
-                            Text(
-                              'Contact Details',
-                              style: NASTypography.titleLg.copyWith(
-                                color: NASColors.primary,
-                              ),
-                            ),
-                          ],
+                        CircleAvatar(
+                          radius: 36,
+                          backgroundColor: const Color(0xFFFCEEE4),
+                          child: const Icon(Icons.person_rounded, size: 40, color: AppColors.primary),
                         ),
-                        const SizedBox(height: NASSpacing.md),
-                        NASInputField(
-                          label: 'Primary Phone',
-                          controller: _phoneController,
-                        ),
-                        const SizedBox(height: NASSpacing.sm),
-                        NASInputField(
-                          label: 'Official Email',
-                          controller: _emailController,
-                        ),
-                        const SizedBox(height: NASSpacing.sm),
-                        NASInputField(
-                          label: 'Website (Optional)',
-                          controller: _websiteController,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: NASSpacing.md),
-
-                  // Section 3: Location Info
-                  NASCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined,
-                                color: NASColors.primary),
-                            const SizedBox(width: NASSpacing.xs),
-                            Text(
-                              'Location Info',
-                              style: NASTypography.titleLg.copyWith(
-                                color: NASColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: NASSpacing.sm),
-                        ClipRRect(
-                          borderRadius: NASRadius.defaultBorderRadius,
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
                           child: Container(
-                            height: 120,
-                            width: double.infinity,
-                            color: NASColors.surfaceContainerHigh,
-                            child: const Center(
-                              child: Icon(Icons.map_outlined,
-                                  size: 40, color: NASColors.primary),
-                            ),
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                            child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
                           ),
-                        ),
-                        const SizedBox(height: NASSpacing.md),
-                        NASInputField(
-                          label: 'Address',
-                          controller: _addressController,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: NASSpacing.md),
+                  const SizedBox(height: 16),
+                  _inputField('Leader Name', _leaderNameController),
+                  const SizedBox(height: 12),
+                  _inputField('Leader Bio', _leaderBioController, maxLines: 2),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
 
-                  // Section 4: Leader Info
-                  NASCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.person_outline,
-                                color: NASColors.primary),
-                            const SizedBox(width: NASSpacing.xs),
-                            Text(
-                              'Leader Info',
-                              style: NASTypography.titleLg.copyWith(
-                                color: NASColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: NASSpacing.md),
-
-                        Center(
-                          child: Stack(
-                            children: [
-                              const CircleAvatar(
-                                radius: 40,
-                                backgroundColor: NASColors.surfaceVariant,
-                                child: Icon(Icons.person,
-                                    size: 48, color: NASColors.primary),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: NASColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.camera_alt,
-                                      size: 16, color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: NASSpacing.md),
-
-                        NASInputField(
-                          label: 'Full Name',
-                          controller: _leaderNameController,
-                        ),
-                        const SizedBox(height: NASSpacing.sm),
-                        NASInputField(
-                          label: 'Brief Bio',
-                          maxLines: 2,
-                          controller: _leaderBioController,
-                        ),
-                      ],
+            // Save / Discard Buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => context.go(AppConstants.adminDashboard),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                      ),
+                      child: const Text('Discard', style: TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ),
-                  const SizedBox(height: NASSpacing.lg),
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NASSecondaryButton(
-                          label: 'Discard',
-                          onPressed: () => Navigator.pop(context),
-                        ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _saveSettings,
+                      icon: const Icon(Icons.save_rounded, size: 18),
+                      label: const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.w700)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
                       ),
-                      const SizedBox(width: NASSpacing.sm),
-                      Expanded(
-                        child: NASPrimaryButton(
-                          label: 'Save Changes',
-                          icon: Icons.save_outlined,
-                          onPressed: _saveSettings,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: NASSpacing.xl),
-            const NASFooter(),
           ],
         ),
       ),
-      bottomNavigationBar: NASBottomNav(
-        selectedIndex: 4,
-        onItemTap: (index) {
-          switch (index) {
-            case 0:
-              context.go(AppConstants.adminDashboard);
-            case 1:
-              context.go(AppConstants.adminMembers);
-            case 2:
-              context.go(AppConstants.adminEvents);
-            case 3:
-              context.go(AppConstants.adminGallery);
-            case 4:
-              break;
-          }
-        },
-        items: const [
-          NASNavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'Dashboard'),
-          NASNavItem(icon: Icons.people_outlined, activeIcon: Icons.people, label: 'Members'),
-          NASNavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: 'Events'),
-          NASNavItem(icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library, label: 'Gallery'),
-          NASNavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, label: 'Settings'),
+      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 4),
+    );
+  }
+
+  Widget _inputField(String label, TextEditingController controller, {int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color(0xFFFAFAFA),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SECTION CARD CONTAINER
+// ---------------------------------------------------------------------------
+class _SectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final List<Widget> children;
+
+  const _SectionCard({
+    required this.icon,
+    required this.title,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ...children,
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TOP BAR WITH EXIT BUTTON
+// ---------------------------------------------------------------------------
+class _AdminTopBar extends StatelessWidget {
+  const _AdminTopBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const NasLogo(size: 38),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Nepal Agrawal Samaj',
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Branch Settings',
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// HERO BANNER
+// ---------------------------------------------------------------------------
+class _HeroBanner extends StatelessWidget {
+  const _HeroBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Branch Settings ⚙️',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                const SizedBox(height: 4),
+                Text('Manage Kathmandu Central Branch profile, contact details, map location, and leadership bio.',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
+            child: const Icon(Icons.tune_rounded, color: AppColors.primary, size: 32),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ADMIN BOTTOM NAV
+// ---------------------------------------------------------------------------
+class _AdminBottomNavBar extends StatelessWidget {
+  final int activeIndex;
+  const _AdminBottomNavBar({required this.activeIndex});
+
+  static const _items = [
+    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
+    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
+    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
+    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
+    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -2))],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            for (int i = 0; i < _items.length; i++)
+              Expanded(
+                child: InkWell(
+                  onTap: () => context.go(_items[i].route),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: i == activeIndex
+                            ? BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              )
+                            : null,
+                        child: Icon(
+                          _items[i].icon,
+                          size: 20,
+                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        _items[i].label,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
+                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
