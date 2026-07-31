@@ -265,6 +265,8 @@ class _EventsManagementScreenState extends State<EventsManagementScreen> {
             case 2:
               break;
             case 3:
+              context.go(AppConstants.adminGallery);
+            case 4:
               context.go(AppConstants.adminSettings);
           }
         },
@@ -272,6 +274,7 @@ class _EventsManagementScreenState extends State<EventsManagementScreen> {
           NASNavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'Dashboard'),
           NASNavItem(icon: Icons.people_outlined, activeIcon: Icons.people, label: 'Members'),
           NASNavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: 'Events'),
+          NASNavItem(icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library, label: 'Gallery'),
           NASNavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, label: 'Settings'),
         ],
       ),

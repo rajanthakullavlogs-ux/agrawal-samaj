@@ -220,7 +220,7 @@ class GalleryManagementScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: NASBottomNav(
-        selectedIndex: 0,
+        selectedIndex: 3,
         onItemTap: (index) {
           switch (index) {
             case 0:
@@ -230,6 +230,8 @@ class GalleryManagementScreen extends StatelessWidget {
             case 2:
               context.go(AppConstants.adminEvents);
             case 3:
+              break;
+            case 4:
               context.go(AppConstants.adminSettings);
           }
         },
@@ -237,6 +239,7 @@ class GalleryManagementScreen extends StatelessWidget {
           NASNavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'Dashboard'),
           NASNavItem(icon: Icons.people_outlined, activeIcon: Icons.people, label: 'Members'),
           NASNavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: 'Events'),
+          NASNavItem(icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library, label: 'Gallery'),
           NASNavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, label: 'Settings'),
         ],
       ),

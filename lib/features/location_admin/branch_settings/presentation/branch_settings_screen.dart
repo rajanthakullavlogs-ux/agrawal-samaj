@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/widgets.dart';
 
@@ -285,6 +287,30 @@ class _BranchSettingsScreenState extends State<BranchSettingsScreen> {
             const NASFooter(),
           ],
         ),
+      ),
+      bottomNavigationBar: NASBottomNav(
+        selectedIndex: 4,
+        onItemTap: (index) {
+          switch (index) {
+            case 0:
+              context.go(AppConstants.adminDashboard);
+            case 1:
+              context.go(AppConstants.adminMembers);
+            case 2:
+              context.go(AppConstants.adminEvents);
+            case 3:
+              context.go(AppConstants.adminGallery);
+            case 4:
+              break;
+          }
+        },
+        items: const [
+          NASNavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'Dashboard'),
+          NASNavItem(icon: Icons.people_outlined, activeIcon: Icons.people, label: 'Members'),
+          NASNavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: 'Events'),
+          NASNavItem(icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library, label: 'Gallery'),
+          NASNavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, label: 'Settings'),
+        ],
       ),
     );
   }

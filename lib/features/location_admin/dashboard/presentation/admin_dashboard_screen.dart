@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 
 /// Location Admin Dashboard — /admin/dashboard
-/// Matches the uploaded design: top bar with branch switcher + notification
-/// bell + avatar, greeting hero banner, 2x2 metric grid with sparklines,
-/// Quick Actions row, filterable Recent Activities feed, and the
-/// "Pending Approvals" banner.
-///
-/// Data is hardcoded per the design — wire each section to Supabase
-/// (`profiles`, `events`, `activity_log`, `donations`) as noted inline.
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
 
@@ -22,7 +18,6 @@ enum _ActivityFilter { all, registrations, events, donations, announcements }
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   _ActivityFilter _filter = _ActivityFilter.all;
 
-  // ---- Sample data — replace with Supabase queries ----
   static const _activities = [
     (
       icon: Icons.person_add_alt_1_rounded,
@@ -95,9 +90,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           children: [
             const _AdminTopBar(),
             const SizedBox(height: 14),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const _GreetingHero(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _GreetingHero(),
             ),
             const SizedBox(height: 22),
 
@@ -127,7 +122,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.35,
+                childAspectRatio: 1.15,
                 children: const [
                   _MetricCard(
                     icon: Icons.people_alt_rounded,
@@ -182,47 +177,44 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             const SizedBox(height: 22),
 
-            _sectionHeader('Quick Actions'),
+            _sectionHeader('Quick Actions', onViewAll: () => context.go(AppConstants.adminEvents)),
             const SizedBox(height: 12),
             SizedBox(
               height: 100,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: const [
+                children: [
                   _ActionTile(
                     icon: Icons.person_add_alt_1_rounded,
-                    bg: Color(0xFFE3EEFD),
-                    iconColor: Color(0xFF2E6FE0),
+                    bg: const Color(0xFFE3EEFD),
+                    iconColor: const Color(0xFF2E6FE0),
                     label: 'Approve\nMembers',
+                    onTap: () => context.go(AppConstants.adminMembers),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   _ActionTile(
                     icon: Icons.add_box_rounded,
-                    bg: Color(0xFFFBE0D2),
-                    iconColor: Color(0xFFE8622C),
+                    bg: const Color(0xFFFBE0D2),
+                    iconColor: const Color(0xFFE8622C),
                     label: 'Create\nEvent',
+                    onTap: () => context.go(AppConstants.adminEvents),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   _ActionTile(
-                    icon: Icons.campaign_rounded,
-                    bg: Color(0xFFEFE7FB),
-                    iconColor: Color(0xFF7B4FD6),
-                    label: 'Send\nAnnouncement',
+                    icon: Icons.photo_library_rounded,
+                    bg: const Color(0xFFEFE7FB),
+                    iconColor: const Color(0xFF7B4FD6),
+                    label: 'Manage\nGallery',
+                    onTap: () => context.go(AppConstants.adminGallery),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   _ActionTile(
-                    icon: Icons.volunteer_activism_rounded,
-                    bg: Color(0xFFD8F0DE),
-                    iconColor: Color(0xFF3E7C4A),
-                    label: 'Record\nDonation',
-                  ),
-                  SizedBox(width: 10),
-                  _ActionTile(
-                    icon: Icons.bar_chart_rounded,
-                    bg: Color(0xFFFBE3E3),
-                    iconColor: Color(0xFFD64545),
-                    label: 'View\nReports',
+                    icon: Icons.settings_rounded,
+                    bg: const Color(0xFFD8F0DE),
+                    iconColor: const Color(0xFF3E7C4A),
+                    label: 'Branch\nSettings',
+                    onTap: () => context.go(AppConstants.adminSettings),
                   ),
                 ],
               ),
@@ -271,29 +263,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             const SizedBox(height: 20),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const _PendingApprovalsBanner(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _PendingApprovalsBanner(),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 2),
+      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 0),
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(String title, {VoidCallback? onViewAll}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-          Row(
-            children: const [
-              Text('View All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary)),
-              Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.primary),
-            ],
+          GestureDetector(
+            onTap: onViewAll,
+            child: Row(
+              children: const [
+                Text('View All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary)),
+                Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.primary),
+              ],
+            ),
           ),
         ],
       ),
@@ -326,7 +321,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// TOP BAR: hamburger • logo + branch title + dropdown • bell w/ badge • avatar
+// TOP BAR: Exit Home • Logo • Branch title • Notification • Avatar
 // ---------------------------------------------------------------------------
 class _AdminTopBar extends StatelessWidget {
   const _AdminTopBar();
@@ -334,61 +329,119 @@ class _AdminTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Button to Exit Admin & Return to Home Screen
           InkWell(
-            onTap: () {
-              final scaffoldState = Scaffold.maybeOf(context);
-              if (scaffoldState?.hasDrawer ?? false) {
-                scaffoldState?.openDrawer();
-              }
-            },
-            child: const Icon(Icons.menu_rounded, size: 26, color: AppColors.textPrimary),
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.home_rounded,
+                size: 22,
+                color: AppColors.primary,
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
-          const NasLogo(size: 46),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
+          const NasLogo(size: 38),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Nepal Agrawal Samaj',
-                    style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 16)),
+                const Text(
+                  'Nepal Agrawal Samaj',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Kathmandu Branch Admin',
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5, fontWeight: FontWeight.w500)),
-                    Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Colors.grey.shade600),
+                    Flexible(
+                      child: Text(
+                        'Kathmandu Branch',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 14,
+                      color: Colors.grey.shade600,
+                    ),
                   ],
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 6),
+          // Notifications Bell
           Stack(
             clipBehavior: Clip.none,
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 36,
+                height: 36,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade100),
-                child: const Icon(Icons.notifications_none_rounded, size: 20, color: AppColors.textPrimary),
+                child: const Icon(Icons.notifications_none_rounded, size: 18, color: AppColors.textPrimary),
               ),
               Positioned(
                 top: -2,
                 right: -2,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(color: Color(0xFFD64545), shape: BoxShape.circle),
-                  child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                  child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 10),
-          const CircleAvatar(radius: 20, backgroundColor: Color(0xFFDDD7CE)),
+          const SizedBox(width: 6),
+          // Exit Admin Button Label Chip
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text(
+                    'Exit',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -406,7 +459,7 @@ class _GreetingHero extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
-        height: 165,
+        height: 150,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
@@ -416,35 +469,33 @@ class _GreetingHero extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Background temple/mountain art — swap for the real photo asset.
             Positioned(
               right: -10,
               bottom: -10,
               child: Opacity(
                 opacity: 0.9,
-                child: Icon(Icons.temple_hindu_rounded, size: 150, color: AppColors.primary.withValues(alpha: 0.35)),
+                child: Icon(Icons.temple_hindu_rounded, size: 140, color: AppColors.primary.withValues(alpha: 0.35)),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: const [
                       Text('Namaste, Administrator',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
                       SizedBox(width: 6),
-                      Text('🙏', style: TextStyle(fontSize: 20)),
+                      Text('🙏', style: TextStyle(fontSize: 18)),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   SizedBox(
-                    width: 230,
+                    width: 220,
                     child: Text(
-                      "Manage the Kathmandu chapter's activities, members and events "
-                      'from your command center.',
-                      style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700, height: 1.4),
+                      "Manage the Kathmandu chapter's activities, members and events from your command center.",
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35),
                     ),
                   ),
                 ],
@@ -488,37 +539,42 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(AppRadius.lg)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 34,
-                height: 34,
+                width: 30,
+                height: 30,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-                child: Icon(icon, size: 17, color: iconColor),
+                child: Icon(icon, size: 15, color: iconColor),
               ),
-              SizedBox(width: 46, height: 24, child: CustomPaint(painter: _SparklinePainter(sparkPoints, sparkColor))),
+              SizedBox(width: 44, height: 20, child: CustomPaint(painter: _SparklinePainter(sparkPoints, sparkColor))),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(title, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-          const SizedBox(height: 4),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+              Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+            ],
+          ),
           Row(
             children: [
-              Icon(Icons.arrow_upward_rounded, size: 11, color: trendColor),
+              Icon(Icons.arrow_upward_rounded, size: 10, color: trendColor),
               const SizedBox(width: 2),
               Expanded(
-                child: Text(trend,
-                    style: TextStyle(fontSize: 10, color: trendColor, fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.ellipsis),
+                child: Text(
+                  trend,
+                  style: TextStyle(fontSize: 9.5, color: trendColor, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -573,26 +629,34 @@ class _ActionTile extends StatelessWidget {
   final Color bg;
   final Color iconColor;
   final String label;
-  const _ActionTile({required this.icon, required this.bg, required this.iconColor, required this.label});
+  final VoidCallback onTap;
+
+  const _ActionTile({
+    required this.icon,
+    required this.bg,
+    required this.iconColor,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
         width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 24, color: iconColor),
-            const SizedBox(height: 8),
+            Icon(icon, size: 22, color: iconColor),
+            const SizedBox(height: 6),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary, height: 1.2),
+              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary, height: 1.2),
             ),
           ],
         ),
@@ -627,21 +691,25 @@ class _ActivityItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 36,
+            height: 36,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: activity.iconBg, shape: BoxShape.circle),
-            child: Icon(activity.icon, size: 18, color: activity.iconColor),
+            child: Icon(activity.icon, size: 17, color: activity.iconColor),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(activity.title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                Text(activity.title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                 const SizedBox(height: 2),
-                Text(activity.subtitle,
-                    style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(
+                  activity.subtitle,
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -649,12 +717,12 @@ class _ActivityItem extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(activity.time, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
-              Text(activity.date, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+              Text(activity.time, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
+              Text(activity.date, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
             ],
           ),
           const SizedBox(width: 6),
-          Container(width: 7, height: 7, decoration: BoxDecoration(color: activity.dotColor, shape: BoxShape.circle)),
+          Container(width: 6, height: 6, decoration: BoxDecoration(color: activity.dotColor, shape: BoxShape.circle)),
         ],
       ),
     );
@@ -678,38 +746,38 @@ class _PendingApprovalsBanner extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.groups_2_rounded, color: Colors.white, size: 22),
+            child: const Icon(Icons.groups_2_rounded, color: Colors.white, size: 20),
           ),
-          const SizedBox(width: 12),
-          const Expanded(
+          const SizedBox(width: 10),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+              children: const [
+                Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
                 SizedBox(height: 2),
-                Text('8 members awaiting approval', style: TextStyle(color: Colors.white70, fontSize: 11.5)),
+                Text('8 members awaiting approval', style: TextStyle(color: Colors.white70, fontSize: 11)),
               ],
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () => context.go(AppConstants.adminMembers),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: AppColors.primary,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Text('Review Now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 14),
+                Text('Review', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                SizedBox(width: 2),
+                Icon(Icons.arrow_forward_rounded, size: 12),
               ],
             ),
           ),
@@ -720,18 +788,18 @@ class _PendingApprovalsBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// ADMIN BOTTOM NAV: Home • Events • Dashboard • Members • More
+// ADMIN BOTTOM NAV: Dashboard • Members • Events • Gallery • Settings
 // ---------------------------------------------------------------------------
 class _AdminBottomNavBar extends StatelessWidget {
   final int activeIndex;
   const _AdminBottomNavBar({required this.activeIndex});
 
   static const _items = [
-    (icon: Icons.home_rounded, label: 'Home'),
-    (icon: Icons.event_rounded, label: 'Events'),
-    (icon: Icons.grid_view_rounded, label: 'Dashboard'),
-    (icon: Icons.people_alt_rounded, label: 'Members'),
-    (icon: Icons.more_horiz_rounded, label: 'More'),
+    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
+    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
+    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
+    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
+    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
   ];
 
   @override
@@ -749,15 +817,15 @@ class _AdminBottomNavBar extends StatelessWidget {
             for (int i = 0; i < _items.length; i++)
               Expanded(
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () => context.go(_items[i].route),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: i == activeIndex
                             ? BoxDecoration(
-                                border: Border.all(color: AppColors.border),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               )
                             : null,
@@ -772,7 +840,7 @@ class _AdminBottomNavBar extends StatelessWidget {
                         _items[i].label,
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w400,
+                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
                           color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
                         ),
                       ),
