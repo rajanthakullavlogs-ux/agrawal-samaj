@@ -66,5 +66,18 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Nepal Agrawal Samaj needs access to photo library to select photos for gallery and profile.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Nepal Agrawal Samaj needs access to camera to capture photos for gallery and profile.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Nepal Agrawal Samaj needs access to microphone when capturing videos.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>
