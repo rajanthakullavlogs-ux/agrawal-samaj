@@ -14,6 +14,8 @@ class LocationsListScreen extends ConsumerStatefulWidget {
 }
 
 class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
+  String _searchQuery = '';
+
   static const _branches = [
     (
       name: 'Kathmandu Branch',
@@ -40,6 +42,12 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final filtered = _searchQuery.isEmpty
+        ? _branches
+        : _branches.where((b) =>
+            b.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            b.address.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const NASAppBar(title: 'Locations', showBackButton: true),
@@ -68,45 +76,39 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Search bar + Filter button row
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.search_rounded, size: 18, color: Colors.grey.shade400),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Search by city or branch',
-                                style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                              ),
-                            ),
-                          ],
+                // Working Search bar
+                Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search_rounded, size: 18, color: Colors.grey.shade400),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (v) => setState(() => _searchQuery = v),
+                          decoration: InputDecoration(
+                            hintText: 'Search by city or branch',
+                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          style: const TextStyle(fontSize: 13),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: const Icon(Icons.tune_rounded, size: 18, color: AppColors.primary),
-                    ),
-                  ],
+                      if (_searchQuery.isNotEmpty)
+                        GestureDetector(
+                          onTap: () => setState(() => _searchQuery = ''),
+                          child: Icon(Icons.close_rounded, size: 16, color: Colors.grey.shade500),
+                        ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -141,10 +143,10 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           ),
           const SizedBox(height: 10),
 
-          ...List.generate(_branches.length, (i) {
+          ...List.generate(filtered.length, (i) {
             return Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-              child: _BranchCard(branch: _branches[i]),
+              child: _BranchCard(branch: filtered[i]),
             );
           }),
         ],

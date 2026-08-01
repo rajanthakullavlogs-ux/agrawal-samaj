@@ -96,80 +96,80 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
-      // ── Public Routes (bottom nav tabs use go) ─────────────
+      // ── Public Routes (bottom nav tabs use go — no animation) ─────
       GoRoute(
         path: AppConstants.home,
-        builder: (_, _) => const HomeScreen(),
+        pageBuilder: (_, _) => const NoTransitionPage(child: HomeScreen()),
       ),
       GoRoute(
         path: AppConstants.about,
-        builder: (_, _) => const AboutScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const AboutScreen()),
       ),
       GoRoute(
         path: AppConstants.events,
-        builder: (_, _) => const EventsListScreen(),
+        pageBuilder: (_, _) => const NoTransitionPage(child: EventsListScreen()),
       ),
       GoRoute(
         path: AppConstants.eventDetail,
-        builder: (_, state) => EventDetailScreen(
-          eventId: state.pathParameters['id'] ?? 'ev-1',
+        pageBuilder: (_, state) => _slideTransitionPage(
+          EventDetailScreen(eventId: state.pathParameters['id'] ?? 'ev-1'),
         ),
       ),
       GoRoute(
         path: AppConstants.gallery,
-        builder: (_, _) => const GalleryListScreen(),
+        pageBuilder: (_, _) => const NoTransitionPage(child: GalleryListScreen()),
       ),
       GoRoute(
         path: AppConstants.galleryDetail,
-        builder: (_, state) => GalleryDetailScreen(
-          galleryId: state.pathParameters['id'] ?? 'gal-1',
+        pageBuilder: (_, state) => _slideTransitionPage(
+          GalleryDetailScreen(galleryId: state.pathParameters['id'] ?? 'gal-1'),
         ),
       ),
       GoRoute(
         path: AppConstants.locations,
-        builder: (_, _) => const LocationsListScreen(),
+        pageBuilder: (_, _) => const NoTransitionPage(child: LocationsListScreen()),
       ),
       GoRoute(
         path: AppConstants.locationProfile,
-        builder: (_, state) => LocationProfileScreen(
-          locationId: state.pathParameters['id'] ?? 'loc-1',
+        pageBuilder: (_, state) => _slideTransitionPage(
+          LocationProfileScreen(locationId: state.pathParameters['id'] ?? 'loc-1'),
         ),
       ),
       GoRoute(
         path: AppConstants.membershipSelector,
-        builder: (_, _) => const MembershipSelectorScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const MembershipSelectorScreen()),
       ),
       GoRoute(
         path: AppConstants.normalRegistration,
-        builder: (_, _) => const NormalRegistrationScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const NormalRegistrationScreen()),
       ),
       GoRoute(
         path: AppConstants.businessRegistration,
-        builder: (_, _) => const BusinessRegistrationScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const BusinessRegistrationScreen()),
       ),
       GoRoute(
         path: AppConstants.contact,
-        builder: (_, _) => const ContactScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const ContactScreen()),
       ),
       GoRoute(
         path: AppConstants.login,
-        builder: (_, _) => const LoginScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const LoginScreen()),
       ),
       GoRoute(
         path: AppConstants.signup,
-        builder: (_, _) => const SignUpScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const SignUpScreen()),
       ),
       GoRoute(
         path: AppConstants.forgotPassword,
-        builder: (_, _) => const ForgotPasswordScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const ForgotPasswordScreen()),
       ),
       GoRoute(
         path: AppConstants.profile,
-        builder: (_, _) => const ProfileScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const ProfileScreen()),
       ),
       GoRoute(
         path: '${AppConstants.profile}/edit',
-        builder: (_, _) => const ProfileEditScreen(),
+        pageBuilder: (_, _) => _slideTransitionPage(const ProfileEditScreen()),
       ),
       GoRoute(
         path: AppConstants.unauthorized,
@@ -230,3 +230,22 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Slide-from-right on push, slide-from-left on pop — natural page transitions.
+CustomTransitionPage<void> _slideTransitionPage(Widget child) {
+  return CustomTransitionPage<void>(
+    child: child,
+    transitionDuration: const Duration(milliseconds: 250),
+    reverseTransitionDuration: const Duration(milliseconds: 250),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final offsetTween = Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeInOut));
+      return SlideTransition(
+        position: animation.drive(offsetTween),
+        child: child,
+      );
+    },
+  );
+}

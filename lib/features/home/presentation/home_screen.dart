@@ -33,9 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: [
             HeroSection(
-              onBecomeMember: () => context.go(AppConstants.membershipSelector),
-              onExploreEvents: () => context.go(AppConstants.events),
-              onBellTap: () {},
+              onBecomeMember: () => context.push(AppConstants.membershipSelector),
+              onExploreEvents: () => context.push(AppConstants.events),
+              onBellTap: () => _showNotificationsSheet(context),
               onProfileTap: () => context.push(AppConstants.profile),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -54,21 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: AppSpacing.lg),
             _SectionHeader(
               title: 'What We Do',
-              onViewAll: () => context.go(AppConstants.about),
+              onViewAll: () => context.push(AppConstants.events),
               padded: true,
             ),
             const SizedBox(height: AppSpacing.sm),
             const _WhatWeDoGrid(),
             const SizedBox(height: AppSpacing.lg),
             const _JoinCommunityBanner(),
-            const SizedBox(height: AppSpacing.xl),
-            _SectionHeader(
-              title: 'Upcoming Events',
-              onViewAll: () => context.go(AppConstants.events),
-              padded: true,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            const _UpcomingEventsHorizontalList(),
             const SizedBox(height: AppSpacing.xl),
             _SectionHeader(
               title: 'Our Locations',
@@ -100,6 +92,70 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: const NASBottomNavBar(activeIndex: 0),
     );
   }
+}
+
+void _showNotificationsSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) => Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.notifications_active_rounded, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              const Text('Notifications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const Spacer(),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Close', style: TextStyle(fontSize: 13)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _notifTile(Icons.event_available_rounded, const Color(0xFFE3EEFD), const Color(0xFF2E6FE0),
+              'Upcoming: Annual Heritage Gala', '2 days away • Kathmandu'),
+          const Divider(height: 20),
+          _notifTile(Icons.person_add_alt_1_rounded, const Color(0xFFE5F5E9), const Color(0xFF3E7C4A),
+              'Membership Approved', 'Welcome to Nepal Agrawal Samaj!'),
+          const Divider(height: 20),
+          _notifTile(Icons.photo_library_rounded, const Color(0xFFEFE7FB), const Color(0xFF7B4FD6),
+              'New Gallery Upload', '12 photos from Dashain 2025 added'),
+          const SizedBox(height: 10),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _notifTile(IconData icon, Color bg, Color color, String title, String subtitle) {
+  return Row(
+    children: [
+      Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: color),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+            const SizedBox(height: 2),
+            Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -827,7 +883,7 @@ class _AboutSection extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           OutlinedButton(
-            onPressed: () => context.go(AppConstants.about),
+            onPressed: () => context.push(AppConstants.about),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               side: const BorderSide(color: AppColors.border),
@@ -1017,146 +1073,7 @@ class _JoinCommunityBanner extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// UPCOMING EVENTS — horizontal list w/ date badge
-// ---------------------------------------------------------------------------
-class _UpcomingEventsHorizontalList extends StatelessWidget {
-  const _UpcomingEventsHorizontalList();
 
-  static const _events = [
-    (
-      month: 'AUG',
-      day: '20',
-      title: 'Annual Business Summit 2026',
-      time: '10:00 AM - 4:00 PM',
-      place: 'Kathmandu',
-      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-    ),
-    (
-      month: 'SEP',
-      day: '05',
-      title: 'Teej Cultural Celebration',
-      time: '11:00 AM - 3:00 PM',
-      place: 'Pokhara',
-      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-    ),
-    (
-      month: 'SEP',
-      day: '18',
-      title: 'Mega Blood Donation Drive',
-      time: '9:00 AM - 1:00 PM',
-      place: 'Biratnagar',
-      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        itemCount: _events.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final e = _events[i];
-          return Container(
-            width: 160,
-            decoration: BoxDecoration(
-              color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              boxShadow: AppShadow.card,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
-                      child: SizedBox(
-                        height: 110,
-                        width: double.infinity,
-                        child: _networkImage(url: e.imageUrl, fit: BoxFit.cover),
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(e.month,
-                                style: const TextStyle(
-                                    fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.badgeMaroon)),
-                            Text(e.day,
-                                style: const TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.badgeMaroon)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(e.title,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 4),
-                      Row(children: [
-                        const Icon(Icons.access_time_rounded, size: 11, color: AppColors.accent),
-                        const SizedBox(width: 3),
-                        Expanded(
-                          child: Text(e.time,
-                              style: AppText.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ),
-                      ]),
-                      const SizedBox(height: 2),
-                      Row(children: [
-                        const Icon(Icons.location_on_rounded, size: 11, color: AppColors.accent),
-                        const SizedBox(width: 3),
-                        Expanded(
-                          child: Text(e.place,
-                              style: AppText.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ),
-                      ]),
-                      const SizedBox(height: 6),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 30,
-                        child: ElevatedButton(
-                          onPressed: () => context.go(AppConstants.events),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            elevation: 0,
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                          ),
-                          child: const Text('Register Now', style: TextStyle(fontSize: 11)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
 
 // ---------------------------------------------------------------------------
 // OUR LOCATIONS — Nepal map placeholder + pins

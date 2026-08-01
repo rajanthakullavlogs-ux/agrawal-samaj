@@ -25,7 +25,7 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NASAppBar(title: 'More', showBackButton: true),
+      appBar: const NASAppBar(title: 'About Us', showBackButton: true),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
@@ -36,7 +36,7 @@ class AboutScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'More',
+                  'About Us',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
