@@ -1,13 +1,56 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/design_tokens.dart';
 import '../../../shared/widgets/widgets.dart';
 
 enum _GalleryCategory { all, business, cultural, socialWork }
 
-/// Gallery Screen — Matches the exact uploaded design screenshot
+class _GalleryPhoto {
+  final String id;
+  final String url;
+  final String title;
+  final _GalleryCategory category;
+  final String eventId;
+  final String eventTitle;
+  final String eventDate;
+  final String venue;
+
+  const _GalleryPhoto({
+    required this.id,
+    required this.url,
+    required this.title,
+    required this.category,
+    required this.eventId,
+    required this.eventTitle,
+    required this.eventDate,
+    required this.venue,
+  });
+}
+
+class _GalleryAlbum {
+  final String id;
+  final String title;
+  final String count;
+  final IconData icon;
+  final String imageUrl;
+  final _GalleryCategory category;
+  final String eventId;
+
+  const _GalleryAlbum({
+    required this.id,
+    required this.title,
+    required this.count,
+    required this.icon,
+    required this.imageUrl,
+    required this.category,
+    required this.eventId,
+  });
+}
+
+/// Gallery Screen — Fully functional with live filtering, full-screen zoom, and event info integration
 class GalleryListScreen extends ConsumerStatefulWidget {
   const GalleryListScreen({super.key});
 
@@ -18,47 +61,148 @@ class GalleryListScreen extends ConsumerStatefulWidget {
 class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
   _GalleryCategory _category = _GalleryCategory.all;
 
-  static const _highlightPhotos = [
-    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
+  static const List<_GalleryPhoto> _allPhotos = [
+    _GalleryPhoto(
+      id: 'p1',
+      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+      title: 'Business Summit Keynote Presentation',
+      category: _GalleryCategory.business,
+      eventId: 'ev-2',
+      eventTitle: 'Entrepreneurship & Trade Summit',
+      eventDate: 'Oct 22, 2026',
+      venue: 'Samaj Hall, Kamaladi',
+    ),
+    _GalleryPhoto(
+      id: 'p2',
+      url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+      title: 'Blood Donation Camp Volunteers',
+      category: _GalleryCategory.socialWork,
+      eventId: 'ev-4',
+      eventTitle: 'Senior Wellness & Health Camp',
+      eventDate: 'Oct 28, 2026',
+      venue: 'Central Clinic Wing, Kathmandu',
+    ),
+    _GalleryPhoto(
+      id: 'p3',
+      url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
+      title: 'Annual Heritage Gala Dance Performance',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-1',
+      eventTitle: 'Annual Heritage Gala 2026',
+      eventDate: 'Oct 15, 2026',
+      venue: 'Hotel Yak & Yeti, Kathmandu',
+    ),
+    _GalleryPhoto(
+      id: 'p4',
+      url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      title: 'Community Networking Dinner',
+      category: _GalleryCategory.business,
+      eventId: 'ev-2',
+      eventTitle: 'Entrepreneurship & Trade Summit',
+      eventDate: 'Oct 22, 2026',
+      venue: 'Samaj Hall, Kamaladi',
+    ),
+    _GalleryPhoto(
+      id: 'p5',
+      url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
+      title: 'Youth Cultural Fest Stage Program',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-3',
+      eventTitle: 'Youth Cultural Fest 2026',
+      eventDate: 'Nov 05, 2026',
+      venue: 'National Stadium, Tripureshwor',
+    ),
+    _GalleryPhoto(
+      id: 'p6',
+      url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
+      title: 'Teej Puja Ceremonies',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-1',
+      eventTitle: 'Annual Heritage Gala 2026',
+      eventDate: 'Oct 15, 2026',
+      venue: 'Hotel Yak & Yeti, Kathmandu',
+    ),
+    _GalleryPhoto(
+      id: 'p7',
+      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+      title: 'Agrawal Entrepreneurs Panel Discussion',
+      category: _GalleryCategory.business,
+      eventId: 'ev-2',
+      eventTitle: 'Entrepreneurship & Trade Summit',
+      eventDate: 'Oct 22, 2026',
+      venue: 'Samaj Hall, Kamaladi',
+    ),
+    _GalleryPhoto(
+      id: 'p8',
+      url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+      title: 'Free Health Checkup Ward',
+      category: _GalleryCategory.socialWork,
+      eventId: 'ev-4',
+      eventTitle: 'Senior Wellness & Health Camp',
+      eventDate: 'Oct 28, 2026',
+      venue: 'Central Clinic Wing, Kathmandu',
+    ),
+    _GalleryPhoto(
+      id: 'p9',
+      url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      title: 'Youth Leadership Workshop',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-3',
+      eventTitle: 'Youth Cultural Fest 2026',
+      eventDate: 'Nov 05, 2026',
+      venue: 'National Stadium, Tripureshwor',
+    ),
   ];
 
-  static const _albums = [
-    (
+  static const List<_GalleryAlbum> _allAlbums = [
+    _GalleryAlbum(
+      id: 'gal-1',
       title: 'Business Summit\n2026',
       count: '45 Photos',
       icon: Icons.work_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
+      category: _GalleryCategory.business,
+      eventId: 'ev-2',
     ),
-    (
-      title: 'Teej Celebration\n2081',
+    _GalleryAlbum(
+      id: 'gal-2',
+      title: 'Heritage Gala\n2026',
       count: '68 Photos',
       icon: Icons.theater_comedy_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-1',
     ),
-    (
-      title: 'Blood Donation\nDrive',
+    _GalleryAlbum(
+      id: 'gal-3',
+      title: 'Health & Blood\nDrive',
       count: '32 Photos',
       icon: Icons.volunteer_activism_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
+      category: _GalleryCategory.socialWork,
+      eventId: 'ev-4',
     ),
-    (
-      title: 'Community\nGathering',
+    _GalleryAlbum(
+      id: 'gal-4',
+      title: 'Youth Cultural\nFest',
       count: '56 Photos',
       icon: Icons.groups_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
+      category: _GalleryCategory.cultural,
+      eventId: 'ev-3',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final filteredPhotos = _category == _GalleryCategory.all
+        ? _allPhotos
+        : _allPhotos.where((p) => p.category == _category).toList();
+
+    final filteredAlbums = _category == _GalleryCategory.all
+        ? _allAlbums
+        : _allAlbums.where((a) => a.category == _category).toList();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const NASAppBar(title: 'Gallery', showBackButton: true),
@@ -94,40 +238,70 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
             onChanged: (c) => setState(() => _category = c),
           ),
           const SizedBox(height: 20),
-          _sectionHeader('Photo Highlights'),
+          _sectionHeader('Photo Highlights', count: filteredPhotos.length),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _highlightPhotos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 1,
-              ),
-              itemBuilder: (context, i) => _PhotoThumb(url: _highlightPhotos[i]),
-            ),
+            child: filteredPhotos.isEmpty
+                ? Container(
+                    padding: const EdgeInsets.all(24),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: const Text('No photos found for this category',
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: filteredPhotos.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (context, i) {
+                      final photo = filteredPhotos[i];
+                      return GestureDetector(
+                        onTap: () => _showZoomableLightbox(context, photo),
+                        child: _PhotoThumb(photo: photo),
+                      );
+                    },
+                  ),
           ),
-          const SizedBox(height: 20),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _EventAlbumsBanner(),
-          ),
-          const SizedBox(height: 20),
-          _sectionHeader('Recent Albums'),
+          const SizedBox(height: 24),
+          _sectionHeader('Recent Albums', count: filteredAlbums.length),
           const SizedBox(height: 12),
           SizedBox(
             height: 195,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _albums.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => _AlbumCard(album: _albums[i]),
-            ),
+            child: filteredAlbums.isEmpty
+                ? Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(24),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: const Text('No albums found for this category',
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                  )
+                : ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: filteredAlbums.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 12),
+                    itemBuilder: (context, i) {
+                      final album = filteredAlbums[i];
+                      return GestureDetector(
+                        onTap: () => context.push('/gallery/${album.id}'),
+                        child: _AlbumCard(album: album),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -135,19 +309,151 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(String title, {required int count}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppText.h2),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(foregroundColor: AppColors.primary, padding: EdgeInsets.zero),
-            child: const Text('View All', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-          ),
+          Text('$title ($count)', style: AppText.h2),
         ],
+      ),
+    );
+  }
+
+  void _showZoomableLightbox(BuildContext context, _GalleryPhoto photo) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: const EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top Bar with Close button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      photo.title,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: Colors.white),
+                    onPressed: () => Navigator.pop(dialogContext),
+                  ),
+                ],
+              ),
+            ),
+
+            // Zoomable Image View (Pinch to zoom / double tap)
+            Flexible(
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 450),
+                child: InteractiveViewer(
+                  minScale: 1.0,
+                  maxScale: 4.0,
+                  child: CachedNetworkImage(
+                    imageUrl: photo.url,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.broken_image_rounded, size: 64, color: Colors.white54),
+                  ),
+                ),
+              ),
+            ),
+
+            // Event Info Reference Card
+            Container(
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.event_note_rounded, color: AppColors.accent, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          photo.eventTitle,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, color: Colors.white54, size: 12),
+                      const SizedBox(width: 4),
+                      Text(photo.eventDate, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                      const SizedBox(width: 12),
+                      const Icon(Icons.location_on_rounded, color: Colors.white54, size: 12),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(photo.venue,
+                            style: const TextStyle(color: Colors.white70, fontSize: 11),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                            context.push('/events/${photo.eventId}');
+                          },
+                          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                          label: const Text('View Event Details', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Opening website coverage for ${photo.eventTitle}...')),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.white38),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+                        ),
+                        child: const Icon(Icons.language_rounded, size: 18),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -218,8 +524,8 @@ class _CategoryRow extends StatelessWidget {
 // PHOTO THUMBNAIL
 // ---------------------------------------------------------------------------
 class _PhotoThumb extends StatelessWidget {
-  final String url;
-  const _PhotoThumb({required this.url});
+  final _GalleryPhoto photo;
+  const _PhotoThumb({required this.photo});
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +535,7 @@ class _PhotoThumb extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           CachedNetworkImage(
-            imageUrl: url,
+            imageUrl: photo.url,
             fit: BoxFit.cover,
             placeholder: (context, url) => Container(color: AppColors.subtleCard),
           ),
@@ -243,61 +549,8 @@ class _PhotoThumb extends StatelessWidget {
                 color: Colors.black.withValues(alpha: 0.60),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.photo_camera_rounded, size: 11, color: Colors.white),
+              child: const Icon(Icons.zoom_in_rounded, size: 12, color: Colors.white),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// EVENT ALBUMS BANNER
-// ---------------------------------------------------------------------------
-class _EventAlbumsBanner extends StatelessWidget {
-  const _EventAlbumsBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.accentLight,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Event Albums',
-                  style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w800, fontSize: 14),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Explore photos from our past events',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-            child: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.accent),
           ),
         ],
       ),
@@ -309,7 +562,7 @@ class _EventAlbumsBanner extends StatelessWidget {
 // ALBUM CARD
 // ---------------------------------------------------------------------------
 class _AlbumCard extends StatelessWidget {
-  final ({String title, String count, IconData icon, String imageUrl}) album;
+  final _GalleryAlbum album;
   const _AlbumCard({required this.album});
 
   @override
