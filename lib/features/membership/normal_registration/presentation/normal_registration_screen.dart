@@ -175,17 +175,19 @@ class _NormalRegistrationScreenState
                           ),
                           const SizedBox(height: NASSpacing.sm),
 
-                          // Location Dropdown
+                          // Location / Chapter Dropdown
                           NASSelectField<String>(
-                            label: 'Regional Chapter',
-                            hint: 'Select your chapter/province',
+                            label: 'Regional Chapter *',
+                            hint: 'Select your local chapter / province',
                             value: _selectedLocation,
                             items: const [
-                              DropdownMenuItem(value: 'kathmandu', child: Text('Kathmandu Chapter')),
-                              DropdownMenuItem(value: 'birgunj', child: Text('Birgunj Chapter')),
-                              DropdownMenuItem(value: 'biratnagar', child: Text('Biratnagar Chapter')),
-                              DropdownMenuItem(value: 'pokhara', child: Text('Pokhara Chapter')),
+                              DropdownMenuItem(value: 'kathmandu', child: Text('Kathmandu Chapter (Bagmati)')),
+                              DropdownMenuItem(value: 'birgunj', child: Text('Birgunj Chapter (Madhesh)')),
+                              DropdownMenuItem(value: 'biratnagar', child: Text('Biratnagar Chapter (Koshi)')),
+                              DropdownMenuItem(value: 'pokhara', child: Text('Pokhara Chapter (Gandaki)')),
+                              DropdownMenuItem(value: 'butwal', child: Text('Butwal Chapter (Lumbini)')),
                             ],
+                            validator: (v) => v == null || v.isEmpty ? 'Please select your regional chapter' : null,
                             onChanged: (val) => setState(() => _selectedLocation = val),
                           ),
                           const SizedBox(height: NASSpacing.md),
