@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants.dart';
-import '../../../core/design_tokens.dart';
 import '../../../shared/widgets/widgets.dart';
 
-/// Home Screen — Matches the new "Nepal Agrawal Samaj" design image & spec exactly.
+/// Refactored HomeScreen matching the exact pixel-perfect design provided in screenshot.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,75 +14,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _eventPage = 0;
-  final PageController _eventPageController = PageController(viewportFraction: 0.72);
-
-  static const List<_EventData> _events = [
-    _EventData(
-      id: 'ev-1',
-      month: 'MAY',
-      day: '25',
-      title: 'Guru Purnima Satsang',
-      time: '5:00 PM',
-      location: 'Kathmandu',
-      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
-      imageIcon: Icons.local_fire_department_rounded,
-      imageColor: Color(0xFFB8622B),
-    ),
-    _EventData(
-      id: 'ev-4',
-      month: 'JUN',
-      day: '08',
-      title: 'Blood Donation Camp',
-      time: '10:00 AM',
-      location: 'Biratnagar Branch',
-      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
-      imageIcon: Icons.favorite_rounded,
-      imageColor: Color(0xFFC0392B),
-    ),
-    _EventData(
-      id: 'ev-2',
-      month: 'JUN',
-      day: '22',
-      title: 'Youth Entrepreneurship Seminar',
-      time: '11:00 AM',
-      location: 'Lalitpur',
-      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-      imageIcon: Icons.groups_2_rounded,
-      imageColor: Color(0xFF34495E),
-    ),
-  ];
-
-  static const List<_CommunityPost> _posts = [
-    _CommunityPost(
-      title: 'Mahila Sashaktikaran Program',
-      timeAgo: '2d ago',
-      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-      imageIcon: Icons.diversity_1_rounded,
-      imageColor: Color(0xFFD4A017),
-    ),
-    _CommunityPost(
-      title: 'Tree Plantation Drive',
-      timeAgo: '5d ago',
-      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-      imageIcon: Icons.park_rounded,
-      imageColor: Color(0xFF2E7D32),
-    ),
-    _CommunityPost(
-      title: 'Business Networking Meet',
-      timeAgo: '1w ago',
-      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-      imageIcon: Icons.business_center_rounded,
-      imageColor: Color(0xFF34495E),
-    ),
-    _CommunityPost(
-      title: 'Teej Celebration',
-      timeAgo: '2w ago',
-      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-      imageIcon: Icons.celebration_rounded,
-      imageColor: Color(0xFF8E2A3B),
-    ),
-  ];
+  final PageController _eventPageController = PageController(viewportFraction: 0.88);
+  int _eventPageIndex = 0;
 
   @override
   void dispose() {
@@ -94,107 +26,41 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
+      backgroundColor: const Color(0xFFF9F7F5),
+      body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Header banner
-            _TopHeader(
+            // Top Burgundy Curved Header + Hero Banner Card
+            _HeaderSection(
               onBellTap: () => _showNotificationsSheet(context),
               onProfileTap: () => context.push(AppConstants.profile),
+              onBecomeMember: () => context.push(AppConstants.membershipSelector),
+              onExploreEvents: () => context.push(AppConstants.events),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 16),
-                    _HeroSection(
-                      onBecomeMember: () => context.push(AppConstants.membershipSelector),
-                      onExploreEvents: () => context.push(AppConstants.events),
-                    ),
-                    const SizedBox(height: 16),
-                    _StatsRow(
-                      onStatTap: (type) {
-                        if (type == 'locations') {
-                          context.go(AppConstants.locations);
-                        } else if (type == 'events') {
-                          context.go(AppConstants.events);
-                        } else {
-                          context.push(AppConstants.membershipSelector);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    _SectionHeader(
-                      title: 'Upcoming Events',
-                      onSeeAll: () => context.go(AppConstants.events),
-                    ),
-                    SizedBox(
-                      height: 330,
-                      child: PageView.builder(
-                        controller: _eventPageController,
-                        itemCount: _events.length,
-                        onPageChanged: (i) => setState(() => _eventPage = i),
-                        itemBuilder: (context, i) {
-                          final event = _events[i];
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 6),
-                            child: _EventCard(
-                              event: event,
-                              onViewDetails: () => context.push('/events/${event.id}'),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Page indicator dots
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(_events.length, (i) {
-                        final bool active = i == _eventPage;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: active ? 18 : 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: active ? AppColors.maroon : AppColors.cardBorder,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 8),
-                    _SectionHeader(
-                      title: 'From Our Community',
-                      onSeeAll: () => context.go(AppConstants.gallery),
-                    ),
-                    SizedBox(
-                      height: 175,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: _posts.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 12),
-                        itemBuilder: (context, i) => _CommunityCard(
-                          post: _posts[i],
-                          onTap: () => context.go(AppConstants.gallery),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _JoinBanner(
-                      onBecomeMember: () => context.push(AppConstants.membershipSelector),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 16),
+
+            // 4 Stats Cards (Members, Locations, Events, Years of Service)
+            const _StatsRow(),
+            const SizedBox(height: 24),
+
+            // Upcoming Events Section
+            _UpcomingEventsSection(
+              controller: _eventPageController,
+              currentIndex: _eventPageIndex,
+              onPageChanged: (i) => setState(() => _eventPageIndex = i),
             ),
+            const SizedBox(height: 24),
+
+            // From Our Community Section
+            const _FromOurCommunitySection(),
+            const SizedBox(height: 24),
+
+            // Join the Community Banner Card
+            _JoinCommunityBanner(
+              onBecomeMember: () => context.push(AppConstants.membershipSelector),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -220,13 +86,13 @@ void _showNotificationsSheet(BuildContext context) {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_active_rounded, color: AppColors.maroon, size: 24),
+              const Icon(Icons.notifications_active_rounded, color: Color(0xFF700D15), size: 24),
               const SizedBox(width: 8),
               const Text('Notifications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Close', style: TextStyle(fontSize: 13)),
+                child: const Text('Close', style: TextStyle(fontSize: 13, color: Color(0xFF700D15))),
               ),
             ],
           ),
@@ -271,482 +137,542 @@ Widget _notifTile(IconData icon, Color bg, Color color, String title, String sub
 }
 
 // ---------------------------------------------------------------------------
-// DATA MODELS
+// 1. BURGUNDY HEADER + HERO BANNER CARD
 // ---------------------------------------------------------------------------
-class _EventData {
-  final String id;
-  final String month;
-  final String day;
-  final String title;
-  final String time;
-  final String location;
-  final String imageUrl;
-  final IconData imageIcon;
-  final Color imageColor;
-
-  const _EventData({
-    required this.id,
-    required this.month,
-    required this.day,
-    required this.title,
-    required this.time,
-    required this.location,
-    required this.imageUrl,
-    required this.imageIcon,
-    required this.imageColor,
-  });
-}
-
-class _CommunityPost {
-  final String title;
-  final String timeAgo;
-  final String imageUrl;
-  final IconData imageIcon;
-  final Color imageColor;
-
-  const _CommunityPost({
-    required this.title,
-    required this.timeAgo,
-    required this.imageUrl,
-    required this.imageIcon,
-    required this.imageColor,
-  });
-}
-
-// ---------------------------------------------------------------------------
-// TOP HEADER
-// ---------------------------------------------------------------------------
-class _TopHeader extends StatelessWidget {
+class _HeaderSection extends StatelessWidget {
   final VoidCallback onBellTap;
   final VoidCallback onProfileTap;
-
-  const _TopHeader({required this.onBellTap, required this.onProfileTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.maroon,
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Circular logo/emblem
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.creamLight,
-              border: Border.all(color: AppColors.gold, width: 2),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(5.0),
-              child: Icon(Icons.temple_hindu, color: AppColors.maroon, size: 28),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Title + tagline
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Nepal Agrawal Samaj',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 3),
-                Text(
-                  'Unity • Culture • Service • Progress',
-                  style: TextStyle(
-                    color: AppColors.goldLight,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Notification bell with badge
-          _HeaderCircleIconButton(
-            icon: Icons.notifications_none_rounded,
-            badgeCount: 3,
-            onTap: onBellTap,
-          ),
-          const SizedBox(width: 10),
-          // Profile icon
-          _HeaderCircleIconButton(
-            icon: Icons.person_outline_rounded,
-            onTap: onProfileTap,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeaderCircleIconButton extends StatelessWidget {
-  final IconData icon;
-  final int? badgeCount;
-  final VoidCallback onTap;
-
-  const _HeaderCircleIconButton({
-    required this.icon,
-    required this.onTap,
-    this.badgeCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: Icon(icon, color: AppColors.maroon, size: 22),
-          ),
-          if (badgeCount != null && badgeCount! > 0)
-            Positioned(
-              top: -2,
-              right: -2,
-              child: Container(
-                padding: const EdgeInsets.all(3),
-                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                decoration: BoxDecoration(
-                  color: AppColors.pinkIcon,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
-                ),
-                child: Center(
-                  child: Text(
-                    '$badgeCount',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// HERO SECTION
-// ---------------------------------------------------------------------------
-class _HeroSection extends StatelessWidget {
   final VoidCallback onBecomeMember;
   final VoidCallback onExploreEvents;
 
-  const _HeroSection({required this.onBecomeMember, required this.onExploreEvents});
+  const _HeaderSection({
+    required this.onBellTap,
+    required this.onProfileTap,
+    required this.onBecomeMember,
+    required this.onExploreEvents,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Column(
+      children: [
+        // Top Deep Burgundy Bar Header
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(16, topPadding + 8, 16, 18),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF6B0E1B), Color(0xFF500913), Color(0xFF3F050C)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Header Row (Logo + Title/Subtitle + Action Buttons)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Circular Emblem Logo
+                  const _HeaderLogo(),
+                  const SizedBox(width: 10),
+
+                  // Organization Name & Subtitle
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          'Nepal Agrawal Samaj',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Unity • Culture • Service • Progress',
+                          style: TextStyle(
+                            color: Color(0xFFE5C158),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Notification Bell & Profile Buttons
+                  Row(
+                    children: [
+                      // Bell Button with Red Badge "3"
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          InkWell(
+                            onTap: onBellTap,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.notifications_none_rounded,
+                                color: Color(0xFF500913),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFE53935),
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: const Text(
+                                '3',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+
+                      // Profile Button
+                      InkWell(
+                        onTap: onProfileTap,
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.person_outline_rounded,
+                            color: Color(0xFF500913),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Hero Card overlapping top burgundy header slightly for seamless depth
+        Transform.translate(
+          offset: const Offset(0, -10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.10),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Stack(
+                  children: [
+                    // Background Cream Gradient
+                    Container(
+                      height: 240,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFFFFBF4), Color(0xFFF9F0E0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                      ),
+                    ),
+
+                    // Right Pagoda Temple Image with smooth multi-stop fade
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: MediaQuery.of(context).size.width * 0.55,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl:
+                                'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80',
+                            fit: BoxFit.cover,
+                          ),
+                          // Multi-stop Linear Gradient overlay fading into cream left content
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFFFBF4),
+                                  const Color(0xFFFFFBF4).withValues(alpha: 0.95),
+                                  const Color(0xFFFFFBF4).withValues(alpha: 0.4),
+                                  Colors.transparent,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                stops: const [0.0, 0.3, 0.65, 1.0],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Left Content (Greeting, Headline, Subtext & Action Buttons)
+                    Padding(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Namaste! 👋
+                          const Text(
+                            'Namaste! 👋',
+                            style: TextStyle(
+                              color: Color(0xFF700D15),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+
+                          // Together, We Grow
+                          const Text(
+                            'Together,',
+                            style: TextStyle(
+                              color: Color(0xFF500913),
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              height: 1.05,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const Text(
+                            'We Grow',
+                            style: TextStyle(
+                              color: Color(0xFF500913),
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                              height: 1.05,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Subtitle Text
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.54,
+                            child: const Text(
+                              'A united family working for culture, welfare, business growth and a better tomorrow.',
+                              style: TextStyle(
+                                color: Color(0xFF5A4540),
+                                fontSize: 11,
+                                height: 1.35,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Action Buttons Row (Become a Member & Explore Events)
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              // Become a Member Button
+                              GestureDetector(
+                                onTap: onBecomeMember,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF6B0E1B),
+                                    borderRadius: BorderRadius.circular(22),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF6B0E1B).withValues(alpha: 0.3),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.groups_outlined, color: Colors.white, size: 15),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Become a Member',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Explore Events Button
+                              GestureDetector(
+                                onTap: onExploreEvents,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(color: const Color(0xFF9E8A83), width: 1.0),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.calendar_today_outlined, color: Color(0xFF500913), size: 14),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Explore Events',
+                                        style: TextStyle(
+                                          color: Color(0xFF500913),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Circular Crest Emblem Logo
+class _HeaderLogo extends StatelessWidget {
+  const _HeaderLogo();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.creamLight, AppColors.creamDark],
-        ),
+        shape: BoxShape.circle,
+        color: const Color(0xFF700D15),
+        border: Border.all(color: const Color(0xFFE5C158), width: 1.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 4,
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          // Decorative temple silhouette on the right
-          Positioned(
-            right: -10,
-            bottom: 0,
-            top: 20,
-            child: Opacity(
-              opacity: 0.9,
-              child: Icon(
-                Icons.temple_hindu,
-                size: 190,
-                color: AppColors.maroonDark.withValues(alpha: 0.85),
-              ),
-            ),
+      child: Center(
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFFE5C158).withValues(alpha: 0.15),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: const [
-                    Text('Namaste!',
-                        style: TextStyle(
-                          color: AppColors.maroon,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        )),
-                    SizedBox(width: 6),
-                    Text('👋', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Together,',
-                  style: TextStyle(
-                    color: AppColors.maroon,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    height: 1.15,
-                  ),
-                ),
-                const Text(
-                  'We Grow',
-                  style: TextStyle(
-                    color: AppColors.maroon,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    height: 1.15,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const SizedBox(
-                  width: 210,
-                  child: Text(
-                    'A united family working for culture, welfare, business growth and a better tomorrow.',
-                    style: TextStyle(
-                      color: AppColors.textGrey,
-                      fontSize: 13.5,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: onBecomeMember,
-                      icon: const Icon(Icons.groups_rounded, size: 18, color: Colors.white),
-                      label: const Text('Become a Member'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.maroon,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: onExploreEvents,
-                      icon: const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.maroon),
-                      label: const Text('Explore Events'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.maroon,
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: AppColors.maroon, width: 1.3),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          child: const Icon(
+            Icons.account_balance_rounded,
+            color: Color(0xFFE5C158),
+            size: 20,
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// STATS ROW
+// 2. STATS ROW (4 Cards)
 // ---------------------------------------------------------------------------
-class _StatItem {
-  final IconData icon;
-  final Color iconBg;
-  final Color iconColor;
-  final String value;
-  final String label;
-  final Color underlineColor;
-  final String type;
-
-  const _StatItem({
-    required this.icon,
-    required this.iconBg,
-    required this.iconColor,
-    required this.value,
-    required this.label,
-    required this.underlineColor,
-    required this.type,
-  });
-}
-
 class _StatsRow extends StatelessWidget {
-  final ValueChanged<String> onStatTap;
-
-  const _StatsRow({required this.onStatTap});
-
-  static const List<_StatItem> _stats = [
-    _StatItem(
-      icon: Icons.groups_rounded,
-      iconBg: AppColors.pinkBg,
-      iconColor: AppColors.pinkIcon,
-      value: '2.4K+',
-      label: 'Members',
-      underlineColor: AppColors.pinkIcon,
-      type: 'members',
-    ),
-    _StatItem(
-      icon: Icons.location_on_rounded,
-      iconBg: AppColors.amberBg,
-      iconColor: AppColors.amberIcon,
-      value: '18',
-      label: 'Locations',
-      underlineColor: AppColors.amberIcon,
-      type: 'locations',
-    ),
-    _StatItem(
-      icon: Icons.calendar_month_rounded,
-      iconBg: AppColors.purpleBg,
-      iconColor: AppColors.purpleIcon,
-      value: '42+',
-      label: 'Events (Yearly)',
-      underlineColor: AppColors.purpleIcon,
-      type: 'events',
-    ),
-    _StatItem(
-      icon: Icons.workspace_premium_rounded,
-      iconBg: AppColors.greenBg,
-      iconColor: AppColors.greenIcon,
-      value: '28+',
-      label: 'Years of Service',
-      underlineColor: AppColors.greenIcon,
-      type: 'service',
-    ),
-  ];
+  const _StatsRow();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Row(
-        children: List.generate(_stats.length, (i) {
-          final s = _stats[i];
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: i == _stats.length - 1 ? 0 : 8),
-              child: InkWell(
-                onTap: () => onStatTap(s.type),
-                borderRadius: BorderRadius.circular(16),
-                child: _StatCard(stat: s),
-              ),
+        children: const [
+          Expanded(
+            child: _StatCard(
+              icon: Icons.groups_outlined,
+              iconBg: Color(0xFFFDE8E8),
+              iconColor: Color(0xFFE53935),
+              value: '2.4K+',
+              label: 'Members',
+              accentLineColor: Color(0xFFE53935),
             ),
-          );
-        }),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: _StatCard(
+              icon: Icons.location_on_outlined,
+              iconBg: Color(0xFFFFF4D8),
+              iconColor: Color(0xFFD99B00),
+              value: '18',
+              label: 'Locations',
+              accentLineColor: Color(0xFFD99B00),
+            ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: _StatCard(
+              icon: Icons.calendar_today_outlined,
+              iconBg: Color(0xFFF3E8FF),
+              iconColor: Color(0xFF8E24AA),
+              value: '42+',
+              label: 'Events (Yearly)',
+              accentLineColor: Color(0xFF8E24AA),
+            ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            child: _StatCard(
+              icon: Icons.workspace_premium_outlined,
+              iconBg: Color(0xFFE8F5E9),
+              iconColor: Color(0xFF2E7D32),
+              value: '28+',
+              label: 'Years of Service',
+              accentLineColor: Color(0xFF2E7D32),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _StatCard extends StatelessWidget {
-  final _StatItem stat;
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String value;
+  final String label;
+  final Color accentLineColor;
 
-  const _StatCard({required this.stat});
+  const _StatCard({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+    required this.accentLineColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
+      padding: const EdgeInsets.fromLTRB(6, 12, 6, 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
         children: [
+          // Circular Icon
           Container(
-            width: 42,
-            height: 42,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: stat.iconBg,
+              color: iconBg,
               shape: BoxShape.circle,
             ),
-            child: Icon(stat.icon, color: stat.iconColor, size: 20),
+            child: Icon(icon, color: iconColor, size: 18),
           ),
-          const SizedBox(height: 10),
-          Text(
-            stat.value,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textDark,
+          const SizedBox(height: 8),
+
+          // Number Value
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF1F1210),
+              ),
             ),
           ),
           const SizedBox(height: 2),
+
+          // Subtitle Label
           Text(
-            stat.label,
+            label,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 10,
-              color: AppColors.textGrey,
+              color: Color(0xFF757575),
               fontWeight: FontWeight.w500,
             ),
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
+
+          // Small Accent Line at Bottom
           Container(
             width: 20,
             height: 3,
             decoration: BoxDecoration(
-              color: stat.underlineColor,
+              color: accentLineColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -757,343 +683,547 @@ class _StatCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// SECTION HEADER
+// 3. UPCOMING EVENTS SECTION
 // ---------------------------------------------------------------------------
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final VoidCallback onSeeAll;
+class _UpcomingEventsSection extends StatelessWidget {
+  final PageController controller;
+  final int currentIndex;
+  final ValueChanged<int> onPageChanged;
 
-  const _SectionHeader({required this.title, required this.onSeeAll});
+  const _UpcomingEventsSection({
+    required this.controller,
+    required this.currentIndex,
+    required this.onPageChanged,
+  });
+
+  static const _events = [
+    (
+      title: 'Guru Purnima Satsang',
+      dateMonth: 'MAY',
+      dateDay: '25',
+      time: '5:00 PM',
+      location: 'Kathmandu',
+      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=600&q=80',
+    ),
+    (
+      title: 'Blood Donation Camp',
+      dateMonth: 'JUN',
+      dateDay: '08',
+      time: '10:00 AM',
+      location: 'Biratnagar Branch',
+      imageUrl: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=600&q=80',
+    ),
+    (
+      title: 'Youth Entrepreneurship Seminar',
+      dateMonth: 'JUN',
+      dateDay: '22',
+      time: '11:00 AM',
+      location: 'Lalitpur',
+      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textDark,
-            ),
-          ),
-          InkWell(
-            onTap: onSeeAll,
-            child: const Row(
-              children: [
-                Text(
-                  'See all',
-                  style: TextStyle(
-                    color: AppColors.maroon,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(width: 3),
-                Icon(Icons.arrow_forward_rounded, size: 15, color: AppColors.maroon),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// EVENT CARD
-// ---------------------------------------------------------------------------
-class _EventCard extends StatelessWidget {
-  final _EventData event;
-  final VoidCallback onViewDetails;
-
-  const _EventCard({required this.event, required this.onViewDetails});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image preview with date badge overlay
-          Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Header Row
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                height: 130,
-                width: double.infinity,
-                child: CachedNetworkImage(
-                  imageUrl: event.imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (ctx, url) => Container(
-                    color: event.imageColor.withValues(alpha: 0.2),
-                    child: Center(
-                      child: Icon(event.imageIcon, size: 36, color: event.imageColor),
-                    ),
-                  ),
+              const Text(
+                'Upcoming Events',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E1615),
                 ),
               ),
-              Positioned(
-                top: 10,
-                left: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.65),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        event.month,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
+              GestureDetector(
+                onTap: () => context.go(AppConstants.events),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Text(
+                      'See all',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF700D15),
                       ),
-                      Text(
-                        event.day,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          height: 1.1,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF700D15)),
+                  ],
                 ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                    height: 1.25,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.access_time_rounded, size: 14, color: AppColors.textGrey),
-                    const SizedBox(width: 5),
-                    Text(event.time,
-                        style: const TextStyle(fontSize: 12.5, color: AppColors.textGrey)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textGrey),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(event.location,
-                          style: const TextStyle(fontSize: 12.5, color: AppColors.textGrey),
-                          overflow: TextOverflow.ellipsis),
+        ),
+        const SizedBox(height: 12),
+
+        // Horizontal List of Cards
+        SizedBox(
+          height: 270,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _events.length,
+            itemBuilder: (context, i) {
+              final ev = _events[i];
+              return Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: SizedBox(
+                  width: 168,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: onViewDetails,
-                    style: TextButton.styleFrom(
-                      backgroundColor: AppColors.viewDetailsBg,
-                      foregroundColor: AppColors.maroon,
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('View Details',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                        SizedBox(width: 6),
-                        Icon(Icons.arrow_forward_rounded, size: 15),
+                        // Event Image + Date Badge Overlay
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                              child: SizedBox(
+                                height: 108,
+                                width: double.infinity,
+                                child: CachedNetworkImage(
+                                  imageUrl: ev.imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(color: const Color(0xFFF0F0F0)),
+                                  errorWidget: (context, url, error) => Container(
+                                    color: const Color(0xFFE5D5D5),
+                                    child: const Icon(Icons.event, color: Color(0xFF700D15)),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Date Badge Overlay (Top-Left)
+                            Positioned(
+                              top: 8,
+                              left: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xEE221B1C),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      ev.dateMonth,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                    Text(
+                                      ev.dateDay,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.05,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Card Details Body
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 32,
+                                  child: Text(
+                                    ev.title,
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF1E1615),
+                                      height: 1.2,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.access_time_outlined, size: 12, color: Color(0xFF8C7A75)),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        ev.time,
+                                        style: const TextStyle(fontSize: 10.5, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on_outlined, size: 12, color: Color(0xFF8C7A75)),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        ev.location,
+                                        style: const TextStyle(fontSize: 10.5, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+
+                                // View Details Pill Button
+                                GestureDetector(
+                                  onTap: () => context.go(AppConstants.events),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFDEAEA),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        Text(
+                                          'View Details',
+                                          style: TextStyle(
+                                            color: Color(0xFF700D15),
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
-        ],
-      ),
-    );
-  }
-}
+        ),
+        const SizedBox(height: 12),
 
-// ---------------------------------------------------------------------------
-// COMMUNITY CARD
-// ---------------------------------------------------------------------------
-class _CommunityCard extends StatelessWidget {
-  final _CommunityPost post;
-  final VoidCallback onTap;
-
-  const _CommunityCard({required this.post, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 150,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        // Indicator Bars matching screenshot (Active Maroon Bar + Inactive Grey Bar)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                height: 110,
-                width: double.infinity,
-                child: CachedNetworkImage(
-                  imageUrl: post.imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (ctx, url) => Container(
-                    color: post.imageColor.withValues(alpha: 0.2),
-                    child: Icon(post.imageIcon, size: 34, color: post.imageColor),
-                  ),
-                ),
+            Container(
+              width: 24,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFF700D15),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              post.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-                height: 1.25,
+            const SizedBox(width: 4),
+            Container(
+              width: 16,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE0E0E0),
+                borderRadius: BorderRadius.circular(2),
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              post.timeAgo,
-              style: const TextStyle(fontSize: 11.5, color: AppColors.textLightGrey),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// JOIN BANNER
+// 4. FROM OUR COMMUNITY SECTION
 // ---------------------------------------------------------------------------
-class _JoinBanner extends StatelessWidget {
-  final VoidCallback onBecomeMember;
+class _FromOurCommunitySection extends StatelessWidget {
+  const _FromOurCommunitySection();
 
-  const _JoinBanner({required this.onBecomeMember});
+  static const _items = [
+    (
+      title: 'Mahila Sashaktikaran Program',
+      timeAgo: '2d ago',
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=500&q=80',
+    ),
+    (
+      title: 'Tree Plantation Drive',
+      timeAgo: '5d ago',
+      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=500&q=80',
+    ),
+    (
+      title: 'Business Networking Meet',
+      timeAgo: '1w ago',
+      imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=500&q=80',
+    ),
+    (
+      title: 'Teej Celebration',
+      timeAgo: '2w ago',
+      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.joinBannerBg,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
+              const Text(
+                'From Our Community',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E1615),
                 ),
-                child: const Icon(Icons.diversity_3_rounded, color: AppColors.maroon, size: 26),
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              GestureDetector(
+                onTap: () => context.go(AppConstants.gallery),
+                child: Row(
+                  children: const [
                     Text(
-                      'Join the Community',
-                      style: TextStyle(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.maroon,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Be a part of our family and help create a stronger impact together.',
+                      'See all',
                       style: TextStyle(
                         fontSize: 12.5,
-                        color: AppColors.textGrey,
-                        height: 1.35,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF700D15),
                       ),
                     ),
+                    SizedBox(width: 3),
+                    Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF700D15)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: onBecomeMember,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.maroon,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+        ),
+        const SizedBox(height: 12),
+
+        // Horizontal List of Cards
+        SizedBox(
+          height: 170,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: _items.length,
+            itemBuilder: (context, i) {
+              final item = _items[i];
+              return Container(
+                width: 155,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      child: SizedBox(
+                        height: 95,
+                        width: double.infinity,
+                        child: CachedNetworkImage(
+                          imageUrl: item.imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(9),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.title,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E1615),
+                              height: 1.25,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            item.timeAgo,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFF9E9E9E),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 5. JOIN THE COMMUNITY BANNER
+// ---------------------------------------------------------------------------
+class _JoinCommunityBanner extends StatelessWidget {
+  final VoidCallback onBecomeMember;
+
+  const _JoinCommunityBanner({required this.onBecomeMember});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFF4F4), Color(0xFFFCEBEB)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFF7D5D5), width: 0.8),
+        ),
+        child: Row(
+          children: [
+            // Left Group Icon Container
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFADCDC),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFEAAFAF), width: 1),
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Become a Member',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, size: 16),
+              child: const Icon(
+                Icons.groups_rounded,
+                color: Color(0xFF700D15),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Middle Text Column
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'Join the Community',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF500913),
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'Be a part of our family and help create a stronger impact together.',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Color(0xFF6E5D5A),
+                      height: 1.3,
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+
+            // Right Become a Member Pill Button
+            GestureDetector(
+              onTap: onBecomeMember,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF700D15),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF700D15).withValues(alpha: 0.25),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Text(
+                      'Become a Member',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(width: 3),
+                    Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

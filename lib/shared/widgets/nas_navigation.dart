@@ -389,86 +389,127 @@ class NASNavItem {
   });
 }
 
-/// Global Public Site Bottom Navigation Bar
+/// Global Public Site Bottom Navigation Bar — matches the exact design from screenshot
 class NASBottomNavBar extends StatelessWidget {
   final int activeIndex;
   const NASBottomNavBar({super.key, this.activeIndex = 0});
 
   static const _items = [
-    (icon: Icons.home_rounded, label: 'Home', route: AppConstants.home),
-    (icon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.events),
-    (icon: Icons.groups_rounded, label: 'Membership', route: AppConstants.membershipSelector),
-    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.gallery),
-    (icon: Icons.grid_view_rounded, label: 'More', route: AppConstants.about),
+    (icon: Icons.home_rounded, activeIcon: Icons.home_rounded, label: 'Home', route: AppConstants.home),
+    (icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.events),
+    (icon: Icons.groups_rounded, activeIcon: Icons.groups_rounded, label: 'Membership', route: AppConstants.membershipSelector),
+    (icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.gallery),
+    (icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'More', route: AppConstants.about),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(_items.length, (i) {
-            final item = _items[i];
-            final bool active = i == activeIndex;
-            final bool isCenter = i == 2;
-
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => context.go(item.route),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isCenter)
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.gold,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x33E8A93A),
-                              blurRadius: 8,
-                              offset: Offset(0, 3),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (int i = 0; i < _items.length; i++) ...[
+                if (i == 2)
+                  // Center Membership Button (Golden circular button)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => context.go(_items[i].route),
+                      behavior: HitTestBehavior.opaque,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFF9C846), Color(0xFFEAA010)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFEAA010).withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.groups_rounded,
+                              size: 22,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            _items[i].label,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
+                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF6E6E6E),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => context.go(_items[i].route),
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: i == activeIndex ? const Color(0xFFFFF0F0) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                i == activeIndex ? _items[i].activeIcon : _items[i].icon,
+                                size: 22,
+                                color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _items[i].label,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
+                                color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
+                              ),
                             ),
                           ],
                         ),
-                        child: Icon(item.icon, color: Colors.white, size: 22),
-                      )
-                    else
-                      Icon(
-                        item.icon,
-                        size: 22,
-                        color: active ? AppColors.maroon : AppColors.textLightGrey,
-                      ),
-                    const SizedBox(height: 3),
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                        color: active ? AppColors.maroon : AppColors.textLightGrey,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          }),
+                  ),
+              ],
+            ],
+          ),
         ),
       ),
     );
