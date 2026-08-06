@@ -6,7 +6,7 @@ import '../../../core/constants.dart';
 import '../../../core/design_tokens.dart';
 import '../../../shared/widgets/widgets.dart';
 
-/// Home screen — matches the "Nepal Agrawal Samaj" design screenshot exactly.
+/// Home Screen — Matches the new "Nepal Agrawal Samaj" design image & spec exactly.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,8 +15,75 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _eventPageController = PageController();
-  int _eventPageIndex = 0;
+  int _eventPage = 0;
+  final PageController _eventPageController = PageController(viewportFraction: 0.72);
+
+  static const List<_EventData> _events = [
+    _EventData(
+      id: 'ev-1',
+      month: 'MAY',
+      day: '25',
+      title: 'Guru Purnima Satsang',
+      time: '5:00 PM',
+      location: 'Kathmandu',
+      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
+      imageIcon: Icons.local_fire_department_rounded,
+      imageColor: Color(0xFFB8622B),
+    ),
+    _EventData(
+      id: 'ev-4',
+      month: 'JUN',
+      day: '08',
+      title: 'Blood Donation Camp',
+      time: '10:00 AM',
+      location: 'Biratnagar Branch',
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+      imageIcon: Icons.favorite_rounded,
+      imageColor: Color(0xFFC0392B),
+    ),
+    _EventData(
+      id: 'ev-2',
+      month: 'JUN',
+      day: '22',
+      title: 'Youth Entrepreneurship Seminar',
+      time: '11:00 AM',
+      location: 'Lalitpur',
+      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+      imageIcon: Icons.groups_2_rounded,
+      imageColor: Color(0xFF34495E),
+    ),
+  ];
+
+  static const List<_CommunityPost> _posts = [
+    _CommunityPost(
+      title: 'Mahila Sashaktikaran Program',
+      timeAgo: '2d ago',
+      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
+      imageIcon: Icons.diversity_1_rounded,
+      imageColor: Color(0xFFD4A017),
+    ),
+    _CommunityPost(
+      title: 'Tree Plantation Drive',
+      timeAgo: '5d ago',
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
+      imageIcon: Icons.park_rounded,
+      imageColor: Color(0xFF2E7D32),
+    ),
+    _CommunityPost(
+      title: 'Business Networking Meet',
+      timeAgo: '1w ago',
+      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
+      imageIcon: Icons.business_center_rounded,
+      imageColor: Color(0xFF34495E),
+    ),
+    _CommunityPost(
+      title: 'Teej Celebration',
+      timeAgo: '2w ago',
+      imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
+      imageIcon: Icons.celebration_rounded,
+      imageColor: Color(0xFF8E2A3B),
+    ),
+  ];
 
   @override
   void dispose() {
@@ -29,63 +96,105 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        bottom: false,
+        child: Column(
           children: [
-            HeroSection(
-              onBecomeMember: () => context.push(AppConstants.membershipSelector),
-              onExploreEvents: () => context.push(AppConstants.events),
+            // Top Header banner
+            _TopHeader(
               onBellTap: () => _showNotificationsSheet(context),
               onProfileTap: () => context.push(AppConstants.profile),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            _SectionHeader(
-              title: 'Upcoming Event',
-              onViewAll: () => context.go(AppConstants.events),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 16),
+                    _HeroSection(
+                      onBecomeMember: () => context.push(AppConstants.membershipSelector),
+                      onExploreEvents: () => context.push(AppConstants.events),
+                    ),
+                    const SizedBox(height: 16),
+                    _StatsRow(
+                      onStatTap: (type) {
+                        if (type == 'locations') {
+                          context.go(AppConstants.locations);
+                        } else if (type == 'events') {
+                          context.go(AppConstants.events);
+                        } else {
+                          context.push(AppConstants.membershipSelector);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    _SectionHeader(
+                      title: 'Upcoming Events',
+                      onSeeAll: () => context.go(AppConstants.events),
+                    ),
+                    SizedBox(
+                      height: 330,
+                      child: PageView.builder(
+                        controller: _eventPageController,
+                        itemCount: _events.length,
+                        onPageChanged: (i) => setState(() => _eventPage = i),
+                        itemBuilder: (context, i) {
+                          final event = _events[i];
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 12, right: 6),
+                            child: _EventCard(
+                              event: event,
+                              onViewDetails: () => context.push('/events/${event.id}'),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Page indicator dots
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(_events.length, (i) {
+                        final bool active = i == _eventPage;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          width: active ? 18 : 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: active ? AppColors.maroon : AppColors.cardBorder,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 8),
+                    _SectionHeader(
+                      title: 'From Our Community',
+                      onSeeAll: () => context.go(AppConstants.gallery),
+                    ),
+                    SizedBox(
+                      height: 175,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _posts.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 12),
+                        itemBuilder: (context, i) => _CommunityCard(
+                          post: _posts[i],
+                          onTap: () => context.go(AppConstants.gallery),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _JoinBanner(
+                      onBecomeMember: () => context.push(AppConstants.membershipSelector),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            _UpcomingEventCarousel(
-              controller: _eventPageController,
-              currentIndex: _eventPageIndex,
-              onPageChanged: (i) => setState(() => _eventPageIndex = i),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            const _AboutSection(),
-            const SizedBox(height: AppSpacing.lg),
-            _SectionHeader(
-              title: 'What We Do',
-              onViewAll: () => context.push(AppConstants.events),
-              padded: true,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            const _WhatWeDoGrid(),
-            const SizedBox(height: AppSpacing.lg),
-            const _JoinCommunityBanner(),
-            const SizedBox(height: AppSpacing.xl),
-            _SectionHeader(
-              title: 'Our Locations',
-              onViewAll: () => context.go(AppConstants.locations),
-              padded: true,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            const _NepalMapPlaceholder(),
-            const SizedBox(height: AppSpacing.md),
-            const _FeaturedLocationCard(),
-            const SizedBox(height: AppSpacing.xl),
-            _SectionHeader(
-              title: 'Gallery Highlights',
-              onViewAll: () => context.go(AppConstants.gallery),
-              padded: true,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            const _GalleryHighlightsGrid(),
-            const SizedBox(height: AppSpacing.xl),
-            const _BecomeAMemberSection(),
-            const SizedBox(height: AppSpacing.lg),
-            const _TogetherBanner(),
-            const SizedBox(height: AppSpacing.lg),
-            const _ConnectWithUs(),
-            const SizedBox(height: AppSpacing.lg),
           ],
         ),
       ),
@@ -94,6 +203,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// NOTIFICATIONS BOTTOM SHEET
+// ---------------------------------------------------------------------------
 void _showNotificationsSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -108,7 +220,7 @@ void _showNotificationsSheet(BuildContext context) {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_active_rounded, color: AppColors.primary, size: 24),
+              const Icon(Icons.notifications_active_rounded, color: AppColors.maroon, size: 24),
               const SizedBox(width: 8),
               const Text('Notifications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
               const Spacer(),
@@ -159,1269 +271,825 @@ Widget _notifTile(IconData icon, Color bg, Color color, String title, String sub
 }
 
 // ---------------------------------------------------------------------------
-// HERO SECTION
+// DATA MODELS
 // ---------------------------------------------------------------------------
-class HeroSection extends StatelessWidget {
-  final VoidCallback? onBecomeMember;
-  final VoidCallback? onExploreEvents;
-  final VoidCallback? onBellTap;
-  final VoidCallback? onProfileTap;
-
-  const HeroSection({
-    super.key,
-    this.onBecomeMember,
-    this.onExploreEvents,
-    this.onBellTap,
-    this.onProfileTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      child: Stack(
-        children: [
-          // ---- Background photo + fade ----
-          const Positioned.fill(
-            child: _HeroBackgroundImage(),
-          ),
-
-          // ---- Foreground content ----
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top bar: logo on left, notifications + profile on right
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _NasLogo(),
-                    Row(
-                      children: [
-                        _iconCircleButton(Icons.notifications_none_rounded, onBellTap),
-                        const SizedBox(width: 8),
-                        _iconCircleButton(Icons.person_rounded, onProfileTap, filled: true),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Heading
-                const Text(
-                  'Nepal',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w800,
-                    height: 1.05,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Text(
-                  'Agrawal Samaj',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w800,
-                    height: 1.05,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Tagline
-                const Text(
-                  'Unity • Culture • Service',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.accent,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Ornamental divider
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 1,
-                        color: AppColors.accent.withValues(alpha: 0.35),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Transform.rotate(
-                        angle: 0.785398, // 45°
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.accent, width: 1.4),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        height: 1,
-                        color: AppColors.accent.withValues(alpha: 0.35),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-
-                // Description
-                SizedBox(
-                  width: 300,
-                  child: Text(
-                    'Connecting families, strengthening businesses, preserving '
-                    'traditions and creating opportunities for future generations.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.55,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: _GradientButton(
-                        label: 'Become a Member',
-                        icon: Icons.person_add_alt_1_rounded,
-                        onTap: onBecomeMember,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 5,
-                      child: _OutlinedIconButton(
-                        label: 'Explore Events',
-                        icon: Icons.event_available_rounded,
-                        onTap: onExploreEvents,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Floating stats card cleanly below buttons
-                const _StatsCard(),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _iconCircleButton(IconData icon, VoidCallback? onTap, {bool filled = false}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: filled ? AppColors.accentLight : Colors.transparent,
-          border: filled ? Border.all(color: AppColors.primary, width: 1.4) : null,
-        ),
-        child: Icon(icon, size: 22, color: AppColors.primary),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// BACKGROUND PHOTO
-// ---------------------------------------------------------------------------
-class _HeroBackgroundImage extends StatelessWidget {
-  const _HeroBackgroundImage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Mountain & temple hero photo
-        Positioned.fill(
-          child: CachedNetworkImage(
-            imageUrl:
-                'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFE7EEF3), Color(0xFFD8C9AE), Color(0xFF8B6B4A)],
-                  stops: [0.0, 0.55, 1.0],
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Horizontal fade: page background on the left, photo visible on the right
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  AppColors.background,
-                  AppColors.background.withValues(alpha: 0.85),
-                  AppColors.background.withValues(alpha: 0.15),
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.35, 0.6, 1.0],
-              ),
-            ),
-          ),
-        ),
-        // Bottom fade back to page background so the stats card overlaps cleanly
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, AppColors.background],
-                stops: const [0.7, 1.0],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// NAS CREST LOGO — laurel + star + shield + "NAS" ribbon
-// ---------------------------------------------------------------------------
-class _NasLogo extends StatelessWidget {
-  const _NasLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 88,
-      height: 92,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        clipBehavior: Clip.none,
-        children: [
-          // Laurel branches
-          Positioned(
-            top: 18,
-            left: -2,
-            child: Transform.rotate(
-              angle: -0.5,
-              child: const Icon(Icons.grass_rounded, size: 34, color: AppColors.gold),
-            ),
-          ),
-          Positioned(
-            top: 18,
-            right: -2,
-            child: Transform.flip(
-              flipX: true,
-              child: Transform.rotate(
-                angle: -0.5,
-                child: const Icon(Icons.grass_rounded, size: 34, color: AppColors.gold),
-              ),
-            ),
-          ),
-          // Star
-          const Positioned(
-            top: 0,
-            child: Icon(Icons.star_rounded, size: 18, color: AppColors.gold),
-          ),
-          // Shield
-          Positioned(
-            top: 20,
-            child: ClipPath(
-              clipper: _ShieldClipper(),
-              child: Container(
-                width: 38,
-                height: 44,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE13B2E), Color(0xFFB5241C)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.auto_awesome, size: 16, color: AppColors.gold),
-              ),
-            ),
-          ),
-          // Ribbon banner with "NAS"
-          Positioned(
-            top: 62,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: const Text(
-                'NAS',
-                style: TextStyle(
-                  color: AppColors.gold,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ShieldClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final w = size.width;
-    final h = size.height;
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(w, 0)
-      ..lineTo(w, h * 0.55)
-      ..quadraticBezierTo(w, h * 0.85, w / 2, h)
-      ..quadraticBezierTo(0, h * 0.85, 0, h * 0.55)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-// ---------------------------------------------------------------------------
-// BUTTONS
-// ---------------------------------------------------------------------------
-class _GradientButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback? onTap;
-  const _GradientButton({required this.label, required this.icon, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Ink(
-          height: 52,
-          decoration: BoxDecoration(
-            gradient: AppColors.orangeGradient,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.accent.withValues(alpha: 0.35),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 18, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OutlinedIconButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback? onTap;
-  const _OutlinedIconButton({required this.label, required this.icon, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Container(
-          height: 52,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.primary, width: 1.4),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.event_note_rounded, size: 18, color: AppColors.primary),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// STATS CARD — floating card with 4 stats separated by thin dividers
-// ---------------------------------------------------------------------------
-class _StatsCard extends StatelessWidget {
-  const _StatsCard();
-
-  static const _stats = [
-    (icon: Icons.groups_rounded, value: '5,200+', label: 'Active Members'),
-    (icon: Icons.location_on_rounded, value: '18', label: 'Branches'),
-    (icon: Icons.event_note_rounded, value: '130+', label: 'Annual Events'),
-    (icon: Icons.workspace_premium_rounded, value: '38', label: 'Years of Service'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          for (int i = 0; i < _stats.length; i++) ...[
-            if (i != 0)
-              Container(width: 1, height: 44, color: Colors.grey.shade200),
-            Expanded(
-              child: Column(
-                children: [
-                  Icon(_stats[i].icon, color: AppColors.accent, size: 24),
-                  const SizedBox(height: 8),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      _stats[i].value,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _stats[i].label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// SECTION HEADER ("Title" ............ "View All")
-// ---------------------------------------------------------------------------
-class _SectionHeader extends StatelessWidget {
+class _EventData {
+  final String id;
+  final String month;
+  final String day;
   final String title;
-  final VoidCallback onViewAll;
-  final bool padded;
-  const _SectionHeader({required this.title, required this.onViewAll, this.padded = false});
+  final String time;
+  final String location;
+  final String imageUrl;
+  final IconData imageIcon;
+  final Color imageColor;
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: AppText.h2),
-          TextButton(
-            onPressed: onViewAll,
-            style: TextButton.styleFrom(foregroundColor: AppColors.primary, padding: EdgeInsets.zero),
-            child: const Text('View All', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// UPCOMING EVENT — single large carousel card w/ dot indicator
-// ---------------------------------------------------------------------------
-class _UpcomingEventCarousel extends StatelessWidget {
-  final PageController controller;
-  final int currentIndex;
-  final ValueChanged<int> onPageChanged;
-  const _UpcomingEventCarousel({
-    required this.controller,
-    required this.currentIndex,
-    required this.onPageChanged,
+  const _EventData({
+    required this.id,
+    required this.month,
+    required this.day,
+    required this.title,
+    required this.time,
+    required this.location,
+    required this.imageUrl,
+    required this.imageIcon,
+    required this.imageColor,
   });
+}
 
-  @override
-  Widget build(BuildContext context) {
-    const eventCount = 4;
-    return Column(
-      children: [
-        SizedBox(
-          height: 215,
-          child: PageView.builder(
-            controller: controller,
-            onPageChanged: onPageChanged,
-            itemCount: eventCount,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    boxShadow: AppShadow.card,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(AppRadius.lg),
-                          bottomLeft: Radius.circular(AppRadius.lg),
-                        ),
-                        child: SizedBox(
-                          width: 110,
-                          height: 215,
-                          child: _networkImage(
-                            url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Annual Business Summit 2026',
-                                style: AppText.h3,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              _iconText(Icons.calendar_today_rounded, '20 Aug, 2026 • 10:00 AM'),
-                              const SizedBox(height: 4),
-                              _iconText(Icons.location_on_rounded, 'Kathmandu, Nepal'),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'A flagship event bringing together entrepreneurs, leaders and professionals.',
-                                style: AppText.bodySmall,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 32,
-                                      child: ElevatedButton(
-                                        onPressed: () => context.go(AppConstants.events),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          elevation: 0,
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(AppRadius.pill)),
-                                        ),
-                                        child: const Text('Register Now', style: TextStyle(fontSize: 11)),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 32,
-                                      child: OutlinedButton(
-                                        onPressed: () => context.go(AppConstants.events),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.primary,
-                                          side: const BorderSide(color: AppColors.border),
-                                          padding: EdgeInsets.zero,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(AppRadius.pill)),
-                                        ),
-                                        child: const Text('Learn More', style: TextStyle(fontSize: 11)),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(eventCount, (i) {
-            final active = i == currentIndex;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: active ? 18 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: active ? AppColors.primary : AppColors.border,
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-              ),
-            );
-          }),
-        ),
-      ],
-    );
-  }
+class _CommunityPost {
+  final String title;
+  final String timeAgo;
+  final String imageUrl;
+  final IconData imageIcon;
+  final Color imageColor;
 
-  Widget _iconText(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 12, color: AppColors.accent),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(text, style: AppText.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-        ),
-      ],
-    );
-  }
+  const _CommunityPost({
+    required this.title,
+    required this.timeAgo,
+    required this.imageUrl,
+    required this.imageIcon,
+    required this.imageColor,
+  });
 }
 
 // ---------------------------------------------------------------------------
-// ABOUT SECTION
+// TOP HEADER
 // ---------------------------------------------------------------------------
-class _AboutSection extends StatelessWidget {
-  const _AboutSection();
+class _TopHeader extends StatelessWidget {
+  final VoidCallback onBellTap;
+  final VoidCallback onProfileTap;
+
+  const _TopHeader({required this.onBellTap, required this.onProfileTap});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      color: AppColors.maroon,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: const [
-              Icon(Icons.workspace_premium_rounded, color: AppColors.accent, size: 20),
-              SizedBox(width: 8),
-              Text('About Nepal Agrawal Samaj', style: AppText.h2),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'Founded in 1988, Nepal Agrawal Samaj has grown into a strong '
-            'nationwide network dedicated to the welfare of the Agrawal '
-            'community and society at large.',
-            style: AppText.body,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton(
-            onPressed: () => context.push(AppConstants.about),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.border),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('Discover Our Story', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                SizedBox(width: 6),
-                Icon(Icons.arrow_forward_rounded, size: 15),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  child: SizedBox(
-                    height: 90,
-                    child: _networkImage(
-                      url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  child: SizedBox(
-                    height: 90,
-                    child: _networkImage(
-                      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  child: SizedBox(
-                    height: 90,
-                    child: _networkImage(
-                      url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// WHAT WE DO — 3x2 grid
-// ---------------------------------------------------------------------------
-class _WhatWeDoGrid extends StatelessWidget {
-  const _WhatWeDoGrid();
-
-  static const _items = [
-    (icon: Icons.temple_hindu_rounded, title: 'Culture', desc: 'Preserving traditions and heritage'),
-    (icon: Icons.work_rounded, title: 'Business', desc: 'Connecting businesses'),
-    (icon: Icons.school_rounded, title: 'Education', desc: 'Supporting education and scholarships'),
-    (icon: Icons.groups_rounded, title: 'Youth', desc: 'Empowering youth and leadership'),
-    (icon: Icons.volunteer_activism_rounded, title: 'Social Work', desc: 'Serving society with compassion'),
-    (icon: Icons.diversity_3_rounded, title: 'Women Empowerment', desc: 'Encouraging women entrepreneurship'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _items.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 0.85,
-        ),
-        itemBuilder: (context, i) {
-          final item = _items[i];
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+          // Circular logo/emblem
+          Container(
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
-              color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: AppColors.border),
+              shape: BoxShape.circle,
+              color: AppColors.creamLight,
+              border: Border.all(color: AppColors.gold, width: 2),
             ),
+            child: const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Icon(Icons.temple_hindu, color: AppColors.maroon, size: 28),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Title + tagline
+          const Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(item.icon, color: AppColors.primary, size: 22),
-                const SizedBox(height: 8),
                 Text(
-                  item.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.desc,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
+                  'Nepal Agrawal Samaj',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// JOIN OUR COMMUNITY — orange gradient banner
-// ---------------------------------------------------------------------------
-class _JoinCommunityBanner extends StatelessWidget {
-  const _JoinCommunityBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: AppColors.orangeGradient,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Join Our Community',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          const Text(
-            'Become part of a growing community dedicated to unity, culture, '
-            'business and social development.',
-            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              ElevatedButton(
-                onPressed: () => context.go(AppConstants.membershipSelector),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.accent,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                ),
-                child: const Text('Become a Member', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-              ),
-              OutlinedButton(
-                onPressed: () => context.go(AppConstants.contact),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white70),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                ),
-                child: const Text('Get in Touch', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-
-// ---------------------------------------------------------------------------
-// OUR LOCATIONS — Nepal map placeholder + pins
-// ---------------------------------------------------------------------------
-class _NepalMapPlaceholder extends StatelessWidget {
-  const _NepalMapPlaceholder();
-
-  static const _pins = [
-    Offset(0.28, 0.35),
-    Offset(0.40, 0.55),
-    Offset(0.52, 0.30),
-    Offset(0.58, 0.60),
-    Offset(0.68, 0.42),
-    Offset(0.80, 0.50),
-    Offset(0.88, 0.65),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 170,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.subtleCard,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.15,
-                  child: Icon(Icons.map, size: 120, color: AppColors.primary),
-                ),
-              ),
-              for (final p in _pins)
-                Positioned(
-                  left: p.dx * constraints.maxWidth - 10,
-                  top: p.dy * constraints.maxHeight - 20,
-                  child: const Icon(Icons.location_on_rounded, color: AppColors.accent, size: 22),
-                ),
-              const Positioned(
-                right: 40,
-                bottom: 30,
-                child: Icon(Icons.location_on_rounded, color: AppColors.primary, size: 30),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _FeaturedLocationCard extends StatelessWidget {
-  const _FeaturedLocationCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadow.card,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            child: SizedBox(
-              width: 90,
-              height: 110,
-              child: _networkImage(
-                url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Kathmandu Branch', style: AppText.h3),
-                const SizedBox(height: 6),
-                _iconRow(Icons.groups_rounded, '1,200+ Members'),
-                const SizedBox(height: 4),
-                _iconRow(Icons.event_rounded, '18 Events'),
-                const SizedBox(height: 4),
-                _iconRow(Icons.badge_rounded, 'Branch Leader\nMr. Rajesh Agrawal'),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: () => context.go(AppConstants.locations),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.border),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                SizedBox(height: 3),
+                Text(
+                  'Unity • Culture • Service • Progress',
+                  style: TextStyle(
+                    color: AppColors.goldLight,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text('Explore Location', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                      SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_rounded, size: 12),
-                    ],
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _iconRow(IconData icon, String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 13, color: AppColors.accent),
-        const SizedBox(width: 5),
-        Expanded(child: Text(text, style: AppText.bodySmall)),
-      ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// GALLERY HIGHLIGHTS — 4x2 photo grid
-// ---------------------------------------------------------------------------
-class _GalleryHighlightsGrid extends StatelessWidget {
-  const _GalleryHighlightsGrid();
-
-  static const _galleryPhotos = [
-    'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 8,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 1,
-        ),
-        itemBuilder: (context, i) => ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-          child: _networkImage(url: _galleryPhotos[i], fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// BECOME A MEMBER — maroon card w/ two membership options
-// ---------------------------------------------------------------------------
-class _BecomeAMemberSection extends StatelessWidget {
-  const _BecomeAMemberSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Column(
-        children: [
-          const Text('Become a Member',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: _membershipCard(
-                  context: context,
-                  icon: Icons.person_rounded,
-                  iconBg: Colors.white24,
-                  title: 'Normal\nMembership',
-                  desc: 'Join as an individual and enjoy exclusive benefits and events.',
-                  buttonColor: AppColors.primary,
-                  onTap: () => context.go(AppConstants.normalRegistration),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _membershipCard(
-                  context: context,
-                  icon: Icons.work_rounded,
-                  iconBg: AppColors.accentLight,
-                  title: 'Business\nMembership',
-                  desc: 'Grow your business, connect and get featured.',
-                  buttonColor: AppColors.accent,
-                  buttonTextColor: Colors.white,
-                  onTap: () => context.go(AppConstants.businessRegistration),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _membershipCard({
-    required BuildContext context,
-    required IconData icon,
-    required Color iconBg,
-    required String title,
-    required String desc,
-    required Color buttonColor,
-    Color buttonTextColor = Colors.white,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(radius: 18, backgroundColor: iconBg, child: Icon(icon, color: AppColors.primary, size: 18)),
-          const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.primary)),
-          const SizedBox(height: 6),
-          Text(desc, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary, height: 1.3)),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            height: 32,
-            child: ElevatedButton(
-              onPressed: onTap,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: buttonColor,
-                foregroundColor: buttonTextColor,
-                elevation: 0,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-              ),
-              child: const Text('Join Now →', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// TOGETHER WE BUILD banner
-// ---------------------------------------------------------------------------
-class _TogetherBanner extends StatelessWidget {
-  const _TogetherBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.accentLight,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        children: const [
-          Expanded(
-            child: Text(
-              'Together We Build\nA Stronger Community',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.accent, height: 1.3),
-            ),
-          ),
-          Icon(Icons.groups_rounded, color: AppColors.accent, size: 34),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// CONNECT WITH US
-// ---------------------------------------------------------------------------
-class _ConnectWithUs extends StatelessWidget {
-  const _ConnectWithUs();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadow.card,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Connect With Us', style: AppText.h3),
-                const SizedBox(height: 10),
-                _row(Icons.call_rounded, '+977 1-4220000'),
-                const SizedBox(height: 8),
-                _row(Icons.email_rounded, 'info@nepalagrawalsamaj.org'),
-                const SizedBox(height: 8),
-                _row(Icons.location_on_rounded, 'Kathmandu, Nepal'),
-                const SizedBox(height: 8),
-                _row(Icons.access_time_rounded, 'Sun - Fri (9:00 AM - 6:00 PM)'),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            child: SizedBox(
-              width: 80,
-              height: 130,
-              child: _networkImage(
-                url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-                fit: BoxFit.cover,
+          // Notification bell with badge
+          _HeaderCircleIconButton(
+            icon: Icons.notifications_none_rounded,
+            badgeCount: 3,
+            onTap: onBellTap,
+          ),
+          const SizedBox(width: 10),
+          // Profile icon
+          _HeaderCircleIconButton(
+            icon: Icons.person_outline_rounded,
+            onTap: onProfileTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeaderCircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final int? badgeCount;
+  final VoidCallback onTap;
+
+  const _HeaderCircleIconButton({
+    required this.icon,
+    required this.onTap,
+    this.badgeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+            child: Icon(icon, color: AppColors.maroon, size: 22),
+          ),
+          if (badgeCount != null && badgeCount! > 0)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                decoration: BoxDecoration(
+                  color: AppColors.pinkIcon,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Center(
+                  child: Text(
+                    '$badgeCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// HERO SECTION
+// ---------------------------------------------------------------------------
+class _HeroSection extends StatelessWidget {
+  final VoidCallback onBecomeMember;
+  final VoidCallback onExploreEvents;
+
+  const _HeroSection({required this.onBecomeMember, required this.onExploreEvents});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.creamLight, AppColors.creamDark],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Decorative temple silhouette on the right
+          Positioned(
+            right: -10,
+            bottom: 0,
+            top: 20,
+            child: Opacity(
+              opacity: 0.9,
+              child: Icon(
+                Icons.temple_hindu,
+                size: 190,
+                color: AppColors.maroonDark.withValues(alpha: 0.85),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: const [
+                    Text('Namaste!',
+                        style: TextStyle(
+                          color: AppColors.maroon,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        )),
+                    SizedBox(width: 6),
+                    Text('👋', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Together,',
+                  style: TextStyle(
+                    color: AppColors.maroon,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                  ),
+                ),
+                const Text(
+                  'We Grow',
+                  style: TextStyle(
+                    color: AppColors.maroon,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const SizedBox(
+                  width: 210,
+                  child: Text(
+                    'A united family working for culture, welfare, business growth and a better tomorrow.',
+                    style: TextStyle(
+                      color: AppColors.textGrey,
+                      fontSize: 13.5,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: onBecomeMember,
+                      icon: const Icon(Icons.groups_rounded, size: 18, color: Colors.white),
+                      label: const Text('Become a Member'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.maroon,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: onExploreEvents,
+                      icon: const Icon(Icons.calendar_today_rounded, size: 16, color: AppColors.maroon),
+                      label: const Text('Explore Events'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.maroon,
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: AppColors.maroon, width: 1.3),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// STATS ROW
+// ---------------------------------------------------------------------------
+class _StatItem {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String value;
+  final String label;
+  final Color underlineColor;
+  final String type;
+
+  const _StatItem({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+    required this.underlineColor,
+    required this.type,
+  });
+}
+
+class _StatsRow extends StatelessWidget {
+  final ValueChanged<String> onStatTap;
+
+  const _StatsRow({required this.onStatTap});
+
+  static const List<_StatItem> _stats = [
+    _StatItem(
+      icon: Icons.groups_rounded,
+      iconBg: AppColors.pinkBg,
+      iconColor: AppColors.pinkIcon,
+      value: '2.4K+',
+      label: 'Members',
+      underlineColor: AppColors.pinkIcon,
+      type: 'members',
+    ),
+    _StatItem(
+      icon: Icons.location_on_rounded,
+      iconBg: AppColors.amberBg,
+      iconColor: AppColors.amberIcon,
+      value: '18',
+      label: 'Locations',
+      underlineColor: AppColors.amberIcon,
+      type: 'locations',
+    ),
+    _StatItem(
+      icon: Icons.calendar_month_rounded,
+      iconBg: AppColors.purpleBg,
+      iconColor: AppColors.purpleIcon,
+      value: '42+',
+      label: 'Events (Yearly)',
+      underlineColor: AppColors.purpleIcon,
+      type: 'events',
+    ),
+    _StatItem(
+      icon: Icons.workspace_premium_rounded,
+      iconBg: AppColors.greenBg,
+      iconColor: AppColors.greenIcon,
+      value: '28+',
+      label: 'Years of Service',
+      underlineColor: AppColors.greenIcon,
+      type: 'service',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: List.generate(_stats.length, (i) {
+          final s = _stats[i];
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: i == _stats.length - 1 ? 0 : 8),
+              child: InkWell(
+                onTap: () => onStatTap(s.type),
+                borderRadius: BorderRadius.circular(16),
+                child: _StatCard(stat: s),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final _StatItem stat;
+
+  const _StatCard({required this.stat});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: stat.iconBg,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(stat.icon, color: stat.iconColor, size: 20),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            stat.value,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            stat.label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.textGrey,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: 20,
+            height: 3,
+            decoration: BoxDecoration(
+              color: stat.underlineColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// SECTION HEADER
+// ---------------------------------------------------------------------------
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback onSeeAll;
+
+  const _SectionHeader({required this.title, required this.onSeeAll});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
+            ),
+          ),
+          InkWell(
+            onTap: onSeeAll,
+            child: const Row(
+              children: [
+                Text(
+                  'See all',
+                  style: TextStyle(
+                    color: AppColors.maroon,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(width: 3),
+                Icon(Icons.arrow_forward_rounded, size: 15, color: AppColors.maroon),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// EVENT CARD
+// ---------------------------------------------------------------------------
+class _EventCard extends StatelessWidget {
+  final _EventData event;
+  final VoidCallback onViewDetails;
+
+  const _EventCard({required this.event, required this.onViewDetails});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image preview with date badge overlay
+          Stack(
+            children: [
+              SizedBox(
+                height: 130,
+                width: double.infinity,
+                child: CachedNetworkImage(
+                  imageUrl: event.imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (ctx, url) => Container(
+                    color: event.imageColor.withValues(alpha: 0.2),
+                    child: Center(
+                      child: Icon(event.imageIcon, size: 36, color: event.imageColor),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.65),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        event.month,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        event.day,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  event.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                    height: 1.25,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 14, color: AppColors.textGrey),
+                    const SizedBox(width: 5),
+                    Text(event.time,
+                        style: const TextStyle(fontSize: 12.5, color: AppColors.textGrey)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textGrey),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(event.location,
+                          style: const TextStyle(fontSize: 12.5, color: AppColors.textGrey),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: onViewDetails,
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.viewDetailsBg,
+                      foregroundColor: AppColors.maroon,
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('View Details',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                        SizedBox(width: 6),
+                        Icon(Icons.arrow_forward_rounded, size: 15),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// COMMUNITY CARD
+// ---------------------------------------------------------------------------
+class _CommunityCard extends StatelessWidget {
+  final _CommunityPost post;
+  final VoidCallback onTap;
+
+  const _CommunityCard({required this.post, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: SizedBox(
+                height: 110,
+                width: double.infinity,
+                child: CachedNetworkImage(
+                  imageUrl: post.imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (ctx, url) => Container(
+                    color: post.imageColor.withValues(alpha: 0.2),
+                    child: Icon(post.imageIcon, size: 34, color: post.imageColor),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              post.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+                height: 1.25,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              post.timeAgo,
+              style: const TextStyle(fontSize: 11.5, color: AppColors.textLightGrey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// JOIN BANNER
+// ---------------------------------------------------------------------------
+class _JoinBanner extends StatelessWidget {
+  final VoidCallback onBecomeMember;
+
+  const _JoinBanner({required this.onBecomeMember});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.joinBannerBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: const Icon(Icons.diversity_3_rounded, color: AppColors.maroon, size: 26),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Join the Community',
+                      style: TextStyle(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.maroon,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Be a part of our family and help create a stronger impact together.',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.textGrey,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onBecomeMember,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.maroon,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Become a Member',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 8),
+                  Icon(Icons.arrow_forward_rounded, size: 16),
+                ],
               ),
             ),
           ),
@@ -1429,38 +1097,4 @@ class _ConnectWithUs extends StatelessWidget {
       ),
     );
   }
-
-  Widget _row(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: AppColors.accent),
-        const SizedBox(width: 8),
-        Expanded(child: Text(text, style: AppText.bodySmall)),
-      ],
-    );
-  }
-}
-
-
-
-// ---------------------------------------------------------------------------
-// SHARED NETWORK IMAGE WITH CACHED LOADING
-// ---------------------------------------------------------------------------
-Widget _networkImage({required String url, BoxFit fit = BoxFit.cover}) {
-  return CachedNetworkImage(
-    imageUrl: url,
-    fit: fit,
-    placeholder: (context, url) => Container(
-      color: AppColors.subtleCard,
-      child: const Center(
-        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-      ),
-    ),
-    errorWidget: (context, url, error) => Container(
-      color: AppColors.subtleCard,
-      child: const Center(
-        child: Icon(Icons.image_rounded, color: AppColors.border, size: 24),
-      ),
-    ),
-  );
 }

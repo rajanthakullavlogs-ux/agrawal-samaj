@@ -270,18 +270,46 @@ class NASIcons {
 class AppColors {
   AppColors._();
 
-  static const Color primary = NASColors.primary;
+  static const Color primary = Color(0xFF7A1B22); // Maroon matching design image
+  static const Color maroon = Color(0xFF7A1B22);
+  static const Color maroonDark = Color(0xFF5C1219);
+  static const Color maroonLight = Color(0xFF8F2530);
+
   static const Color accent = Color(0xFFD32F2F);
   static const Color accentLight = Color(0xFFFBE9E7);
-  static const Color gold = Color(0xFFD4AF37);
-  static const Color background = NASColors.background;
+
+  static const Color gold = Color(0xFFE8A93A);
+  static const Color goldDark = Color(0xFFD79424);
+  static const Color goldLight = Color(0xFFF4C766);
+
+  static const Color creamLight = Color(0xFFFDF3DC);
+  static const Color creamDark = Color(0xFFF3DDB0);
+
+  static const Color textDark = Color(0xFF2B2320);
+  static const Color textGrey = Color(0xFF6E645D);
+  static const Color textLightGrey = Color(0xFF9A928C);
+
+  static const Color pinkBg = Color(0xFFFBE3E4);
+  static const Color pinkIcon = Color(0xFFE0596B);
+  static const Color amberBg = Color(0xFFFCEBD3);
+  static const Color amberIcon = Color(0xFFE8A93A);
+  static const Color purpleBg = Color(0xFFEAE3F7);
+  static const Color purpleIcon = Color(0xFF8B5FC7);
+  static const Color greenBg = Color(0xFFE1F2E3);
+  static const Color greenIcon = Color(0xFF4CA85B);
+
+  static const Color viewDetailsBg = Color(0xFFF7E2E2);
+  static const Color joinBannerBg = Color(0xFFFBE7E7);
+  static const Color cardBorder = Color(0xFFEDEAE6);
+
+  static const Color background = Color(0xFFF7F5F3);
   static const Color cardBackground = NASColors.surfaceContainerLowest;
   static const Color subtleCard = NASColors.surfaceContainerLow;
   static const Color border = NASColors.outlineVariant;
   static const Color divider = NASColors.surfaceVariant;
   static const Color textSecondary = NASColors.onSurfaceVariant;
   static const Color textPrimary = Color(0xFF1F2937);
-  static const Color badgeMaroon = NASColors.primary;
+  static const Color badgeMaroon = Color(0xFF7A1B22);
 
   static const LinearGradient orangeGradient = LinearGradient(
     colors: [Color(0xFFE65100), Color(0xFFF57C00)],
@@ -290,7 +318,7 @@ class AppColors {
   );
 
   static const LinearGradient maroonGradient = LinearGradient(
-    colors: [Color(0xFF570000), Color(0xFF800000)],
+    colors: [Color(0xFF7A1B22), Color(0xFF5C1219)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

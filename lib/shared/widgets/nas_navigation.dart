@@ -396,16 +396,16 @@ class NASBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.home_rounded, label: 'Home', route: AppConstants.home),
-    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.events),
-    (icon: Icons.place_rounded, label: 'Locations', route: AppConstants.locations),
+    (icon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.events),
+    (icon: Icons.groups_rounded, label: 'Membership', route: AppConstants.membershipSelector),
     (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.gallery),
-    (icon: Icons.more_horiz_rounded, label: 'More', route: AppConstants.about),
+    (icon: Icons.grid_view_rounded, label: 'More', route: AppConstants.about),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -419,34 +419,56 @@ class NASBottomNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Row(
-          children: [
-            for (int i = 0; i < _items.length; i++)
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => context.go(_items[i].route),
-                  behavior: HitTestBehavior.opaque,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _items[i].icon,
-                        size: 22,
-                        color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _items[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w400,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(_items.length, (i) {
+            final item = _items[i];
+            final bool active = i == activeIndex;
+            final bool isCenter = i == 2;
+
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => context.go(item.route),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isCenter)
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.gold,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x33E8A93A),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
+                        child: Icon(item.icon, color: Colors.white, size: 22),
+                      )
+                    else
+                      Icon(
+                        item.icon,
+                        size: 22,
+                        color: active ? AppColors.maroon : AppColors.textLightGrey,
                       ),
-                    ],
-                  ),
+                    const SizedBox(height: 3),
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                        color: active ? AppColors.maroon : AppColors.textLightGrey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-          ],
+            );
+          }),
         ),
       ),
     );
