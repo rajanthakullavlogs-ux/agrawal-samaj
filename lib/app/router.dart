@@ -103,7 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppConstants.about,
-        pageBuilder: (_, _) => _slideTransitionPage(const AboutScreen()),
+        pageBuilder: (_, _) => const NoTransitionPage(child: AboutScreen()),
       ),
       GoRoute(
         path: AppConstants.events,

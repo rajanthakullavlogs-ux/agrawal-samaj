@@ -395,11 +395,11 @@ class NASBottomNavBar extends StatelessWidget {
   const NASBottomNavBar({super.key, this.activeIndex = 0});
 
   static const _items = [
-    (icon: Icons.home_rounded, activeIcon: Icons.home_rounded, label: 'Home', route: AppConstants.home),
+    (icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: 'Home', route: AppConstants.home),
     (icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.events),
-    (icon: Icons.groups_rounded, activeIcon: Icons.groups_rounded, label: 'Membership', route: AppConstants.membershipSelector),
-    (icon: Icons.photo_library_outlined, activeIcon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.gallery),
-    (icon: Icons.grid_view_rounded, activeIcon: Icons.grid_view_rounded, label: 'More', route: AppConstants.about),
+    (icon: Icons.location_on_outlined, activeIcon: Icons.location_on_rounded, label: 'Locations', route: AppConstants.locations),
+    (icon: Icons.image_outlined, activeIcon: Icons.image_rounded, label: 'Gallery', route: AppConstants.gallery),
+    (icon: Icons.more_horiz_rounded, activeIcon: Icons.more_horiz_rounded, label: 'More', route: AppConstants.about),
   ];
 
   @override
@@ -424,90 +424,42 @@ class NASBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              for (int i = 0; i < _items.length; i++) ...[
-                if (i == 2)
-                  // Center Membership Button (Golden circular button)
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => context.go(_items[i].route),
-                      behavior: HitTestBehavior.opaque,
+              for (int i = 0; i < _items.length; i++)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => context.go(_items[i].route),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 44,
-                            height: 44,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFF9C846), Color(0xFFEAA010)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFEAA010).withValues(alpha: 0.4),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                              color: i == activeIndex ? const Color(0xFFFDF0F0) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Icon(
-                              Icons.groups_rounded,
+                            child: Icon(
+                              i == activeIndex ? _items[i].activeIcon : _items[i].icon,
                               size: 22,
-                              color: Colors.white,
+                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 2),
                           Text(
                             _items[i].label,
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 10.5,
                               fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF6E6E6E),
+                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  )
-                else
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => context.go(_items[i].route),
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: i == activeIndex ? const Color(0xFFFFF0F0) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(
-                                i == activeIndex ? _items[i].activeIcon : _items[i].icon,
-                                size: 22,
-                                color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _items[i].label,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                                color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
-              ],
+                ),
             ],
           ),
         ),

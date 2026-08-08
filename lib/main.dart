@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app/router.dart';
 import 'app/theme.dart';
@@ -9,12 +10,21 @@ import 'core/supabase_client.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = true;
 
-  // Load environment variables
-  await dotenv.load(fileName: '.env');
+  // Load environment variables safely
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('dotenv.load warning: $e');
+  }
 
-  // Initialize Supabase
-  await SupabaseConfig.initialize();
+  // Initialize Supabase safely
+  try {
+    await SupabaseConfig.initialize();
+  } catch (e) {
+    debugPrint('SupabaseConfig.initialize warning: $e');
+  }
 
   runApp(
     const ProviderScope(

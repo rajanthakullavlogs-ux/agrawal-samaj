@@ -3,54 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/design_tokens.dart';
+import '../../../core/constants.dart';
 import '../../../shared/widgets/widgets.dart';
 
-enum _GalleryCategory { all, business, cultural, socialWork }
-
-class _GalleryPhoto {
+class _HighlightPhoto {
   final String id;
   final String url;
   final String title;
-  final _GalleryCategory category;
-  final String eventId;
-  final String eventTitle;
-  final String eventDate;
-  final String venue;
+  final int photoCount;
 
-  const _GalleryPhoto({
+  const _HighlightPhoto({
     required this.id,
     required this.url,
     required this.title,
-    required this.category,
-    required this.eventId,
-    required this.eventTitle,
-    required this.eventDate,
-    required this.venue,
+    required this.photoCount,
   });
 }
 
-class _GalleryAlbum {
+class _AlbumItem {
   final String id;
   final String title;
-  final String count;
+  final int photoCount;
+  final int albumCount;
   final IconData icon;
   final String imageUrl;
-  final _GalleryCategory category;
-  final String eventId;
 
-  const _GalleryAlbum({
+  const _AlbumItem({
     required this.id,
     required this.title,
-    required this.count,
+    required this.photoCount,
+    required this.albumCount,
     required this.icon,
     required this.imageUrl,
-    required this.category,
-    required this.eventId,
   });
 }
 
-/// Gallery Screen — Fully functional with live filtering, full-screen zoom, and event info integration
+/// Refactored GalleryListScreen matching pixel-for-pixel the reference UI screenshot.
 class GalleryListScreen extends ConsumerStatefulWidget {
   const GalleryListScreen({super.key});
 
@@ -59,279 +47,377 @@ class GalleryListScreen extends ConsumerStatefulWidget {
 }
 
 class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
-  _GalleryCategory _category = _GalleryCategory.all;
+  String _selectedCategory = 'All'; // 'All', 'Business Events', 'Cultural Events', 'Social Service', 'Youth Activities'
+  String _selectedYear = '2025'; // '2025', '2024', '2023', '2022', '2021'
 
-  static const List<_GalleryPhoto> _allPhotos = [
-    _GalleryPhoto(
-      id: 'p1',
-      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
-      title: 'Business Summit Keynote Presentation',
-      category: _GalleryCategory.business,
-      eventId: 'ev-2',
-      eventTitle: 'Entrepreneurship & Trade Summit',
-      eventDate: 'Oct 22, 2026',
-      venue: 'Samaj Hall, Kamaladi',
-    ),
-    _GalleryPhoto(
-      id: 'p2',
-      url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
-      title: 'Blood Donation Camp Volunteers',
-      category: _GalleryCategory.socialWork,
-      eventId: 'ev-4',
-      eventTitle: 'Senior Wellness & Health Camp',
-      eventDate: 'Oct 28, 2026',
-      venue: 'Central Clinic Wing, Kathmandu',
-    ),
-    _GalleryPhoto(
-      id: 'p3',
-      url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
-      title: 'Annual Heritage Gala Dance Performance',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-1',
-      eventTitle: 'Annual Heritage Gala 2026',
-      eventDate: 'Oct 15, 2026',
-      venue: 'Hotel Yak & Yeti, Kathmandu',
-    ),
-    _GalleryPhoto(
-      id: 'p4',
-      url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-      title: 'Community Networking Dinner',
-      category: _GalleryCategory.business,
-      eventId: 'ev-2',
-      eventTitle: 'Entrepreneurship & Trade Summit',
-      eventDate: 'Oct 22, 2026',
-      venue: 'Samaj Hall, Kamaladi',
-    ),
-    _GalleryPhoto(
-      id: 'p5',
-      url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
-      title: 'Youth Cultural Fest Stage Program',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-3',
-      eventTitle: 'Youth Cultural Fest 2026',
-      eventDate: 'Nov 05, 2026',
-      venue: 'National Stadium, Tripureshwor',
-    ),
-    _GalleryPhoto(
-      id: 'p6',
-      url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
-      title: 'Teej Puja Ceremonies',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-1',
-      eventTitle: 'Annual Heritage Gala 2026',
-      eventDate: 'Oct 15, 2026',
-      venue: 'Hotel Yak & Yeti, Kathmandu',
-    ),
-    _GalleryPhoto(
-      id: 'p7',
-      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
-      title: 'Agrawal Entrepreneurs Panel Discussion',
-      category: _GalleryCategory.business,
-      eventId: 'ev-2',
-      eventTitle: 'Entrepreneurship & Trade Summit',
-      eventDate: 'Oct 22, 2026',
-      venue: 'Samaj Hall, Kamaladi',
-    ),
-    _GalleryPhoto(
-      id: 'p8',
-      url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
-      title: 'Free Health Checkup Ward',
-      category: _GalleryCategory.socialWork,
-      eventId: 'ev-4',
-      eventTitle: 'Senior Wellness & Health Camp',
-      eventDate: 'Oct 28, 2026',
-      venue: 'Central Clinic Wing, Kathmandu',
-    ),
-    _GalleryPhoto(
-      id: 'p9',
-      url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-      title: 'Youth Leadership Workshop',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-3',
-      eventTitle: 'Youth Cultural Fest 2026',
-      eventDate: 'Nov 05, 2026',
-      venue: 'National Stadium, Tripureshwor',
-    ),
-  ];
+  static const _HighlightPhoto _tallLeftPhoto = _HighlightPhoto(
+    id: 'p-1',
+    url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+    title: 'Annual Business Summit Keynote Audience',
+    photoCount: 24,
+  );
 
-  static const List<_GalleryAlbum> _allAlbums = [
-    _GalleryAlbum(
-      id: 'gal-1',
-      title: 'Business Summit\n2026',
-      count: '45 Photos',
-      icon: Icons.work_rounded,
+  static const _HighlightPhoto _midTopPhoto = _HighlightPhoto(
+    id: 'p-2',
+    url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
+    title: 'Nepali Traditional Harmonium Performance',
+    photoCount: 18,
+  );
+
+  static const _HighlightPhoto _midBottomPhoto = _HighlightPhoto(
+    id: 'p-3',
+    url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+    title: 'Youth Tree Plantation Social Service',
+    photoCount: 16,
+  );
+
+  static const _HighlightPhoto _rightTopPhoto = _HighlightPhoto(
+    id: 'p-4',
+    url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
+    title: 'Teej Festival Temple Dance Group',
+    photoCount: 32,
+  );
+
+  static const _HighlightPhoto _rightBottomPhoto = _HighlightPhoto(
+    id: 'p-5',
+    url: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=800&q=80',
+    title: 'Mega Blood Donation Drive Volunteers',
+    photoCount: 20,
+  );
+
+  static const List<_AlbumItem> _albums = [
+    _AlbumItem(
+      id: 'alb-1',
+      title: 'Business Events',
+      photoCount: 15,
+      albumCount: 2,
+      icon: Icons.business_center_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=400&q=80',
-      category: _GalleryCategory.business,
-      eventId: 'ev-2',
     ),
-    _GalleryAlbum(
-      id: 'gal-2',
-      title: 'Heritage Gala\n2026',
-      count: '68 Photos',
+    _AlbumItem(
+      id: 'alb-2',
+      title: 'Cultural Events',
+      photoCount: 18,
+      albumCount: 3,
       icon: Icons.theater_comedy_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-1',
     ),
-    _GalleryAlbum(
-      id: 'gal-3',
-      title: 'Health & Blood\nDrive',
-      count: '32 Photos',
+    _AlbumItem(
+      id: 'alb-3',
+      title: 'Social Service',
+      photoCount: 12,
+      albumCount: 2,
       icon: Icons.volunteer_activism_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
-      category: _GalleryCategory.socialWork,
-      eventId: 'ev-4',
     ),
-    _GalleryAlbum(
-      id: 'gal-4',
-      title: 'Youth Cultural\nFest',
-      count: '56 Photos',
+    _AlbumItem(
+      id: 'alb-4',
+      title: 'Youth Activities',
+      photoCount: 14,
+      albumCount: 2,
       icon: Icons.groups_rounded,
       imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-      category: _GalleryCategory.cultural,
-      eventId: 'ev-3',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final filteredPhotos = _category == _GalleryCategory.all
-        ? _allPhotos
-        : _allPhotos.where((p) => p.category == _category).toList();
-
-    final filteredAlbums = _category == _GalleryCategory.all
-        ? _allAlbums
-        : _allAlbums.where((a) => a.category == _category).toList();
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: const NASAppBar(title: 'Gallery', showBackButton: true),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: const Color(0xFFF9F7F5),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Navigation & Hero Banner Section
+            _GalleryHeroSection(
+              onBack: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(AppConstants.home);
+                }
+              },
+              onProfile: () => context.push(AppConstants.profile),
+            ),
+            const SizedBox(height: 16),
+
+            // Horizontal Category Filter Pills Bar
+            _GalleryCategoryPillsBar(
+              selectedCategory: _selectedCategory,
+              onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
+            ),
+            const SizedBox(height: 24),
+
+            // Photo Highlights Section Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Photo Highlights',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E1615),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Opening full photo highlights...')),
+                      );
+                    },
+                    child: Row(
+                      children: const [
+                        Text(
+                          'View All',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF700D15),
+                          ),
+                        ),
+                        SizedBox(width: 2),
+                        Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF700D15)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Asymmetric Photo Grid (Left Tall + 2 Middle Stacked + 2 Right Stacked)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                height: 240,
+                child: Row(
+                  children: [
+                    // Left Column (Tall Photo)
+                    Expanded(
+                      flex: 3,
+                      child: _PhotoGridCard(
+                        photo: _tallLeftPhoto,
+                        onTap: () => _showZoomableLightbox(context, _tallLeftPhoto),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Middle Column (2 Stacked Photos)
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: _PhotoGridCard(
+                              photo: _midTopPhoto,
+                              onTap: () => _showZoomableLightbox(context, _midTopPhoto),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: _PhotoGridCard(
+                              photo: _midBottomPhoto,
+                              onTap: () => _showZoomableLightbox(context, _midBottomPhoto),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Right Column (2 Stacked Photos)
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: _PhotoGridCard(
+                              photo: _rightTopPhoto,
+                              onTap: () => _showZoomableLightbox(context, _rightTopPhoto),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: _PhotoGridCard(
+                              photo: _rightBottomPhoto,
+                              onTap: () => _showZoomableLightbox(context, _rightBottomPhoto),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Carousel Indicator Dots Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 12),
-                const Text(
-                  'Gallery',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                    fontFamily: NASTypography.headlineFont,
+                Container(
+                  width: 16,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF700D15),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Moments that define us',
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 16),
+                for (int i = 0; i < 4; i++)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(left: 5),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE5D5D5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
               ],
             ),
-          ),
-          _CategoryRow(
-            category: _category,
-            onChanged: (c) => setState(() => _category = c),
-          ),
-          const SizedBox(height: 20),
-          _sectionHeader('Photo Highlights', count: filteredPhotos.length),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: filteredPhotos.isEmpty
-                ? Container(
-                    padding: const EdgeInsets.all(24),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+            const SizedBox(height: 28),
+
+            // Recent Albums Section Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Recent Albums',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E1615),
                     ),
-                    child: const Text('No photos found for this category',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-                  )
-                : GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: filteredPhotos.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: 1,
-                    ),
-                    itemBuilder: (context, i) {
-                      final photo = filteredPhotos[i];
-                      return GestureDetector(
-                        onTap: () => _showZoomableLightbox(context, photo),
-                        child: _PhotoThumb(photo: photo),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Opening all albums...')),
                       );
                     },
-                  ),
-          ),
-          const SizedBox(height: 24),
-          _sectionHeader('Recent Albums', count: filteredAlbums.length),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 195,
-            child: filteredAlbums.isEmpty
-                ? Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.all(24),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    child: Row(
+                      children: const [
+                        Text(
+                          'View All Albums',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF700D15),
+                          ),
+                        ),
+                        SizedBox(width: 2),
+                        Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF700D15)),
+                      ],
                     ),
-                    child: const Text('No albums found for this category',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-                  )
-                : ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: filteredAlbums.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 12),
-                    itemBuilder: (context, i) {
-                      final album = filteredAlbums[i];
-                      return GestureDetector(
-                        onTap: () => context.push('/gallery/${album.id}'),
-                        child: _AlbumCard(album: album),
-                      );
-                    },
                   ),
-          ),
-        ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Horizontal Recent Albums Scroll
+            SizedBox(
+              height: 185,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _albums.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
+                itemBuilder: (context, i) {
+                  final album = _albums[i];
+                  return GestureDetector(
+                    onTap: () => context.push('/gallery/${album.id}'),
+                    child: _RecentAlbumCard(album: album),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // Explore by Year Section Header & Pills
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Explore by Year',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E1615),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Year Filter Pills Bar
+            SizedBox(
+              height: 38,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: ['2025', '2024', '2023', '2022', '2021'].map((yr) {
+                  final isSelected = yr == _selectedYear;
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedYear = yr),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFF500913) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 13,
+                            color: isSelected ? Colors.white : const Color(0xFF700D15),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            yr,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: isSelected ? Colors.white : const Color(0xFF1E1615),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
       bottomNavigationBar: const NASBottomNavBar(activeIndex: 3),
     );
   }
 
-  Widget _sectionHeader(String title, {required int count}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('$title ($count)', style: AppText.h2),
-        ],
-      ),
-    );
-  }
-
-  void _showZoomableLightbox(BuildContext context, _GalleryPhoto photo) {
+  void _showZoomableLightbox(BuildContext context, _HighlightPhoto photo) {
     showDialog(
       context: context,
-      builder: (dialogContext) => Dialog(
+      builder: (dialogCtx) => Dialog(
         backgroundColor: Colors.black,
         insetPadding: const EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top Bar with Close button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
@@ -346,13 +432,11 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded, color: Colors.white),
-                    onPressed: () => Navigator.pop(dialogContext),
+                    onPressed: () => Navigator.pop(dialogCtx),
                   ),
                 ],
               ),
             ),
-
-            // Zoomable Image View (Pinch to zoom / double tap)
             Flexible(
               child: Container(
                 constraints: const BoxConstraints(maxHeight: 450),
@@ -363,7 +447,7 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
                     imageUrl: photo.url,
                     fit: BoxFit.contain,
                     placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(color: AppColors.accent),
+                      child: CircularProgressIndicator(color: Color(0xFF700D15)),
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.broken_image_rounded, size: 64, color: Colors.white54),
@@ -371,146 +455,270 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            // Event Info Reference Card
-            Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: Colors.white24),
+// ---------------------------------------------------------------------------
+// 1. TOP HERO BANNER & NAVIGATION
+// ---------------------------------------------------------------------------
+class _GalleryHeroSection extends StatelessWidget {
+  final VoidCallback onBack;
+  final VoidCallback onProfile;
+
+  const _GalleryHeroSection({
+    required this.onBack,
+    required this.onProfile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFFF9F7F5),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Bar Row: Back Button + Centered Title + Profile Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: onBack,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF0EAE8),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back_rounded, color: Color(0xFF500913), size: 20),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const Text(
+                'Gallery',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF500913),
+                  letterSpacing: -0.3,
+                ),
+              ),
+              GestureDetector(
+                onTap: onProfile,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF0EAE8),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 20),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Main Headline & Temple Pagoda Graphic Stack/Row
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 110),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Moments that define us',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF500913),
+                        height: 1.2,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Relive our events, celebrations and success stories.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF666666),
+                        fontWeight: FontWeight.w400,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Pagoda Illustration Graphic (Faded light red/pink right accent)
+              Positioned(
+                right: 0,
+                bottom: -10,
+                child: SizedBox(
+                  width: 120,
+                  height: 110,
+                  child: ShaderMask(
+                    shaderCallback: (rect) => LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.15),
+                      ],
+                    ).createShader(rect),
+                    blendMode: BlendMode.dstIn,
+                    child: CachedNetworkImage(
+                      imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
+                      fit: BoxFit.contain,
+                      errorWidget: (_, _, _) => const Icon(Icons.account_balance_rounded, size: 64, color: Color(0x33500913)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2. HORIZONTAL CATEGORY FILTER PILLS BAR
+// ---------------------------------------------------------------------------
+class _GalleryCategoryPillsBar extends StatelessWidget {
+  final String selectedCategory;
+  final ValueChanged<String> onCategorySelected;
+
+  const _GalleryCategoryPillsBar({
+    required this.selectedCategory,
+    required this.onCategorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = [
+      {'label': 'All', 'icon': Icons.grid_view_rounded},
+      {'label': 'Business Events', 'icon': Icons.business_center_rounded},
+      {'label': 'Cultural Events', 'icon': Icons.theater_comedy_rounded},
+      {'label': 'Social Service', 'icon': Icons.volunteer_activism_rounded},
+      {'label': 'Youth Activities', 'icon': Icons.groups_rounded},
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: categories.length,
+        itemBuilder: (context, i) {
+          final cat = categories[i];
+          final label = cat['label'] as String;
+          final icon = cat['icon'] as IconData;
+          final isSelected = label == selectedCategory;
+
+          return GestureDetector(
+            onTap: () => onCategorySelected(label),
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFF500913) : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
+                ),
+              ),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.event_note_rounded, color: AppColors.accent, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          photo.eventTitle,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5),
-                        ),
-                      ),
-                    ],
+                  Icon(
+                    icon,
+                    size: 14,
+                    color: isSelected ? Colors.white : const Color(0xFF700D15),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, color: Colors.white54, size: 12),
-                      const SizedBox(width: 4),
-                      Text(photo.eventDate, style: const TextStyle(color: Colors.white70, fontSize: 11)),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.location_on_rounded, color: Colors.white54, size: 12),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(photo.venue,
-                            style: const TextStyle(color: Colors.white70, fontSize: 11),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(dialogContext);
-                            context.push('/events/${photo.eventId}');
-                          },
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                          label: const Text('View Event Details', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      OutlinedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Opening website coverage for ${photo.eventTitle}...')),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white38),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                        ),
-                        child: const Icon(Icons.language_rounded, size: 18),
-                      ),
-                    ],
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? Colors.white : const Color(0xFF1E1615),
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// CATEGORY FILTER ROW
+// 3. PHOTO HIGHLIGHT CARD ITEM
 // ---------------------------------------------------------------------------
-class _CategoryRow extends StatelessWidget {
-  final _GalleryCategory category;
-  final ValueChanged<_GalleryCategory> onChanged;
-  const _CategoryRow({required this.category, required this.onChanged});
+class _PhotoGridCard extends StatelessWidget {
+  final _HighlightPhoto photo;
+  final VoidCallback onTap;
+
+  const _PhotoGridCard({
+    required this.photo,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 38,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: [
-          _chip(Icons.grid_view_rounded, 'All', _GalleryCategory.all),
-          const SizedBox(width: 8),
-          _chip(Icons.work_rounded, 'Business Events', _GalleryCategory.business),
-          const SizedBox(width: 8),
-          _chip(Icons.theater_comedy_rounded, 'Cultural Events', _GalleryCategory.cultural),
-          const SizedBox(width: 8),
-          _chip(Icons.volunteer_activism_rounded, 'Social Work', _GalleryCategory.socialWork),
-        ],
-      ),
-    );
-  }
-
-  Widget _chip(IconData icon, String label, _GalleryCategory value) {
-    final selected = category == value;
-    return InkWell(
-      onTap: () => onChanged(value),
-      borderRadius: BorderRadius.circular(100),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: selected ? AppColors.primary : AppColors.border),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Icon(icon, size: 14, color: selected ? Colors.white : AppColors.accent),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppColors.textSecondary,
+            CachedNetworkImage(
+              imageUrl: photo.url,
+              fit: BoxFit.cover,
+              placeholder: (_, _) => Container(color: const Color(0xFFEFEBE8)),
+              errorWidget: (_, _, _) => Container(
+                color: const Color(0xFFE5D0D0),
+                child: const Icon(Icons.image, color: Color(0xFF700D15)),
+              ),
+            ),
+
+            // Bottom-Left Translucent Photo Count Badge
+            Positioned(
+              left: 8,
+              bottom: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.60),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 12),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${photo.photoCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -521,64 +729,40 @@ class _CategoryRow extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// PHOTO THUMBNAIL
+// 4. RECENT ALBUM CARD ITEM
 // ---------------------------------------------------------------------------
-class _PhotoThumb extends StatelessWidget {
-  final _GalleryPhoto photo;
-  const _PhotoThumb({required this.photo});
+class _RecentAlbumCard extends StatelessWidget {
+  final _AlbumItem album;
+
+  const _RecentAlbumCard({required this.album});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CachedNetworkImage(
-            imageUrl: photo.url,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: AppColors.subtleCard),
-          ),
-          Positioned(
-            left: 6,
-            bottom: 6,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.60),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.zoom_in_rounded, size: 12, color: Colors.white),
-            ),
+    return Container(
+      width: 155,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5D0D0), width: 0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// ALBUM CARD
-// ---------------------------------------------------------------------------
-class _AlbumCard extends StatelessWidget {
-  final _GalleryAlbum album;
-  const _AlbumCard({required this.album});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 130,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top Cover Image Stack with Circular Icon Badge
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 child: SizedBox(
                   height: 110,
-                  width: 130,
+                  width: 155,
                   child: CachedNetworkImage(
                     imageUrl: album.imageUrl,
                     fit: BoxFit.cover,
@@ -586,29 +770,50 @@ class _AlbumCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 6,
-                top: 6,
+                left: 8,
+                top: 8,
                 child: Container(
-                  width: 26,
-                  height: 26,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.90),
+                  width: 28,
+                  height: 28,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(album.icon, size: 13, color: AppColors.primary),
+                  child: Icon(album.icon, size: 14, color: const Color(0xFF700D15)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            album.title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, height: 1.25),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+
+          // Bottom Album Details Padding
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  album.title,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1E1615),
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${album.photoCount} Photos • ${album.albumCount} Albums',
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF666666),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 2),
-          Text(album.count, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         ],
       ),
     );

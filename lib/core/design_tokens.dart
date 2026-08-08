@@ -185,70 +185,61 @@ class NASShadows {
 class NASTypography {
   NASTypography._();
 
-  static const String headlineFont = 'Playfair Display';
-  static const String bodyFont = 'Inter';
+  static const String? headlineFont = null;
+  static const String? bodyFont = null;
 
   static const TextStyle displayLg = TextStyle(
-    fontFamily: headlineFont,
     fontSize: 48,
     fontWeight: FontWeight.w700,
     height: 56 / 48,
-    letterSpacing: -0.96, // -0.02em
+    letterSpacing: -0.96,
   );
 
   static const TextStyle displayLgMobile = TextStyle(
-    fontFamily: headlineFont,
     fontSize: 32,
     fontWeight: FontWeight.w700,
     height: 40 / 32,
-    letterSpacing: -0.32, // -0.01em
+    letterSpacing: -0.32,
   );
 
   static const TextStyle headlineMd = TextStyle(
-    fontFamily: headlineFont,
     fontSize: 32,
     fontWeight: FontWeight.w600,
     height: 40 / 32,
   );
 
   static const TextStyle headlineMdMobile = TextStyle(
-    fontFamily: headlineFont,
     fontSize: 24,
     fontWeight: FontWeight.w600,
     height: 32 / 24,
   );
 
   static const TextStyle titleLg = TextStyle(
-    fontFamily: bodyFont,
     fontSize: 20,
     fontWeight: FontWeight.w600,
     height: 28 / 20,
   );
 
   static const TextStyle bodyLg = TextStyle(
-    fontFamily: bodyFont,
     fontSize: 18,
     fontWeight: FontWeight.w400,
     height: 28 / 18,
   );
 
   static const TextStyle bodyMd = TextStyle(
-    fontFamily: bodyFont,
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 24 / 16,
   );
 
   static const TextStyle labelMd = TextStyle(
-    fontFamily: bodyFont,
     fontSize: 14,
     fontWeight: FontWeight.w500,
     height: 20 / 14,
-    letterSpacing: 0.14, // 0.01em
+    letterSpacing: 0.14,
   );
 
   static const TextStyle labelSm = TextStyle(
-    fontFamily: bodyFont,
     fontSize: 12,
     fontWeight: FontWeight.w600,
     height: 16 / 12,
@@ -353,7 +344,6 @@ class AppText {
   AppText._();
 
   static const TextStyle h1 = TextStyle(
-    fontFamily: NASTypography.headlineFont,
     fontSize: 28,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
@@ -361,21 +351,18 @@ class AppText {
   );
 
   static const TextStyle h2 = TextStyle(
-    fontFamily: NASTypography.headlineFont,
     fontSize: 18,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
 
   static const TextStyle h3 = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 14,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
 
   static const TextStyle tagline = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 11,
     fontWeight: FontWeight.w700,
     color: AppColors.gold,
@@ -383,33 +370,28 @@ class AppText {
   );
 
   static const TextStyle body = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 13,
     color: AppColors.textSecondary,
     height: 1.4,
   );
 
   static const TextStyle bodySmall = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 11,
     color: AppColors.textSecondary,
   );
 
   static const TextStyle button = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle statNumber = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 15,
     fontWeight: FontWeight.w800,
     color: AppColors.primary,
   );
 
   static const TextStyle statLabel = TextStyle(
-    fontFamily: NASTypography.bodyFont,
     fontSize: 10,
     color: AppColors.textSecondary,
   );

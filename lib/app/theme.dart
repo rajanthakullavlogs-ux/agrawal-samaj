@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../core/design_tokens.dart';
 
 /// Builds the app-wide [ThemeData] from the Heritage & Unity design tokens.
@@ -45,31 +46,34 @@ class NASTheme {
       surfaceBright: NASColors.surfaceBright,
     );
 
-    return ThemeData(
+    final baseTheme = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: NASColors.surface,
+    );
 
+    return baseTheme.copyWith(
       // ── Typography ──────────────────────────────────────────────
-      fontFamily: NASTypography.bodyFont,
-      textTheme: TextTheme(
-        displayLarge: NASTypography.displayLg.copyWith(color: NASColors.primary),
-        displayMedium:
-            NASTypography.displayLgMobile.copyWith(color: NASColors.primary),
-        headlineMedium:
-            NASTypography.headlineMd.copyWith(color: NASColors.primary),
-        headlineSmall:
-            NASTypography.headlineMdMobile.copyWith(color: NASColors.primary),
-        titleLarge: NASTypography.titleLg.copyWith(color: NASColors.onSurface),
-        bodyLarge:
-            NASTypography.bodyLg.copyWith(color: NASColors.onSurfaceVariant),
-        bodyMedium:
-            NASTypography.bodyMd.copyWith(color: NASColors.onSurfaceVariant),
-        labelLarge: NASTypography.labelMd.copyWith(color: NASColors.onSurface),
-        labelMedium:
-            NASTypography.labelMd.copyWith(color: NASColors.onSurfaceVariant),
-        labelSmall:
-            NASTypography.labelSm.copyWith(color: NASColors.onSurfaceVariant),
+      textTheme: GoogleFonts.interTextTheme(
+        TextTheme(
+          displayLarge: NASTypography.displayLg.copyWith(color: NASColors.primary),
+          displayMedium:
+              NASTypography.displayLgMobile.copyWith(color: NASColors.primary),
+          headlineMedium:
+              NASTypography.headlineMd.copyWith(color: NASColors.primary),
+          headlineSmall:
+              NASTypography.headlineMdMobile.copyWith(color: NASColors.primary),
+          titleLarge: NASTypography.titleLg.copyWith(color: NASColors.onSurface),
+          bodyLarge:
+              NASTypography.bodyLg.copyWith(color: NASColors.onSurfaceVariant),
+          bodyMedium:
+              NASTypography.bodyMd.copyWith(color: NASColors.onSurfaceVariant),
+          labelLarge: NASTypography.labelMd.copyWith(color: NASColors.onSurface),
+          labelMedium:
+              NASTypography.labelMd.copyWith(color: NASColors.onSurfaceVariant),
+          labelSmall:
+              NASTypography.labelSm.copyWith(color: NASColors.onSurfaceVariant),
+        ),
       ),
 
       // ── AppBar ──────────────────────────────────────────────────
