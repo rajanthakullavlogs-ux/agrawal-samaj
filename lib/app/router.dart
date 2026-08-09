@@ -17,6 +17,7 @@ import '../features/gallery/presentation/gallery_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/locations/presentation/location_profile_screen.dart';
 import '../features/locations/presentation/locations_list_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/membership/business_registration/presentation/business_registration_screen.dart';
 import '../features/membership/normal_registration/presentation/normal_registration_screen.dart';
 import '../features/membership/presentation/membership_selector_screen.dart';
@@ -170,6 +171,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '${AppConstants.profile}/edit',
         pageBuilder: (_, _) => _slideTransitionPage(const ProfileEditScreen()),
+      ),
+      GoRoute(
+        path: AppConstants.notifications,
+        pageBuilder: (_, _) => _slideTransitionPage(const NotificationsScreen()),
       ),
       GoRoute(
         path: AppConstants.unauthorized,

@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Top Burgundy Curved Header + Hero Banner Card
             _HeaderSection(
-              onBellTap: () => _showNotificationsSheet(context),
+              onBellTap: () => context.push(AppConstants.notifications),
               onProfileTap: () => context.push(AppConstants.profile),
               onBecomeMember: () => context.push(AppConstants.membershipSelector),
               onExploreEvents: () => context.push(AppConstants.events),

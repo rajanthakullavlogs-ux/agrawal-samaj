@@ -22,6 +22,7 @@ class AppConstants {
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
   static const String profile = '/profile';
+  static const String notifications = '/notifications';
   static const String unauthorized = '/unauthorized';
 
   // Location Admin routes

@@ -27,35 +27,62 @@ class NASAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final canPop = showBackButton || ModalRoute.of(context)?.canPop == true || GoRouter.of(context).canPop();
     return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
+      leadingWidth: 64,
       leading: canPop
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: NASColors.primary),
-              onPressed: () {
-                if (GoRouter.of(context).canPop()) {
-                  context.pop();
-                } else if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                } else {
-                  context.go(AppConstants.home);
-                }
-              },
+          ? Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Center(
+                child: InkWell(
+                  onTap: () {
+                    if (GoRouter.of(context).canPop()) {
+                      context.pop();
+                    } else if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      context.go(AppConstants.home);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDF0F0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.chevron_left_rounded,
+                      color: Color(0xFF5C1414),
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
             )
           : IconButton(
-              icon: const Icon(Icons.menu),
+              icon: const Icon(Icons.menu, color: Color(0xFF5C1414)),
               onPressed: onMenuTap ?? () => Scaffold.of(context).openDrawer(),
             ),
       title: Text(
         title,
-        style: NASTypography.headlineMdMobile.copyWith(
-          color: NASColors.primary,
+        style: const TextStyle(
+          color: Color(0xFF5C1414),
           fontWeight: FontWeight.w700,
+          fontSize: 19,
         ),
       ),
       actions: actions ??
           [
-            IconButton(
-              icon: const Icon(Icons.account_circle_outlined, color: NASColors.primary),
-              onPressed: () => context.push(AppConstants.profile),
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: const Icon(Icons.account_circle_outlined, color: Color(0xFF5C1414), size: 24),
+                onPressed: () => context.push(AppConstants.profile),
+              ),
             ),
           ],
     );
@@ -410,7 +437,7 @@ class NASBottomNavBar extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, -4),
           ),
@@ -430,20 +457,23 @@ class NASBottomNavBar extends StatelessWidget {
                     onTap: () => context.go(_items[i].route),
                     behavior: HitTestBehavior.opaque,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
-                              color: i == activeIndex ? const Color(0xFFFDF0F0) : Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
+                              color: i == activeIndex ? const Color(0xFF5C1414) : Colors.transparent,
+                              shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              i == activeIndex ? _items[i].activeIcon : _items[i].icon,
-                              size: 22,
-                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
+                            child: Center(
+                              child: Icon(
+                                i == activeIndex ? _items[i].activeIcon : _items[i].icon,
+                                size: i == activeIndex ? 20 : 22,
+                                color: i == activeIndex ? Colors.white : const Color(0xFF6E645D),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -452,7 +482,7 @@ class NASBottomNavBar extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 10.5,
                               fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                              color: i == activeIndex ? const Color(0xFF700D15) : const Color(0xFF757575),
+                              color: i == activeIndex ? const Color(0xFF5C1414) : const Color(0xFF6E645D),
                             ),
                           ),
                         ],
