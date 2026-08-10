@@ -974,15 +974,7 @@ class _AnimatedSaveButtonState extends State<_AnimatedSaveButton>
 
   void _handleTap() {
     _controller.forward(from: 0.0);
-    final willBeSaved = !widget.isSaved;
     widget.onTap();
-
-    // Trigger modern bottom-anchored animated event save notification
-    NASToast.eventSaved(
-      context,
-      eventTitle: widget.eventTitle,
-      isSaved: willBeSaved,
-    );
   }
 
   @override
