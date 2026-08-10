@@ -235,20 +235,11 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Section Heading Row (Left Burgundy Accent Bar + Managed Count)
+                    // Section Heading Row (Clean Typography + Managed Count)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          Container(
-                            width: 4,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF700D15),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
                           Text(
                             '$_selectedCategory Photos',
                             style: const TextStyle(

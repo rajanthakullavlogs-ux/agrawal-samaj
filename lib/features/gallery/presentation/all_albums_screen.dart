@@ -198,30 +198,17 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Section Title: Explore by Year with Left Accent Bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 4,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF700D15),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Explore by Year',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF1E1615),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ],
+                    // Section Title: Explore by Year
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Explore by Year',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF1E1615),
+                          letterSpacing: -0.3,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -286,15 +273,6 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          Container(
-                            width: 4,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF700D15),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
                           Text(
                             'Albums ($_selectedYear)',
                             style: const TextStyle(
