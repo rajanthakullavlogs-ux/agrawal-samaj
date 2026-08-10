@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "np.org.agrawalsamaj.nepal_agrawal_samaj"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
