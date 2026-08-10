@@ -38,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onBecomeMember: () => context.push(AppConstants.membershipSelector),
               onExploreEvents: () => context.push(AppConstants.events),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // 4 Stats Cards (Members, Locations, Events, Years of Service)
+            // 4 Stats Cards (Spacious 2x2 Grid)
             const _StatsRow(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             // Upcoming Events Section
             _UpcomingEventsSection(
@@ -50,17 +50,17 @@ class _HomeScreenState extends State<HomeScreen> {
               currentIndex: _eventPageIndex,
               onPageChanged: (i) => setState(() => _eventPageIndex = i),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             // From Our Community Section
             const _FromOurCommunitySection(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
             // Join the Community Banner Card
             _JoinCommunityBanner(
               onBecomeMember: () => context.push(AppConstants.membershipSelector),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
           ],
         ),
       ),
@@ -161,14 +161,14 @@ class _HeaderSection extends StatelessWidget {
         // Top Deep Burgundy Bar Header
         Container(
           width: double.infinity,
-          padding: EdgeInsets.fromLTRB(16, topPadding + 8, 16, 18),
+          padding: EdgeInsets.fromLTRB(16, topPadding + 6, 16, 14),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFF6B0E1B), Color(0xFF500913), Color(0xFF3F050C)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
           ),
           child: Column(
             children: [
@@ -178,7 +178,7 @@ class _HeaderSection extends StatelessWidget {
                 children: [
                   // Circular Emblem Logo
                   const _HeaderLogo(),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
 
                   // Organization Name & Subtitle
                   Expanded(
@@ -190,19 +190,19 @@ class _HeaderSection extends StatelessWidget {
                           'Nepal Agrawal Samaj',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 18.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.1,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        SizedBox(height: 1),
                         Text(
                           'Unity • Culture • Service • Progress',
                           style: TextStyle(
                             color: Color(0xFFE5C158),
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.1,
+                            fontSize: 9.0,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.15,
                           ),
                         ),
                       ],
@@ -218,10 +218,10 @@ class _HeaderSection extends StatelessWidget {
                         children: [
                           InkWell(
                             onTap: onBellTap,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(18),
                             child: Container(
-                              width: 38,
-                              height: 38,
+                              width: 34,
+                              height: 34,
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
@@ -229,28 +229,28 @@ class _HeaderSection extends StatelessWidget {
                               child: const Icon(
                                 Icons.notifications_none_rounded,
                                 color: Color(0xFF500913),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                           ),
                           Positioned(
-                            top: -2,
-                            right: -2,
+                            top: -1,
+                            right: -1,
                             child: Container(
-                              padding: const EdgeInsets.all(3),
+                              padding: const EdgeInsets.all(2.5),
                               decoration: const BoxDecoration(
                                 color: Color(0xFFE53935),
                                 shape: BoxShape.circle,
                               ),
                               constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
+                                minWidth: 14,
+                                minHeight: 14,
                               ),
                               child: const Text(
                                 '3',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 9.5,
+                                  fontSize: 8.5,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
@@ -264,10 +264,10 @@ class _HeaderSection extends StatelessWidget {
                       // Profile Button
                       InkWell(
                         onTap: onProfileTap,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(18),
                         child: Container(
-                          width: 38,
-                          height: 38,
+                          width: 34,
+                          height: 34,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
@@ -275,7 +275,7 @@ class _HeaderSection extends StatelessWidget {
                           child: const Icon(
                             Icons.person_outline_rounded,
                             color: Color(0xFF500913),
-                            size: 20,
+                            size: 18,
                           ),
                         ),
                       ),
@@ -325,14 +325,19 @@ class _HeaderSection extends StatelessWidget {
                       right: 0,
                       top: 0,
                       bottom: 0,
-                      width: MediaQuery.of(context).size.width * 0.55,
+                      width: MediaQuery.of(context).size.width * 0.58,
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          CachedNetworkImage(
-                            imageUrl:
-                                'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80',
+                          Image.asset(
+                            'assets/images/pagoda_header_bg.png',
                             fit: BoxFit.cover,
+                            alignment: Alignment.centerRight,
+                            errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
+                              imageUrl:
+                                  'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           // Multi-stop Linear Gradient overlay fading into cream left content
                           DecoratedBox(
@@ -340,13 +345,13 @@ class _HeaderSection extends StatelessWidget {
                               gradient: LinearGradient(
                                 colors: [
                                   const Color(0xFFFFFBF4),
-                                  const Color(0xFFFFFBF4).withValues(alpha: 0.95),
-                                  const Color(0xFFFFFBF4).withValues(alpha: 0.4),
+                                  const Color(0xFFFFFBF4).withValues(alpha: 0.90),
+                                  const Color(0xFFFFFBF4).withValues(alpha: 0.25),
                                   Colors.transparent,
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
-                                stops: const [0.0, 0.3, 0.65, 1.0],
+                                stops: const [0.0, 0.22, 0.52, 1.0],
                               ),
                             ),
                           ),
@@ -408,76 +413,47 @@ class _HeaderSection extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
 
-                          // Action Buttons Row (Become a Member & Explore Events)
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              // Become a Member Button
-                              GestureDetector(
-                                onTap: onBecomeMember,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF6B0E1B),
-                                    borderRadius: BorderRadius.circular(22),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF6B0E1B).withValues(alpha: 0.3),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.groups_outlined, color: Colors.white, size: 15),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        'Become a Member',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                          // Single Primary Action Button: Explore Events
+                          GestureDetector(
+                            onTap: onExploreEvents,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF8B1222), Color(0xFF6B0E1B)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                              ),
-
-                              // Explore Events Button
-                              GestureDetector(
-                                onTap: onExploreEvents,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(22),
-                                    border: Border.all(color: const Color(0xFF9E8A83), width: 1.0),
+                                borderRadius: BorderRadius.circular(22),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF6B0E1B).withValues(alpha: 0.35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.calendar_today_outlined, color: Color(0xFF500913), size: 14),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        'Explore Events',
-                                        style: TextStyle(
-                                          color: Color(0xFF500913),
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                ],
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.calendar_month_rounded, color: Colors.white, size: 15),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Explore Events',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 14),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -500,31 +476,30 @@ class _HeaderLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 44,
-      height: 44,
+      width: 34,
+      height: 34,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: const Color(0xFF700D15),
-        border: Border.all(color: const Color(0xFFE5C158), width: 1.8),
+        border: Border.all(color: const Color(0xFFE5C158), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 4,
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 3,
           ),
         ],
       ),
-      child: Center(
-        child: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: const Color(0xFFE5C158).withValues(alpha: 0.15),
-          ),
-          child: const Icon(
-            Icons.account_balance_rounded,
-            color: Color(0xFFE5C158),
-            size: 20,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(17),
+        child: Image.asset(
+          'assets/images/pagoda_logo_badge.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Center(
+            child: Icon(
+              Icons.account_balance_rounded,
+              color: const Color(0xFFE5C158),
+              size: 16,
+            ),
           ),
         ),
       ),
@@ -533,7 +508,8 @@ class _HeaderLogo extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 2. STATS ROW (4 Cards)
+// ---------------------------------------------------------------------------
+// 2. STATS ROW (Spacious 2x2 Grid Cards)
 // ---------------------------------------------------------------------------
 class _StatsRow extends StatelessWidget {
   const _StatsRow();
@@ -541,51 +517,59 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Row(
-        children: const [
-          Expanded(
-            child: _StatCard(
-              icon: Icons.groups_outlined,
-              iconBg: Color(0xFFFDE8E8),
-              iconColor: Color(0xFFE53935),
-              value: '2.4K+',
-              label: 'Members',
-              accentLineColor: Color(0xFFE53935),
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Row(
+            children: const [
+              Expanded(
+                child: _StatCard(
+                  icon: Icons.groups_rounded,
+                  iconBg: Color(0xFFFDE8E8),
+                  iconColor: Color(0xFFE53935),
+                  value: '2.4K+',
+                  label: 'Members',
+                  accentLineColor: Color(0xFFE53935),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _StatCard(
+                  icon: Icons.location_on_rounded,
+                  iconBg: Color(0xFFFFF4D8),
+                  iconColor: Color(0xFFD99B00),
+                  value: '18',
+                  label: 'Locations',
+                  accentLineColor: Color(0xFFD99B00),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _StatCard(
-              icon: Icons.location_on_outlined,
-              iconBg: Color(0xFFFFF4D8),
-              iconColor: Color(0xFFD99B00),
-              value: '18',
-              label: 'Locations',
-              accentLineColor: Color(0xFFD99B00),
-            ),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _StatCard(
-              icon: Icons.calendar_today_outlined,
-              iconBg: Color(0xFFF3E8FF),
-              iconColor: Color(0xFF8E24AA),
-              value: '42+',
-              label: 'Events (Yearly)',
-              accentLineColor: Color(0xFF8E24AA),
-            ),
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: _StatCard(
-              icon: Icons.workspace_premium_outlined,
-              iconBg: Color(0xFFE8F5E9),
-              iconColor: Color(0xFF2E7D32),
-              value: '28+',
-              label: 'Years of Service',
-              accentLineColor: Color(0xFF2E7D32),
-            ),
+          const SizedBox(height: 10),
+          Row(
+            children: const [
+              Expanded(
+                child: _StatCard(
+                  icon: Icons.calendar_month_rounded,
+                  iconBg: Color(0xFFF3E8FF),
+                  iconColor: Color(0xFF8E24AA),
+                  value: '42+',
+                  label: 'Events (Yearly)',
+                  accentLineColor: Color(0xFF8E24AA),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: _StatCard(
+                  icon: Icons.workspace_premium_rounded,
+                  iconBg: Color(0xFFE8F5E9),
+                  iconColor: Color(0xFF2E7D32),
+                  value: '28+',
+                  label: 'Years of Service',
+                  accentLineColor: Color(0xFF2E7D32),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -613,67 +597,61 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(6, 12, 6, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF0E8E6), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
+            blurRadius: 10,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Circular Icon
+          // Circular Icon Container
           Container(
-            width: 34,
-            height: 34,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: iconBg,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: iconColor, size: 18),
+            child: Icon(icon, color: iconColor, size: 20),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(width: 10),
 
-          // Number Value
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF1F1210),
-              ),
-            ),
-          ),
-          const SizedBox(height: 2),
-
-          // Subtitle Label
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Color(0xFF757575),
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-
-          // Small Accent Line at Bottom
-          Container(
-            width: 20,
-            height: 3,
-            decoration: BoxDecoration(
-              color: accentLineColor,
-              borderRadius: BorderRadius.circular(2),
+          // Value and Label Column
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF1F1210),
+                    height: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF666666),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
@@ -734,30 +712,51 @@ class _UpcomingEventsSection extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Upcoming Events',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1E1615),
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF700D15),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Upcoming Events',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF1E1615),
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ],
               ),
               GestureDetector(
                 onTap: () => context.go(AppConstants.events),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text(
-                      'See all',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF700D15),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        'See all',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF700D15),
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF700D15)),
-                  ],
+                      SizedBox(width: 3),
+                      Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -767,7 +766,7 @@ class _UpcomingEventsSection extends StatelessWidget {
 
         // Horizontal List of Cards
         SizedBox(
-          height: 270,
+          height: 198,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -778,7 +777,7 @@ class _UpcomingEventsSection extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: SizedBox(
-                  width: 168,
+                  width: 160,
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -800,7 +799,7 @@ class _UpcomingEventsSection extends StatelessWidget {
                             ClipRRect(
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                               child: SizedBox(
-                                height: 108,
+                                height: 96,
                                 width: double.infinity,
                                 child: CachedNetworkImage(
                                   imageUrl: ev.imageUrl,
@@ -816,10 +815,10 @@ class _UpcomingEventsSection extends StatelessWidget {
 
                             // Date Badge Overlay (Top-Left)
                             Positioned(
-                              top: 8,
-                              left: 8,
+                              top: 6,
+                              left: 6,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                                 decoration: BoxDecoration(
                                   color: const Color(0xEE221B1C),
                                   borderRadius: BorderRadius.circular(8),
@@ -831,7 +830,7 @@ class _UpcomingEventsSection extends StatelessWidget {
                                       ev.dateMonth,
                                       style: const TextStyle(
                                         color: Colors.white70,
-                                        fontSize: 9.5,
+                                        fontSize: 8.5,
                                         fontWeight: FontWeight.w800,
                                         letterSpacing: 0.3,
                                       ),
@@ -840,7 +839,7 @@ class _UpcomingEventsSection extends StatelessWidget {
                                       ev.dateDay,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w900,
                                         height: 1.05,
                                       ),
@@ -853,87 +852,83 @@ class _UpcomingEventsSection extends StatelessWidget {
                         ),
 
                         // Card Details Body
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 32,
-                                  child: Text(
-                                    ev.title,
-                                    style: const TextStyle(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF1E1615),
-                                      height: 1.2,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                ev.title,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1E1615),
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.access_time_outlined, size: 11, color: Color(0xFF8C7A75)),
+                                  const SizedBox(width: 3),
+                                  Expanded(
+                                    child: Text(
+                                      ev.time,
+                                      style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.access_time_outlined, size: 12, color: Color(0xFF8C7A75)),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        ev.time,
-                                        style: const TextStyle(fontSize: 10.5, color: Color(0xFF757575), fontWeight: FontWeight.w500),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on_outlined, size: 11, color: Color(0xFF8C7A75)),
+                                  const SizedBox(width: 3),
+                                  Expanded(
+                                    child: Text(
+                                      ev.location,
+                                      style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.location_on_outlined, size: 12, color: Color(0xFF8C7A75)),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        ev.location,
-                                        style: const TextStyle(fontSize: 10.5, color: Color(0xFF757575), fontWeight: FontWeight.w500),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Spacer(),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
 
-                                // View Details Pill Button
-                                GestureDetector(
-                                  onTap: () => context.go(AppConstants.events),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFDEAEA),
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const [
-                                        Text(
-                                          'View Details',
-                                          style: TextStyle(
-                                            color: Color(0xFF700D15),
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                              // View Details Pill Button
+                              GestureDetector(
+                                onTap: () => context.go(AppConstants.events),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 26,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFDEAEA),
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text(
+                                        'View Details',
+                                        style: TextStyle(
+                                          color: Color(0xFF700D15),
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w700,
                                         ),
-                                        SizedBox(width: 4),
-                                        Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(width: 3),
+                                      Icon(Icons.arrow_forward_rounded, size: 11, color: Color(0xFF700D15)),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -1014,29 +1009,51 @@ class _FromOurCommunitySection extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'From Our Community',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1E1615),
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF700D15),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'From Our Community',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF1E1615),
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ],
               ),
               GestureDetector(
                 onTap: () => context.go(AppConstants.gallery),
-                child: Row(
-                  children: const [
-                    Text(
-                      'See all',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF700D15),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text(
+                        'See all',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF700D15),
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 3),
-                    Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF700D15)),
-                  ],
+                      SizedBox(width: 3),
+                      Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
+                    ],
+                  ),
                 ),
               ),
             ],

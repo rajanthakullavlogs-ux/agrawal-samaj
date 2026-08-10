@@ -214,8 +214,106 @@ class NASEmptyState extends StatelessWidget {
 class NASToast {
   NASToast._();
 
+  /// Show an event save / bookmark toast (anchored at bottom with smooth animation & gold branding).
+  static void eventSaved(BuildContext context, {required String eventTitle, required bool isSaved}) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Container(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isSaved
+                      ? const Color(0xFFE5C158).withValues(alpha: 0.22)
+                      : Colors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isSaved ? Icons.bookmark_added_rounded : Icons.bookmark_remove_rounded,
+                  color: const Color(0xFFE5C158),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isSaved ? 'Event Bookmarked' : 'Bookmark Removed',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                        color: Color(0xFFE5C158),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isSaved
+                          ? '"$eventTitle" added to saved events'
+                          : '"$eventTitle" removed from saved events',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isSaved
+                      ? const Color(0xFFE5C158).withValues(alpha: 0.25)
+                      : Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE5C158).withValues(alpha: 0.4),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  isSaved ? 'SAVED' : 'REMOVED',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: isSaved ? const Color(0xFFE5C158) : Colors.white70,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: const Color(0xFF4A0810),
+        duration: const Duration(seconds: 2, milliseconds: 400),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 28, left: 16, right: 16),
+        dismissDirection: DismissDirection.down,
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: const Color(0xFFE5C158).withValues(alpha: 0.45),
+            width: 1.2,
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Show a success toast (dark background with green checkmark).
   static void success(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -234,6 +332,9 @@ class NASToast {
         ),
         backgroundColor: NASColors.inverseSurface,
         behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 28, left: 16, right: 16),
+        dismissDirection: DismissDirection.down,
+        elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: NASRadius.defaultBorderRadius),
         duration: const Duration(seconds: 3),
       ),
@@ -242,6 +343,7 @@ class NASToast {
 
   /// Show an error toast (error container background).
   static void error(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -260,6 +362,9 @@ class NASToast {
         ),
         backgroundColor: NASColors.errorContainer,
         behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 28, left: 16, right: 16),
+        dismissDirection: DismissDirection.down,
+        elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: NASRadius.defaultBorderRadius),
         duration: const Duration(seconds: 4),
       ),

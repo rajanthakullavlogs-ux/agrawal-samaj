@@ -279,7 +279,7 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // Horizontal Filter Pills Bar
                     _FilterPillsBar(
@@ -290,61 +290,93 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                       onProvinceSelected: (pr) => setState(() => _selectedProvince = pr),
                       onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
 
-                    // Section Title Row
+                    // Section Title Row (Managed Heading + Styled Count Badge)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 26,
-                                height: 26,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFDF0F0),
-                                  borderRadius: BorderRadius.circular(6),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 4,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF700D15),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
                                 ),
-                                child: const Icon(Icons.calendar_today_outlined, size: 14, color: Color(0xFF700D15)),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '$_selectedStatusFilter Events (${filteredEvents.length})',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E1615),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    '$_selectedStatusFilter Events',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1E1615),
+                                      letterSpacing: -0.3,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0xFF700D15).withValues(alpha: 0.15)),
+                                  ),
+                                  child: Text(
+                                    '${filteredEvents.length}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF700D15),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Calendar view opened')),
                               );
                             },
-                            child: Row(
-                              children: const [
-                                Text(
-                                  'View Calendar',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF700D15),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text(
+                                    'View Calendar',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF700D15),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(Icons.calendar_month_outlined, size: 14, color: Color(0xFF700D15)),
-                              ],
+                                  SizedBox(width: 4),
+                                  Icon(Icons.calendar_month_outlined, size: 13, color: Color(0xFF700D15)),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
 
                     // Event Cards List
                     if (filteredEvents.isEmpty)
@@ -866,7 +898,160 @@ class _FilterPillsBar extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 3. EVENT CARD ITEM (SPLIT IMAGE & DETAILS CONTAINER)
+// 3. ANIMATED SAVE / BOOKMARK BUTTON WITH SPRING SCALE EFFECT
+// ---------------------------------------------------------------------------
+class _AnimatedSaveButton extends StatefulWidget {
+  final bool isSaved;
+  final VoidCallback onTap;
+  final String eventTitle;
+
+  const _AnimatedSaveButton({
+    required this.isSaved,
+    required this.onTap,
+    required this.eventTitle,
+  });
+
+  @override
+  State<_AnimatedSaveButton> createState() => _AnimatedSaveButtonState();
+}
+
+class _AnimatedSaveButtonState extends State<_AnimatedSaveButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _rotationAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.48)
+            .chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.48, end: 0.88)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.88, end: 1.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 30,
+      ),
+    ]).animate(_controller);
+
+    _rotationAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: -0.15)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 35,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: -0.15, end: 0.15)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 35,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.15, end: 0.0)
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 30,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    _controller.forward(from: 0.0);
+    final willBeSaved = !widget.isSaved;
+    widget.onTap();
+
+    // Trigger modern bottom-anchored animated event save notification
+    NASToast.eventSaved(
+      context,
+      eventTitle: widget.eventTitle,
+      isSaved: willBeSaved,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: widget.isSaved ? 'Remove from saved' : 'Save Event',
+      child: GestureDetector(
+        onTap: _handleTap,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: RotationTransition(
+            turns: _rotationAnimation,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: widget.isSaved
+                    ? const Color(0xFF700D15)
+                    : const Color(0xFFFDF5F2),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: widget.isSaved
+                      ? const Color(0xFFE5C158)
+                      : const Color(0xFFE8D5D0),
+                  width: widget.isSaved ? 1.5 : 1.2,
+                ),
+                boxShadow: widget.isSaved
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFE5C158).withValues(alpha: 0.35),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 2),
+                        ),
+                        BoxShadow(
+                          color: const Color(0xFF700D15).withValues(alpha: 0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: Icon(
+                widget.isSaved
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_outline_rounded,
+                size: 18,
+                color: widget.isSaved
+                    ? const Color(0xFFE5C158)
+                    : const Color(0xFF700D15),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 4. EVENT CARD ITEM (SPLIT IMAGE & DETAILS CONTAINER)
 // ---------------------------------------------------------------------------
 class _EventCardItem extends StatelessWidget {
   final _EventItem event;
@@ -908,42 +1093,37 @@ class _EventCardItem extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
-                    child: CachedNetworkImage(
-                      imageUrl: event.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(color: const Color(0xFFF0F0F0)),
-                      errorWidget: (context, url, error) => Container(
-                        color: const Color(0xFFE5D5D5),
-                        child: const Icon(Icons.event, color: Color(0xFF700D15)),
-                      ),
+                  CachedNetworkImage(
+                    imageUrl: event.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(color: const Color(0xFFF0F0F0)),
+                    errorWidget: (context, url, error) => Container(
+                      color: const Color(0xFFE5D5D5),
+                      child: const Icon(Icons.event, color: Color(0xFF700D15)),
                     ),
                   ),
-
-                  // Featured Badge Tag (Top-Left)
                   if (event.isFeatured)
                     Positioned(
-                      top: 10,
-                      left: 10,
+                      top: 8,
+                      left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
                           color: const Color(0xFFE53935),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
-                            Icon(Icons.star, size: 10, color: Colors.white),
-                            SizedBox(width: 3),
+                            Icon(Icons.star, size: 9, color: Colors.white),
+                            SizedBox(width: 2),
                             Text(
                               'FEATURED',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 8.5,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
+                                letterSpacing: 0.4,
                               ),
                             ),
                           ],
@@ -954,194 +1134,193 @@ class _EventCardItem extends StatelessWidget {
               ),
             ),
 
-            // Right Content Details Column
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Row: Date Badge + Title/Subtitle + Bookmark Button
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Date Badge Box
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF241B1D),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                event.month,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                              Text(
-                                event.day,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.05,
-                                ),
-                              ),
-                              Text(
-                                event.year,
-                                style: const TextStyle(
-                                  color: Color(0xFFE5C158),
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
+          // Right Content Details Column
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top Row: Date Badge + Title/Subtitle + Animated Save Button
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Date Badge Box
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF241B1D),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const SizedBox(width: 8),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              event.month,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            Text(
+                              event.day,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                height: 1.05,
+                              ),
+                            ),
+                            Text(
+                              event.year,
+                              style: const TextStyle(
+                                color: Color(0xFFE5C158),
+                                fontSize: 7.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
 
-                        // Title & Subtitle
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                      // Title & Subtitle
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event.title,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1615),
+                                height: 1.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (event.subtitle.isNotEmpty) ...[
+                              const SizedBox(height: 2),
                               Text(
-                                event.title,
+                                event.subtitle,
                                 style: const TextStyle(
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E1615),
-                                  height: 1.2,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFA67C1E),
                                 ),
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              if (event.subtitle.isNotEmpty) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  event.subtitle,
-                                  style: const TextStyle(
-                                    fontSize: 10.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFFA67C1E),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
                             ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+
+                      // Animated Save Button (Scales up on click)
+                      _AnimatedSaveButton(
+                        isSaved: event.isBookmarked,
+                        onTap: onBookmarkTap,
+                        eventTitle: event.title,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Info Metadata Rows
+                  _buildInfoRow(Icons.access_time_outlined, event.time),
+                  const SizedBox(height: 2),
+                  _buildInfoRow(Icons.location_on_outlined, event.location),
+                  const SizedBox(height: 2),
+                  _buildInfoRow(Icons.account_circle_outlined, 'Organized by: ${event.organizer}'),
+                  const SizedBox(height: 6),
+
+                  // Tags Row
+                  Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: event.tags.map((tag) {
+                      final tagBg = _getTagBg(event.tagType);
+                      final tagTxt = _getTagText(event.tagType);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                        decoration: BoxDecoration(
+                          color: tagBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          tag,
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: tagTxt,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 8),
 
-                        // Bookmark Circle Icon
-                        GestureDetector(
-                          onTap: onBookmarkTap,
+                  // Action Buttons Row (Register Now + Learn More)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onRegisterTap,
                           child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFDF5F2),
-                              shape: BoxShape.circle,
+                            height: 30,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF500913),
+                              borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Icon(
-                              event.isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                              size: 16,
-                              color: const Color(0xFF700D15),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Info Metadata Rows
-                    _buildInfoRow(Icons.access_time_outlined, event.time),
-                    const SizedBox(height: 3),
-                    _buildInfoRow(Icons.location_on_outlined, event.location),
-                    const SizedBox(height: 3),
-                    _buildInfoRow(Icons.account_circle_outlined, 'Organized by: ${event.organizer}'),
-                    const SizedBox(height: 8),
-
-                    // Tags Row
-                    Wrap(
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: event.tags.map((tag) {
-                        final tagBg = _getTagBg(event.tagType);
-                        final tagTxt = _getTagText(event.tagType);
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: tagBg,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            tag,
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w700,
-                              color: tagTxt,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Action Buttons Row (Register Now + Learn More)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: onRegisterTap,
-                            child: Container(
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF500913),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Text(
-                                    'Register Now',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.w700,
+                            child: Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'Register Now',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.white),
-                                ],
+                                    SizedBox(width: 3),
+                                    Icon(Icons.arrow_forward_rounded, size: 11, color: Colors.white),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: onLearnMoreTap,
-                            child: Container(
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: const Color(0xFFD6C9C5)),
-                              ),
-                              child: const Center(
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onLearnMoreTap,
+                          child: Container(
+                            height: 30,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: const Color(0xFFD6C9C5)),
+                            ),
+                            child: const Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
                                 child: Text(
                                   'Learn More',
                                   style: TextStyle(
                                     color: Color(0xFF500913),
-                                    fontSize: 10.5,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1149,29 +1328,30 @@ class _EventCardItem extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
-  );
+  ),
+);
 }
 
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 12, color: const Color(0xFF8C7A75)),
+        Icon(icon, size: 11, color: const Color(0xFF8C7A75)),
         const SizedBox(width: 4),
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 10.5,
+              fontSize: 10,
               color: Color(0xFF666666),
               fontWeight: FontWeight.w500,
             ),
