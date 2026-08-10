@@ -48,7 +48,6 @@ class GalleryListScreen extends ConsumerStatefulWidget {
 
 class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
   String _selectedCategory = 'All'; // 'All', 'Business Events', 'Cultural Events', 'Social Service', 'Youth Activities'
-  String _selectedYear = '2025'; // '2025', '2024', '2023', '2022', '2021'
 
   static const _HighlightPhoto _tallLeftPhoto = _HighlightPhoto(
     id: 'p-1',
@@ -154,27 +153,33 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF700D15),
-                          borderRadius: BorderRadius.circular(2),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF700D15),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Photo Highlights',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1E1615),
-                          letterSpacing: -0.3,
+                        const SizedBox(width: 8),
+                        const Flexible(
+                          child: Text(
+                            'Photo Highlights',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF1E1615),
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   GestureDetector(
                     onTap: () => context.push(AppConstants.allPhotos),
@@ -305,27 +310,33 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF700D15),
-                          borderRadius: BorderRadius.circular(2),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF700D15),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Recent Albums',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1E1615),
-                          letterSpacing: -0.3,
+                        const SizedBox(width: 8),
+                        const Flexible(
+                          child: Text(
+                            'Recent Albums',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF1E1615),
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   GestureDetector(
                     onTap: () => context.push(AppConstants.allAlbums),
@@ -667,34 +678,6 @@ class _PhotoGridCard extends StatelessWidget {
                 child: const Icon(Icons.image, color: Color(0xFF700D15)),
               ),
             ),
-
-            // Bottom-Left Translucent Photo Count Badge
-            Positioned(
-              left: 8,
-              bottom: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.60),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 12),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${photo.photoCount}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -777,9 +760,9 @@ class _RecentAlbumCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '${album.photoCount} Photos • ${album.albumCount} Albums',
-                  style: const TextStyle(
+                const Text(
+                  'Album Collection',
+                  style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF666666),

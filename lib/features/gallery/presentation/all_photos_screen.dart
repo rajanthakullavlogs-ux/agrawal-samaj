@@ -191,85 +191,98 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Horizontal Category Filter Pills Bar
-                    SizedBox(
-                      height: 36,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: ['All', 'Business', 'Cultural', 'Social Service', 'Youth', 'Health'].map((cat) {
-                          final isSelected = cat == _selectedCategory;
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedCategory = cat),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF500913) : Colors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
-                                ),
-                                boxShadow: [
-                                  if (isSelected)
-                                    BoxShadow(
-                                      color: const Color(0xFF500913).withValues(alpha: 0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                ],
-                              ),
-                              child: Text(
-                                cat,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected ? Colors.white : const Color(0xFF1E1615),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Section Heading Row (Clean Typography + Managed Count)
+                    // Unified Section Header: Title + Count + Category Action Dropdown Button
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '$_selectedCategory Photos',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF1E1615),
-                              letterSpacing: -0.3,
+                          const Expanded(
+                            child: Text(
+                              'Photo Highlights',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1E1615),
+                                letterSpacing: -0.4,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF700D15).withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFF700D15).withValues(alpha: 0.15)),
-                            ),
-                            child: Text(
-                              '${filteredPhotos.length}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF700D15),
+
+                          // Category Popup Menu Filter Button
+                          PopupMenuButton<String>(
+                            initialValue: _selectedCategory,
+                            onSelected: (cat) => setState(() => _selectedCategory = cat),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            color: Colors.white,
+                            elevation: 6,
+                            itemBuilder: (context) => ['All', 'Business', 'Cultural', 'Social Service', 'Youth', 'Health'].map((cat) {
+                              final isSel = cat == _selectedCategory;
+                              return PopupMenuItem<String>(
+                                value: cat,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.collections_outlined,
+                                      size: 14,
+                                      color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      cat == 'All' ? 'All Categories' : cat,
+                                      style: TextStyle(
+                                        fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                                        color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    if (isSel) ...[
+                                      const Spacer(),
+                                      const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF500913),
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF500913).withValues(alpha: 0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.filter_alt_rounded, size: 13, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _selectedCategory == 'All' ? 'All Categories' : _selectedCategory,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Colors.white),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
 
                     // 2-Column Photo Grid
                     Padding(

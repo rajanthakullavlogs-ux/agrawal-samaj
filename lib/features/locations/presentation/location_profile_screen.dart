@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants.dart';
 import '../../../shared/widgets/widgets.dart';
-import '../data/locations_repository.dart';
 
 /// Location Profile / Details Screen — Redesigned to match exact UI spec
 class LocationProfileScreen extends ConsumerWidget {
@@ -487,12 +486,16 @@ class LocationProfileScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Gallery Highlights',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF5C1414),
+                const Expanded(
+                  child: Text(
+                    'Gallery Highlights',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF5C1414),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 InkWell(

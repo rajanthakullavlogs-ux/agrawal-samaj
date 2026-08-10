@@ -207,36 +207,20 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Photo Albums',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF1E1615),
-                                  letterSpacing: -0.4,
-                                ),
+                          const Expanded(
+                            child: Text(
+                              'Photo Albums',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1E1615),
+                                letterSpacing: -0.4,
                               ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF700D15).withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0xFF700D15).withValues(alpha: 0.15)),
-                                ),
-                                child: Text(
-                                  '${filteredAlbums.length}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF700D15),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
+                          const SizedBox(width: 8),
 
                           // Year Popup Menu Filter
                           PopupMenuButton<String>(
@@ -380,32 +364,6 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                                               ),
                                             ),
                                           ),
-                                          Positioned(
-                                            top: 8,
-                                            right: 8,
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xCC000000),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Icon(Icons.photo_library_outlined, size: 10, color: Colors.white),
-                                                  const SizedBox(width: 3),
-                                                  Text(
-                                                    '${album.photoCount}',
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w800,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -426,7 +384,7 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            'Year ${album.year} • ${album.photoCount} Photos',
+                                            'Year ${album.year}',
                                             style: const TextStyle(
                                               fontSize: 10.5,
                                               color: Color(0xFF757575),

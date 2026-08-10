@@ -435,25 +435,6 @@ class _AlbumCard extends StatelessWidget {
                 Center(
                   child: Icon(Icons.photo_album_rounded, size: 48, color: AppColors.primary.withValues(alpha: 0.4)),
                 ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.65),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.photo_camera_rounded, size: 12, color: Colors.white),
-                        const SizedBox(width: 4),
-                        Text('${album.count}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
