@@ -102,7 +102,10 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredAlbums = _allAlbums.where((a) => a.year == _selectedYear).toList();
+    final filteredAlbums = _allAlbums.where((a) {
+      if (_selectedYear == 'All') return true;
+      return a.year == _selectedYear;
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F5),
@@ -198,104 +201,108 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Section Title: Explore by Year
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'Explore by Year',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1E1615),
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Year Filter Pills Bar
-                    SizedBox(
-                      height: 38,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: ['2025', '2024', '2023', '2022', '2021'].map((yr) {
-                          final isSelected = yr == _selectedYear;
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedYear = yr),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF500913) : Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
+                    // Unified Section Header: Title + Count + Year Dropdown Filter
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                'Photo Albums',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF1E1615),
+                                  letterSpacing: -0.4,
                                 ),
-                                boxShadow: [
-                                  if (isSelected)
-                                    BoxShadow(
-                                      color: const Color(0xFF500913).withValues(alpha: 0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xFF700D15).withValues(alpha: 0.15)),
+                                ),
+                                child: Text(
+                                  '${filteredAlbums.length}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF700D15),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // Year Popup Menu Filter
+                          PopupMenuButton<String>(
+                            initialValue: _selectedYear,
+                            onSelected: (yr) => setState(() => _selectedYear = yr),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            color: Colors.white,
+                            elevation: 6,
+                            itemBuilder: (context) => ['All', '2025', '2024', '2023', '2022', '2021'].map((yr) {
+                              final isSel = yr == _selectedYear;
+                              final labelText = yr == 'All' ? 'All Years' : 'Year $yr';
+                              return PopupMenuItem<String>(
+                                value: yr,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 14,
+                                      color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
                                     ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      labelText,
+                                      style: TextStyle(
+                                        fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                                        color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    if (isSel) ...[
+                                      const Spacer(),
+                                      const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF500913),
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF500913).withValues(alpha: 0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
                                 ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 13,
-                                    color: isSelected ? Colors.white : const Color(0xFF700D15),
-                                  ),
+                                  const Icon(Icons.calendar_today_rounded, size: 13, color: Colors.white),
                                   const SizedBox(width: 6),
                                   Text(
-                                    yr,
-                                    style: TextStyle(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: isSelected ? Colors.white : const Color(0xFF1E1615),
+                                    _selectedYear == 'All' ? 'All Years' : 'Year $_selectedYear',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
                                     ),
                                   ),
+                                  const SizedBox(width: 3),
+                                  const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Colors.white),
                                 ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Section Heading for Grid
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Albums ($_selectedYear)',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF1E1615),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF700D15).withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFF700D15).withValues(alpha: 0.15)),
-                            ),
-                            child: Text(
-                              '${filteredAlbums.length}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF700D15),
                               ),
                             ),
                           ),
@@ -303,6 +310,43 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    // Quick Year Filter Pills Bar
+                    SizedBox(
+                      height: 34,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        children: ['All Years', '2025', '2024', '2023', '2022', '2021'].map((yr) {
+                          final isSelected = (yr == 'All Years' && _selectedYear == 'All') || (yr == _selectedYear);
+                          return GestureDetector(
+                            onTap: () => setState(() => _selectedYear = yr == 'All Years' ? 'All' : yr),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFF700D15).withValues(alpha: 0.1) : Colors.white,
+                                borderRadius: BorderRadius.circular(17),
+                                border: Border.all(
+                                  color: isSelected ? const Color(0xFF700D15) : const Color(0xFFE5D0D0),
+                                  width: isSelected ? 1.5 : 1.0,
+                                ),
+                              ),
+                              child: Text(
+                                yr,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                  color: isSelected ? const Color(0xFF700D15) : const Color(0xFF666666),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
                     // Grid of Album Cards
                     if (filteredAlbums.isEmpty)
