@@ -309,44 +309,7 @@ class _AllAlbumsScreenState extends State<AllAlbumsScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-
-                    // Quick Year Filter Pills Bar
-                    SizedBox(
-                      height: 34,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: ['All Years', '2025', '2024', '2023', '2022', '2021'].map((yr) {
-                          final isSelected = (yr == 'All Years' && _selectedYear == 'All') || (yr == _selectedYear);
-                          return GestureDetector(
-                            onTap: () => setState(() => _selectedYear = yr == 'All Years' ? 'All' : yr),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF700D15).withValues(alpha: 0.1) : Colors.white,
-                                borderRadius: BorderRadius.circular(17),
-                                border: Border.all(
-                                  color: isSelected ? const Color(0xFF700D15) : const Color(0xFFE5D0D0),
-                                  width: isSelected ? 1.5 : 1.0,
-                                ),
-                              ),
-                              child: Text(
-                                yr,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                  color: isSelected ? const Color(0xFF700D15) : const Color(0xFF666666),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // Grid of Album Cards
                     if (filteredAlbums.isEmpty)
