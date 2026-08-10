@@ -154,33 +154,51 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Photo Highlights',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1E1615),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF700D15),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Photo Highlights',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF1E1615),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
                   ),
                   GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening full photo highlights...')),
-                      );
-                    },
-                    child: Row(
-                      children: const [
-                        Text(
-                          'View All',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF700D15),
+                    onTap: () => context.push(AppConstants.allPhotos),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text(
+                            'View All',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF700D15),
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2),
-                        Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF700D15)),
-                      ],
+                          SizedBox(width: 3),
+                          Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -287,33 +305,51 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Recent Albums',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1E1615),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF700D15),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Recent Albums',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF1E1615),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
                   ),
                   GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening all albums...')),
-                      );
-                    },
-                    child: Row(
-                      children: const [
-                        Text(
-                          'View All Albums',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF700D15),
+                    onTap: () => context.push(AppConstants.allAlbums),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Text(
+                            'View All Albums',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF700D15),
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 2),
-                        Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF700D15)),
-                      ],
+                          SizedBox(width: 3),
+                          Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF700D15)),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -338,68 +374,6 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 28),
-
-            // Explore by Year Section Header & Pills
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Explore by Year',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1E1615),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Year Filter Pills Bar
-            SizedBox(
-              height: 38,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: ['2025', '2024', '2023', '2022', '2021'].map((yr) {
-                  final isSelected = yr == _selectedYear;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedYear = yr),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF500913) : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 13,
-                            color: isSelected ? Colors.white : const Color(0xFF700D15),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            yr,
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
-                              color: isSelected ? Colors.white : const Color(0xFF1E1615),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
             const SizedBox(height: 32),
           ],
         ),

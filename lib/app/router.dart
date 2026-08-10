@@ -12,6 +12,8 @@ import '../features/auth/presentation/forgot_password_screen.dart';
 import '../features/contact/presentation/contact_screen.dart';
 import '../features/events/presentation/event_detail_screen.dart';
 import '../features/events/presentation/events_list_screen.dart';
+import '../features/gallery/presentation/all_albums_screen.dart';
+import '../features/gallery/presentation/all_photos_screen.dart';
 import '../features/gallery/presentation/gallery_detail_screen.dart';
 import '../features/gallery/presentation/gallery_list_screen.dart';
 import '../features/home/presentation/home_screen.dart';
@@ -119,6 +121,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppConstants.gallery,
         pageBuilder: (_, _) => const NoTransitionPage(child: GalleryListScreen()),
+      ),
+      GoRoute(
+        path: AppConstants.allAlbums,
+        pageBuilder: (_, _) => _slideTransitionPage(const AllAlbumsScreen()),
+      ),
+      GoRoute(
+        path: AppConstants.allPhotos,
+        pageBuilder: (_, _) => _slideTransitionPage(const AllPhotosScreen()),
       ),
       GoRoute(
         path: AppConstants.galleryDetail,

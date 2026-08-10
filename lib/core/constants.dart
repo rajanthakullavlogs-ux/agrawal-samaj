@@ -11,6 +11,8 @@ class AppConstants {
   static const String events = '/events';
   static const String eventDetail = '/events/:id';
   static const String gallery = '/gallery';
+  static const String allAlbums = '/gallery/all-albums';
+  static const String allPhotos = '/gallery/all-photos';
   static const String galleryDetail = '/gallery/:id';
   static const String locations = '/locations';
   static const String locationProfile = '/locations/:id';
