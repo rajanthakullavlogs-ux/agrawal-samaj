@@ -51,9 +51,9 @@ class ProfileScreen extends ConsumerWidget {
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
-                    'assets/images/profile_banner.jpg',
+                    'assets/images/pagoda_header_bg.png',
                     fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
+                    alignment: Alignment.center,
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -137,7 +137,7 @@ class ProfileScreen extends ConsumerWidget {
                   backgroundImage: profile.avatarUrl != null &&
                           profile.avatarUrl!.startsWith('assets/')
                       ? AssetImage(profile.avatarUrl!) as ImageProvider
-                      : const AssetImage('assets/images/profile_banner.jpg'),
+                      : const AssetImage('assets/images/pagoda_header_bg.png'),
                 ),
                 const SizedBox(width: 14),
                 Expanded(

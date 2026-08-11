@@ -25,7 +25,7 @@ final Profile demoMemberProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'normal',
   membershipStatus: 'active',
-  avatarUrl: 'assets/images/profile_banner.jpg',
+  avatarUrl: 'assets/images/pagoda_header_bg.png',
   createdAt: DateTime(2024, 1, 15),
 );
 
@@ -41,7 +41,7 @@ final Profile demoLocationAdminProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'business',
   membershipStatus: 'active',
-  avatarUrl: 'assets/images/profile_banner.jpg',
+  avatarUrl: 'assets/images/pagoda_header_bg.png',
   createdAt: DateTime(2023, 6, 1),
 );
 
@@ -57,7 +57,7 @@ final Profile demoSuperAdminProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'business',
   membershipStatus: 'active',
-  avatarUrl: 'assets/images/profile_banner.jpg',
+  avatarUrl: 'assets/images/pagoda_header_bg.png',
   createdAt: DateTime(2022, 1, 1),
 );
 
