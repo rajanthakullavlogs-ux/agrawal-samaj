@@ -133,10 +133,11 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundImage: CachedNetworkImageProvider(
-                    profile.avatarUrl ??
-                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-                  ),
+                  backgroundColor: const Color(0xFF700D15),
+                  backgroundImage: profile.avatarUrl != null &&
+                          profile.avatarUrl!.startsWith('assets/')
+                      ? AssetImage(profile.avatarUrl!) as ImageProvider
+                      : const AssetImage('assets/images/profile_banner.jpg'),
                 ),
                 const SizedBox(width: 14),
                 Expanded(

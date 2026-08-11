@@ -25,7 +25,7 @@ final Profile demoMemberProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'normal',
   membershipStatus: 'active',
-  avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+  avatarUrl: 'assets/images/profile_banner.jpg',
   createdAt: DateTime(2024, 1, 15),
 );
 
@@ -41,7 +41,7 @@ final Profile demoLocationAdminProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'business',
   membershipStatus: 'active',
-  avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
+  avatarUrl: 'assets/images/profile_banner.jpg',
   createdAt: DateTime(2023, 6, 1),
 );
 
@@ -57,7 +57,7 @@ final Profile demoSuperAdminProfile = Profile(
   locationId: 'loc-ktm',
   membershipType: 'business',
   membershipStatus: 'active',
-  avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+  avatarUrl: 'assets/images/profile_banner.jpg',
   createdAt: DateTime(2022, 1, 1),
 );
 

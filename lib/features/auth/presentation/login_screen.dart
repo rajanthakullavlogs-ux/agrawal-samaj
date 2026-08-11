@@ -341,7 +341,10 @@ class _DemoAccountCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundImage: NetworkImage(avatarUrl),
+              backgroundColor: const Color(0xFF700D15),
+              backgroundImage: avatarUrl.startsWith('assets/')
+                  ? AssetImage(avatarUrl) as ImageProvider
+                  : NetworkImage(avatarUrl),
             ),
             const SizedBox(width: 12),
             Expanded(
