@@ -648,7 +648,9 @@ class _MemberCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.border),
       ),
-      child: ListTile(
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         leading: CircleAvatar(
@@ -682,6 +684,7 @@ class _MemberCard extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

@@ -79,9 +79,24 @@ class NASAppBar extends StatelessWidget implements PreferredSizeWidget {
           [
             Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: IconButton(
-                icon: const Icon(Icons.account_circle_outlined, color: Color(0xFF5C1414), size: 24),
-                onPressed: () => context.push(AppConstants.profile),
+              child: Center(
+                child: InkWell(
+                  onTap: () => context.push(AppConstants.profile),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDF0F0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.account_circle_outlined,
+                      color: Color(0xFF5C1414),
+                      size: 22,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

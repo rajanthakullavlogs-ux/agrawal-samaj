@@ -421,7 +421,6 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
 
                     // Event Cards List
                     if (filteredEvents.isEmpty)
@@ -1131,16 +1130,17 @@ class _EventsHeaderSection extends StatelessWidget {
                   child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
                 ),
               ),
-              GestureDetector(
+              InkWell(
                 onTap: onProfile,
+                borderRadius: BorderRadius.circular(18),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 34,
+                  height: 34,
                   decoration: const BoxDecoration(
-                    color: Color(0x33FFFFFF),
+                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 20),
+                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
                 ),
               ),
             ],

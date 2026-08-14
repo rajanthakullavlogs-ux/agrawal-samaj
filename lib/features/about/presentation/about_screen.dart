@@ -216,7 +216,7 @@ class _MoreTopBar extends StatelessWidget {
           const Text(
             'More',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
               color: Color(0xFF500913),
               letterSpacing: -0.3,
@@ -257,16 +257,17 @@ class _MoreTopBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              GestureDetector(
+              InkWell(
                 onTap: onProfile,
+                borderRadius: BorderRadius.circular(18),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 34,
+                  height: 34,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFF0EAE8),
+                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 20),
+                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
                 ),
               ),
             ],
@@ -311,32 +312,6 @@ class _SamajHeaderBanner extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Faded Temple Pagoda Graphic Accent
-            Positioned(
-              right: 24,
-              bottom: -5,
-              child: SizedBox(
-                width: 130,
-                height: 95,
-                child: ShaderMask(
-                  shaderCallback: (rect) => LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.transparent,
-                      Colors.white.withValues(alpha: 0.18),
-                    ],
-                  ).createShader(rect),
-                  blendMode: BlendMode.dstIn,
-                  child: CachedNetworkImage(
-                    imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
-                    fit: BoxFit.contain,
-                    errorWidget: (_, _, _) => const Icon(Icons.account_balance_rounded, size: 64, color: Colors.white12),
-                  ),
-                ),
-              ),
-            ),
-
             // Main Banner Content Padding
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),

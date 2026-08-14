@@ -390,7 +390,9 @@ class _ChapterCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.border),
       ),
-      child: ListTile(
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         leading: CircleAvatar(
           radius: 20,
@@ -411,6 +413,7 @@ class _ChapterCard extends StatelessWidget {
             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF3E7C4A)),
           ),
         ),
+      ),
       ),
     );
   }
