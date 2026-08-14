@@ -15,177 +15,245 @@ class LocationsListScreen extends ConsumerStatefulWidget {
 
 class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
   String _searchQuery = '';
-  bool _isListView = true;
+  String? _selectedProvince; // null = All
+  String? _selectedTag; // null = All
 
   static const _branches = [
     (
       name: 'Kathmandu Branch',
       tag: 'Head Branch',
+      province: 'Bagmati',
       address: 'Sinamangal, Kathmandu, Nepal',
       phone: '+977 1-XXXXXXX',
       imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=400&q=80',
     ),
     (
       name: 'Biratnagar Branch',
-      tag: null,
+      tag: 'Regional Office',
+      province: 'Koshi',
       address: 'Biratnagar, Koshi Province',
       phone: '+977 21-XXXXXXX',
       imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=400&q=80',
     ),
     (
       name: 'Pokhara Branch',
-      tag: null,
+      tag: 'Regional Office',
+      province: 'Gandaki',
       address: 'Pokhara, Gandaki Province',
       phone: '+977 61-XXXXXXX',
       imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=400&q=80',
     ),
     (
       name: 'Butwal Branch',
-      tag: null,
+      tag: 'Regional Office',
+      province: 'Lumbini',
       address: 'Butwal, Lumbini Province',
       phone: '+977 71-XXXXXXX',
       imageUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=400&q=80',
+    ),
+    (
+      name: 'Nepalgunj Branch',
+      tag: 'Regional Office',
+      province: 'Lumbini',
+      address: 'Nepalgunj, Lumbini Province',
+      phone: '+977 81-XXXXXXX',
+      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=400&q=80',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _searchQuery.isEmpty
-        ? _branches
-        : _branches.where((b) =>
-            b.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            b.address.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+    final filtered = _branches.where((b) {
+      if (_searchQuery.isNotEmpty) {
+        final query = _searchQuery.toLowerCase();
+        final matchesQuery = b.name.toLowerCase().contains(query) || b.address.toLowerCase().contains(query);
+        if (!matchesQuery) return false;
+      }
+      if (_selectedProvince != null && b.province != _selectedProvince) {
+        return false;
+      }
+      if (_selectedTag != null && b.tag != _selectedTag) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    final activeFilterCount = (_selectedProvince != null ? 1 : 0) + (_selectedTag != null ? 1 : 0);
+    final hasActiveFilter = activeFilterCount > 0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF8F6),
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: const NASAppBar(title: 'Locations', showBackButton: true),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // Hero Header with Pagoda Graphic
+          // Hero Header Row with Pagoda Photo Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              height: 100,
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: -10,
-                    top: -10,
-                    bottom: 0,
-                    width: 220,
-                    child: Opacity(
-                      opacity: 0.85,
-                      child: Image(
-                        image: const AssetImage('assets/images/pagoda_header_bg.png'),
-                        fit: BoxFit.contain,
-                        alignment: Alignment.centerRight,
-                        errorBuilder: (context, error, stackTrace) => const SizedBox(),
-                      ),
-                    ),
-                  ),
-                  Column(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Text(
                         'Our Locations',
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF5C1414),
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF3F050C),
                           letterSpacing: -0.5,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 6),
                       Text(
-                        'Find Nepal Agrawal Samaj branches\nnear you',
+                        'Find Nepal Agrawal Samaj\nbranches near you',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF6E645D),
-                          height: 1.3,
+                          color: Color(0xFF756E68),
+                          height: 1.35,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 14),
+                Container(
+                  width: 105,
+                  height: 105,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/images/pagoda_header_bg.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: const Color(0xFF500913),
+                        child: const Icon(Icons.temple_hindu_rounded, color: Colors.white, size: 40),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
 
-          // Search & Filter Bar
+          // Ultra-Premium Modern Search Bar & Interactive Filter Button Row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 46,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFEAE4E0)),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: _searchQuery.isNotEmpty ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                        width: _searchQuery.isNotEmpty ? 1.5 : 1.0,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+                          color: const Color(0xFF500913).withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search_rounded, size: 20, color: Color(0xFF9A928C)),
-                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF500913).withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.search_rounded, size: 18, color: Color(0xFF500913)),
+                        ),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
                             onChanged: (v) => setState(() => _searchQuery = v),
                             decoration: const InputDecoration(
-                              hintText: 'Search by city, district or branch',
-                              hintStyle: TextStyle(color: Color(0xFF9A928C), fontSize: 13),
+                              hintText: 'Search city, district or branch...',
+                              hintStyle: TextStyle(color: Color(0xFF9E958F), fontSize: 13, fontWeight: FontWeight.w500),
                               border: InputBorder.none,
                               isDense: true,
                               contentPadding: EdgeInsets.zero,
                             ),
-                            style: const TextStyle(fontSize: 13, color: Color(0xFF1F2937)),
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Color(0xFF1E1615)),
                           ),
                         ),
                         if (_searchQuery.isNotEmpty)
                           GestureDetector(
                             onTap: () => setState(() => _searchQuery = ''),
-                            child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF6E645D)),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFEBE5E1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF500913)),
+                            ),
                           ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Filter Button
-                Container(
-                  height: 46,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFDF0F0),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFF9DADA)),
-                  ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.tune_rounded, size: 18, color: Color(0xFF5C1414)),
-                      SizedBox(width: 6),
-                      Text(
-                        'Filter',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF5C1414),
+                // Interactive Filter Button with Active Badge Accent
+                GestureDetector(
+                  onTap: () => _showLocationsFilterModalSheet(context),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: hasActiveFilter ? const Color(0xFF500913) : const Color(0xFFFBEBEB),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: hasActiveFilter
+                          ? [
+                              BoxShadow(
+                                color: const Color(0xFF500913).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          : [],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 18,
+                          color: hasActiveFilter ? Colors.white : const Color(0xFF500913),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 6),
+                        Text(
+                          hasActiveFilter ? 'Filter ($activeFilterCount)' : 'Filter',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: hasActiveFilter ? Colors.white : const Color(0xFF500913),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -200,7 +268,7 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           ),
           const SizedBox(height: 16),
 
-          // 4 Stat Cards
+          // 4 Stat Cards Row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -210,8 +278,8 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                     icon: Icons.account_balance_rounded,
                     value: '18',
                     label: 'Branches',
-                    bgColor: Color(0xFFFDF0F0),
-                    iconColor: Color(0xFF5C1414),
+                    bgColor: Color(0xFFFDEEEE),
+                    iconColor: Color(0xFF500913),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -220,8 +288,8 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                     icon: Icons.grid_view_rounded,
                     value: '77',
                     label: 'Districts\nCovered',
-                    bgColor: Color(0xFFFDF3E7),
-                    iconColor: Color(0xFFD97706),
+                    bgColor: Color(0xFFFFF3E0),
+                    iconColor: Color(0xFFE67E22),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -230,8 +298,8 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                     icon: Icons.groups_rounded,
                     value: '10K+',
                     label: 'Members',
-                    bgColor: Color(0xFFF3F0F9),
-                    iconColor: Color(0xFF7C3AED),
+                    bgColor: Color(0xFFF0EDFB),
+                    iconColor: Color(0xFF7B4FD6),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -240,8 +308,8 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                     icon: Icons.flag_rounded,
                     value: '1 Goal',
                     label: 'United\nCommunity',
-                    bgColor: Color(0xFFEEF7F1),
-                    iconColor: Color(0xFF16A34A),
+                    bgColor: Color(0xFFE8F5E9),
+                    iconColor: Color(0xFF2E7D32),
                   ),
                 ),
               ],
@@ -249,89 +317,44 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           ),
           const SizedBox(height: 22),
 
-          // Section Title & View Toggle
+          // All Branches Header Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Container(
+                  width: 4,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF500913),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 const Text(
                   'All Branches',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF5C1414),
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF1E1615),
+                    letterSpacing: -0.3,
                   ),
                 ),
-                // Toggle pill
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.all(3),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFF500913).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFEAE4E0)),
+                    border: Border.all(color: const Color(0xFF500913).withValues(alpha: 0.15)),
                   ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => setState(() => _isListView = true),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: _isListView ? const Color(0xFF5C1414) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.format_list_bulleted_rounded,
-                                size: 14,
-                                color: _isListView ? Colors.white : const Color(0xFF6E645D),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'List View',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: _isListView ? Colors.white : const Color(0xFF6E645D),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => setState(() => _isListView = false),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: !_isListView ? const Color(0xFF5C1414) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.map_outlined,
-                                size: 14,
-                                color: !_isListView ? Colors.white : const Color(0xFF6E645D),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Map View',
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: !_isListView ? Colors.white : const Color(0xFF6E645D),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    '${filtered.length}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF500913),
+                    ),
                   ),
                 ),
               ],
@@ -339,29 +362,338 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           ),
           const SizedBox(height: 14),
 
-          // List View vs Map View display
-          if (_isListView)
-            ...List.generate(filtered.length, (i) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: _BranchCard(branch: filtered[i]),
-              );
-            })
-          else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _NepalMapCard(interactive: true),
-            ),
+          // Branch Cards List View display
+          ...List.generate(filtered.length, (i) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: _BranchCard(branch: filtered[i]),
+            );
+          }),
         ],
       ),
       bottomNavigationBar: const NASBottomNavBar(activeIndex: 2),
     );
   }
+
+  void _showLocationsFilterModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final activeCount = (_selectedProvince != null ? 1 : 0) + (_selectedTag != null ? 1 : 0);
+
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Top Drag Indicator Bar
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE0E0E0),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Header Card with Burgundy Gradient
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF6B0E1B), Color(0xFF45060E)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF6B0E1B).withValues(alpha: 0.25),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(Icons.tune_rounded, color: Color(0xFFE5C158), size: 22),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Filter Locations',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  activeCount > 0
+                                      ? '$activeCount active filter${activeCount > 1 ? 's' : ''} applied'
+                                      : 'Explore branches by province & category',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (activeCount > 0)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedProvince = null;
+                                  _selectedTag = null;
+                                });
+                                setModalState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white30),
+                                ),
+                                child: const Text(
+                                  'Reset',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Section 1: Province Selection
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: const [
+                            Icon(Icons.location_on_rounded, size: 16, color: Color(0xFF500913)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Filter by Province',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1615),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          'All Provinces',
+                          'Bagmati',
+                          'Gandaki',
+                          'Koshi',
+                          'Lumbini',
+                          'Madhesh',
+                          'Sudurpashchim',
+                        ].map((pr) {
+                          final isAll = pr == 'All Provinces';
+                          final isSel = isAll ? _selectedProvince == null : _selectedProvince == pr;
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedProvince = isAll ? null : pr;
+                              });
+                              setModalState(() {});
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSel) ...[
+                                    const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+                                    const SizedBox(width: 5),
+                                  ],
+                                  Text(
+                                    pr,
+                                    style: TextStyle(
+                                      color: isSel ? Colors.white : const Color(0xFF500913),
+                                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Section 2: Branch Category
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: const [
+                            Icon(Icons.category_rounded, size: 16, color: Color(0xFF500913)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Branch Category',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E1615),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          'All Types',
+                          'Head Branch',
+                          'Regional Office',
+                        ].map((tg) {
+                          final isAll = tg == 'All Types';
+                          final isSel = isAll ? _selectedTag == null : _selectedTag == tg;
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedTag = isAll ? null : tg;
+                              });
+                              setModalState(() {});
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (isSel) ...[
+                                    const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+                                    const SizedBox(width: 5),
+                                  ],
+                                  Text(
+                                    tg,
+                                    style: TextStyle(
+                                      color: isSel ? Colors.white : const Color(0xFF500913),
+                                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                                      fontSize: 12.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Apply Filters Action Button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF500913),
+                            foregroundColor: Colors.white,
+                            elevation: 4,
+                            shadowColor: const Color(0xFF500913).withValues(alpha: 0.3),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                          ),
+                          child: const Text(
+                            'Apply Location Filters',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 15,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _NepalMapCard extends StatelessWidget {
-  final bool interactive;
-  const _NepalMapCard({this.interactive = false});
+  const _NepalMapCard();
 
   static const _pinDetails = [
     (name: 'Nepalgunj', offset: Offset(0.18, 0.62)),
@@ -460,7 +792,7 @@ class _NepalMapCard extends StatelessWidget {
     );
 
     return Container(
-      height: interactive ? 340 : 200,
+      height: 200,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: const Color(0xFFE8F3E5),
@@ -474,13 +806,7 @@ class _NepalMapCard extends StatelessWidget {
           ),
         ],
       ),
-      child: interactive
-          ? InteractiveViewer(
-              minScale: 1.0,
-              maxScale: 3.0,
-              child: mapContent,
-            )
-          : mapContent,
+      child: mapContent,
     );
   }
 }
@@ -539,12 +865,13 @@ class _StatCard extends StatelessWidget {
 }
 
 class _BranchCard extends StatelessWidget {
-  final ({String name, String? tag, String address, String phone, String imageUrl}) branch;
+  final ({String name, String? tag, String? province, String address, String phone, String imageUrl}) branch;
   const _BranchCard({required this.branch});
 
   @override
   Widget build(BuildContext context) {
     final slug = branch.name.toLowerCase().split(' ').first;
+
     return InkWell(
       onTap: () => context.push('/locations/$slug'),
       borderRadius: BorderRadius.circular(16),
@@ -553,127 +880,131 @@ class _BranchCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFEAE4E0)),
+          border: Border.all(color: const Color(0xFFEBE5E1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: 84,
-              height: 94,
-              child: CachedNetworkImage(
-                imageUrl: branch.imageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
-                  color: const Color(0xFFF3F0EE),
-                  child: const Icon(Icons.image_outlined, color: Color(0xFF9A928C)),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 84,
+                height: 94,
+                child: CachedNetworkImage(
+                  imageUrl: branch.imageUrl,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => Container(
+                    color: const Color(0xFFF3F0EE),
+                    child: const Icon(Icons.image_outlined, color: Color(0xFF9A928C)),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        branch.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 15,
-                          color: Color(0xFF5C1414),
-                        ),
-                      ),
-                    ),
-                    if (branch.tag != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE6F4EA),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
                         child: Text(
-                          branch.tag!,
+                          branch.name,
                           style: const TextStyle(
-                            color: Color(0xFF1E8E3E),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            color: Color(0xFF500913),
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                    ],
-                    const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFF9A928C)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                _iconLine(Icons.location_on_rounded, branch.address),
-                const SizedBox(height: 4),
-                _iconLine(Icons.call_rounded, branch.phone),
-                const SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDF0F0),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.near_me_rounded, size: 14, color: Color(0xFF5C1414)),
-                          SizedBox(width: 5),
-                          Text(
-                            'Directions',
-                            style: TextStyle(
-                              color: Color(0xFF5C1414),
+                      if (branch.tag != null) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            branch.tag!,
+                            style: const TextStyle(
+                              color: Color(0xFF2E7D32),
+                              fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              fontSize: 11.5,
                             ),
                           ),
-                        ],
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0xFF9A928C)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  _iconLine(Icons.location_on_rounded, branch.address),
+                  const SizedBox(height: 4),
+                  _iconLine(Icons.call_rounded, branch.phone),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDF0F0),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.near_me_rounded, size: 14, color: Color(0xFF500913)),
+                            SizedBox(width: 5),
+                            Text(
+                              'Directions',
+                              style: TextStyle(
+                                color: Color(0xFF500913),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11.5,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
   Widget _iconLine(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF5C1414)),
+        Icon(icon, size: 14, color: const Color(0xFF500913)),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF6E645D),
+              color: Color(0xFF756E68),
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ),
       ],

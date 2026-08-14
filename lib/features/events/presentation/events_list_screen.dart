@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/constants.dart';
 import '../../../shared/widgets/widgets.dart';
@@ -47,6 +48,17 @@ class _EventItem {
     required this.tagType,
   });
 
+  DateTime get eventDate {
+    const monthMap = {
+      'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6,
+      'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10, 'NOV': 11, 'DEC': 12,
+    };
+    final m = monthMap[month.toUpperCase()] ?? 1;
+    final d = int.tryParse(day) ?? 1;
+    final y = int.tryParse(year) ?? 2026;
+    return DateTime(y, m, d);
+  }
+
   _EventItem copyWith({bool? isBookmarked}) {
     return _EventItem(
       id: id,
@@ -83,6 +95,8 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
   String _selectedStatusFilter = 'Upcoming'; // 'Upcoming', 'Past', 'All'
   String? _selectedProvince; // null = All Provinces
   String? _selectedCategory; // null = All Categories
+  DateTimeRange? _selectedDateRange; // null = All Dates
+  String? _selectedDateRangeLabel;
 
   late List<_EventItem> _events;
 
@@ -247,6 +261,11 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
       if (_selectedStatusFilter == 'Past' && e.status != 'past') return false;
       if (_selectedProvince != null && e.province != _selectedProvince) return false;
       if (_selectedCategory != null && e.category != _selectedCategory) return false;
+      if (_selectedDateRange != null) {
+        final start = DateTime(_selectedDateRange!.start.year, _selectedDateRange!.start.month, _selectedDateRange!.start.day);
+        final end = DateTime(_selectedDateRange!.end.year, _selectedDateRange!.end.month, _selectedDateRange!.end.day, 23, 59, 59);
+        if (e.eventDate.isBefore(start) || e.eventDate.isAfter(end)) return false;
+      }
       return true;
     }).toList();
 
@@ -271,12 +290,14 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
             // Main Content Area inside Top Rounded Container
             Transform.translate(
               offset: const Offset(0, -16),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF9F7F5),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                ),
-                child: Column(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF9F7F5),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 12),
@@ -292,7 +313,7 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Section Title Row (Managed Heading + Styled Count Badge)
+                    // Section Title Row (Managed Heading + Styled Count Badge + Date Range Selector Button)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -344,31 +365,55 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
+                          // Redesigned Interactive Date Range Selector Pill
                           GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Calendar view opened')),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            onTap: () => _showDateRangeModalSheet(context),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF700D15).withValues(alpha: 0.08),
+                                color: _selectedDateRange != null
+                                    ? const Color(0xFF700D15)
+                                    : const Color(0xFF700D15).withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _selectedDateRange != null
+                                      ? const Color(0xFF700D15)
+                                      : const Color(0xFF700D15).withValues(alpha: 0.15),
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
+                                  Icon(
+                                    Icons.calendar_month_rounded,
+                                    size: 13,
+                                    color: _selectedDateRange != null ? Colors.white : const Color(0xFF700D15),
+                                  ),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    'View Calendar',
+                                    _selectedDateRangeLabel ?? 'Date Range',
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w800,
-                                      color: Color(0xFF700D15),
+                                      color: _selectedDateRange != null ? Colors.white : const Color(0xFF700D15),
                                     ),
                                   ),
-                                  SizedBox(width: 4),
-                                  Icon(Icons.calendar_month_outlined, size: 13, color: Color(0xFF700D15)),
+                                  if (_selectedDateRange != null) ...[
+                                    const SizedBox(width: 6),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedDateRange = null;
+                                          _selectedDateRangeLabel = null;
+                                        });
+                                      },
+                                      child: const Icon(Icons.cancel_rounded, size: 14, color: Colors.white),
+                                    ),
+                                  ] else ...[
+                                    const SizedBox(width: 3),
+                                    const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: Color(0xFF700D15)),
+                                  ],
                                 ],
                               ),
                             ),
@@ -404,6 +449,8 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                                   _selectedStatusFilter = 'Upcoming';
                                   _selectedProvince = null;
                                   _selectedCategory = null;
+                                  _selectedDateRange = null;
+                                  _selectedDateRangeLabel = null;
                                 });
                               },
                               child: const Text('Reset All Filters', style: TextStyle(color: Color(0xFF700D15), fontWeight: FontWeight.w700)),
@@ -436,152 +483,12 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-
-      // Floating Action Button with Red Badge Counter
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            GestureDetector(
-              onTap: () => _showFilterModalSheet(context),
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6B0E1B),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF6B0E1B).withValues(alpha: 0.35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.filter_alt_outlined, color: Colors.white, size: 24),
-              ),
-            ),
-            Positioned(
-              top: -2,
-              right: -2,
-              child: Container(
-                width: 18,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE53935),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.8),
-                ),
-                child: const Center(
-                  child: Text(
-                    '2',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      height: 1.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    ),
 
       bottomNavigationBar: const NASBottomNavBar(activeIndex: 1),
-    );
-  }
-
-  void _showFilterModalSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.filter_alt_rounded, color: Color(0xFF700D15)),
-                  const SizedBox(width: 8),
-                  const Text('Filter Events', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedProvince = null;
-                        _selectedCategory = null;
-                      });
-                      Navigator.pop(ctx);
-                    },
-                    child: const Text('Reset All', style: TextStyle(color: Color(0xFF700D15), fontWeight: FontWeight.w700)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text('Select Province', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E1615))),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: ['Bagmati', 'Gandaki', 'Koshi', 'Madhesh', 'Lumbini'].map((pr) {
-                  final sel = _selectedProvince == pr;
-                  return ChoiceChip(
-                    label: Text(pr),
-                    selected: sel,
-                    selectedColor: const Color(0xFF700D15),
-                    labelStyle: TextStyle(color: sel ? Colors.white : const Color(0xFF1E1615), fontWeight: FontWeight.w600, fontSize: 12),
-                    onSelected: (val) {
-                      setState(() => _selectedProvince = val ? pr : null);
-                      setModalState(() {});
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              const Text('Select Category', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E1615))),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: ['Business', 'Cultural', 'Health', 'Youth', 'Social'].map((cat) {
-                  final sel = _selectedCategory == cat;
-                  return ChoiceChip(
-                    label: Text(cat),
-                    selected: sel,
-                    selectedColor: const Color(0xFF700D15),
-                    labelStyle: TextStyle(color: sel ? Colors.white : const Color(0xFF1E1615), fontWeight: FontWeight.w600, fontSize: 12),
-                    onSelected: (val) {
-                      setState(() => _selectedCategory = val ? cat : null);
-                      setModalState(() {});
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF500913),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-                  ),
-                  child: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -647,6 +554,532 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
             child: const Text('Confirm Registration', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showDateRangeModalSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final isRangeActive = _selectedDateRange != null;
+
+          return Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 20,
+                  offset: Offset(0, -4),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  // Drag Handle Bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4.5,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD6C7C2),
+                        borderRadius: BorderRadius.circular(2.5),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Premium Top Burgundy Header Card
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6B0E1B), Color(0xFF45060E)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF6B0E1B).withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: const Color(0xFFE5C158).withValues(alpha: 0.5), width: 1.2),
+                          ),
+                          child: const Icon(Icons.date_range_rounded, color: Color(0xFFE5C158), size: 22),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Filter by Date Range',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                isRangeActive
+                                    ? 'Active: ${_selectedDateRangeLabel ?? "Custom Range"}'
+                                    : 'Select a quick range or custom start & end date',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isRangeActive ? FontWeight.w700 : FontWeight.w400,
+                                  color: isRangeActive ? const Color(0xFFE5C158) : Colors.white70,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isRangeActive)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedDateRange = null;
+                                _selectedDateRangeLabel = null;
+                              });
+                              Navigator.pop(ctx);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.white30),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(Icons.refresh_rounded, color: Colors.white, size: 13),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Reset',
+                                    style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+
+                          // Presets Section Heading
+                          Row(
+                            children: const [
+                              Icon(Icons.bolt_rounded, size: 16, color: Color(0xFF700D15)),
+                              SizedBox(width: 6),
+                              Text(
+                                'QUICK RANGE PRESETS',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF700D15),
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          // 2-Column Grid of Presets Cards
+                          GridView.count(
+                            crossAxisCount: 2,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2.6,
+                            children: [
+                              _buildPresetCard(
+                                title: 'All Dates',
+                                subtitle: 'Show all events',
+                                icon: Icons.all_inclusive_rounded,
+                                isSelected: _selectedDateRange == null,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDateRange = null;
+                                    _selectedDateRangeLabel = null;
+                                  });
+                                  Navigator.pop(ctx);
+                                },
+                              ),
+                              _buildPresetCard(
+                                title: 'This Month',
+                                subtitle: 'Current month',
+                                icon: Icons.calendar_today_rounded,
+                                isSelected: _selectedDateRangeLabel == 'This Month',
+                                onTap: () {
+                                  final now = DateTime(2026, 10, 1);
+                                  final start = DateTime(now.year, now.month, 1);
+                                  final end = DateTime(now.year, now.month + 1, 0);
+                                  setState(() {
+                                    _selectedDateRange = DateTimeRange(start: start, end: end);
+                                    _selectedDateRangeLabel = 'This Month';
+                                  });
+                                  Navigator.pop(ctx);
+                                },
+                              ),
+                              _buildPresetCard(
+                                title: 'Next 30 Days',
+                                subtitle: 'Upcoming month',
+                                icon: Icons.date_range_outlined,
+                                isSelected: _selectedDateRangeLabel == 'Next 30 Days',
+                                onTap: () {
+                                  final now = DateTime(2026, 10, 1);
+                                  final end = now.add(const Duration(days: 30));
+                                  setState(() {
+                                    _selectedDateRange = DateTimeRange(start: now, end: end);
+                                    _selectedDateRangeLabel = 'Next 30 Days';
+                                  });
+                                  Navigator.pop(ctx);
+                                },
+                              ),
+                              _buildPresetCard(
+                                title: 'Next 3 Months',
+                                subtitle: 'Quarterly view',
+                                icon: Icons.update_rounded,
+                                isSelected: _selectedDateRangeLabel == 'Next 3 Months',
+                                onTap: () {
+                                  final now = DateTime(2026, 10, 1);
+                                  final end = now.add(const Duration(days: 90));
+                                  setState(() {
+                                    _selectedDateRange = DateTimeRange(start: now, end: end);
+                                    _selectedDateRangeLabel = 'Next 3 Months';
+                                  });
+                                  Navigator.pop(ctx);
+                                },
+                              ),
+                              _buildPresetCard(
+                                title: 'Year 2026',
+                                subtitle: 'Full 2026 calendar',
+                                icon: Icons.event_available_rounded,
+                                isSelected: _selectedDateRangeLabel == 'Year 2026',
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDateRange = DateTimeRange(
+                                      start: DateTime(2026, 1, 1),
+                                      end: DateTime(2026, 12, 31),
+                                    );
+                                    _selectedDateRangeLabel = 'Year 2026';
+                                  });
+                                  Navigator.pop(ctx);
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+
+                          // Custom Date Range Section Heading
+                          Row(
+                            children: const [
+                              Icon(Icons.edit_calendar_rounded, size: 16, color: Color(0xFF700D15)),
+                              SizedBox(width: 6),
+                              Text(
+                                'CUSTOM DATE RANGE',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF700D15),
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Custom Date Range Interactive Selector Box
+                          InkWell(
+                            onTap: () async {
+                              final picked = await showDateRangePicker(
+                                context: context,
+                                initialDateRange: _selectedDateRange ??
+                                    DateTimeRange(
+                                      start: DateTime(2026, 10, 1),
+                                      end: DateTime(2026, 12, 31),
+                                    ),
+                                firstDate: DateTime(2024, 1, 1),
+                                lastDate: DateTime(2030, 12, 31),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: Color(0xFF700D15),
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Color(0xFF1E1615),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              if (picked != null) {
+                                final shortStart = DateFormat('MMM d').format(picked.start);
+                                final shortEnd = DateFormat('MMM d').format(picked.end);
+                                setState(() {
+                                  _selectedDateRange = picked;
+                                  _selectedDateRangeLabel = '$shortStart – $shortEnd';
+                                });
+                                if (context.mounted) Navigator.pop(ctx);
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(18),
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: isRangeActive
+                                    ? const Color(0xFF700D15).withValues(alpha: 0.06)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: isRangeActive
+                                      ? const Color(0xFF700D15)
+                                      : const Color(0xFFE2D6D3),
+                                  width: isRangeActive ? 1.5 : 1.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  // Start Date Box
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: const Color(0xFFE2D6D3)),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'FROM DATE',
+                                            style: TextStyle(
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF8C7A75),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            _selectedDateRange != null
+                                                ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.start)
+                                                : 'Select Start',
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w800,
+                                              color: _selectedDateRange != null
+                                                  ? const Color(0xFF700D15)
+                                                  : const Color(0xFF1E1615),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8),
+                                    child: Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF700D15)),
+                                  ),
+                                  // End Date Box
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: const Color(0xFFE2D6D3)),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'TO DATE',
+                                            style: TextStyle(
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF8C7A75),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            _selectedDateRange != null
+                                                ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)
+                                                : 'Select End',
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w800,
+                                              color: _selectedDateRange != null
+                                                  ? const Color(0xFF700D15)
+                                                  : const Color(0xFF1E1615),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+
+                          // Done/Apply Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF500913),
+                                foregroundColor: Colors.white,
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'Apply Date Filter',
+                                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14.5),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.check_circle_outline_rounded, size: 18),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPresetCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF700D15) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF700D15) : const Color(0xFFE2D6D3),
+            width: isSelected ? 1.5 : 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? const Color(0xFF700D15).withValues(alpha: 0.25)
+                  : Colors.black.withValues(alpha: 0.03),
+              blurRadius: isSelected ? 8 : 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.white.withValues(alpha: 0.2) : const Color(0xFF700D15).withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 15,
+                color: isSelected ? Colors.white : const Color(0xFF700D15),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: isSelected ? Colors.white : const Color(0xFF1E1615),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected ? Colors.white70 : const Color(0xFF8C7A75),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+          ],
+        ),
       ),
     );
   }
@@ -742,7 +1175,10 @@ class _EventsHeaderSection extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // 2. HORIZONTAL FILTER PILLS ROW
 // ---------------------------------------------------------------------------
-class _FilterPillsBar extends StatelessWidget {
+// ---------------------------------------------------------------------------
+// 2. HORIZONTAL FILTER PILLS ROW WITH TOP CURVE FOLLOWING ANIMATION
+// ---------------------------------------------------------------------------
+class _FilterPillsBar extends StatefulWidget {
   final String selectedStatus;
   final String? selectedProvince;
   final String? selectedCategory;
@@ -760,61 +1196,235 @@ class _FilterPillsBar extends StatelessWidget {
   });
 
   @override
+  State<_FilterPillsBar> createState() => _FilterPillsBarState();
+}
+
+class _FilterPillsBarState extends State<_FilterPillsBar> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SizedBox(
-      height: 38,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          // Upcoming Pill
-          _buildPill(
-            icon: Icons.calendar_today_outlined,
-            label: 'Upcoming',
-            isSelected: selectedStatus == 'Upcoming',
-            onTap: () => onStatusSelected('Upcoming'),
-          ),
-          const SizedBox(width: 8),
+      height: 42,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          setState(() {});
+          return false;
+        },
+        child: ListView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            // Upcoming Pill
+            _buildCurvedItem(
+              screenWidth: screenWidth,
+              child: _buildPill(
+                icon: Icons.calendar_today_outlined,
+                label: 'Upcoming',
+                isSelected: widget.selectedStatus == 'Upcoming',
+                onTap: () => widget.onStatusSelected('Upcoming'),
+              ),
+            ),
+            const SizedBox(width: 8),
 
-          // Past Pill
-          _buildPill(
-            icon: Icons.history_rounded,
-            label: 'Past',
-            isSelected: selectedStatus == 'Past',
-            onTap: () => onStatusSelected('Past'),
-          ),
-          const SizedBox(width: 8),
+            // Past Pill
+            _buildCurvedItem(
+              screenWidth: screenWidth,
+              child: _buildPill(
+                icon: Icons.history_rounded,
+                label: 'Past',
+                isSelected: widget.selectedStatus == 'Past',
+                onTap: () => widget.onStatusSelected('Past'),
+              ),
+            ),
+            const SizedBox(width: 8),
 
-          // All Pill
-          _buildPill(
-            icon: Icons.grid_view_rounded,
-            label: 'All',
-            isSelected: selectedStatus == 'All',
-            onTap: () => onStatusSelected('All'),
-          ),
-          const SizedBox(width: 8),
+            // All Pill
+            _buildCurvedItem(
+              screenWidth: screenWidth,
+              child: _buildPill(
+                icon: Icons.grid_view_rounded,
+                label: 'All',
+                isSelected: widget.selectedStatus == 'All',
+                onTap: () => widget.onStatusSelected('All'),
+              ),
+            ),
+            const SizedBox(width: 8),
 
-          // Province Dropdown Pill
-          PopupMenuButton<String?>(
-            initialValue: selectedProvince,
-            tooltip: 'Select Province',
-            onSelected: onProvinceSelected,
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: null, child: Text('All Provinces')),
-              const PopupMenuItem(value: 'Bagmati', child: Text('Bagmati Province')),
-              const PopupMenuItem(value: 'Gandaki', child: Text('Gandaki Province')),
-              const PopupMenuItem(value: 'Koshi', child: Text('Koshi Province')),
-              const PopupMenuItem(value: 'Madhesh', child: Text('Madhesh Province')),
-              const PopupMenuItem(value: 'Lumbini', child: Text('Lumbini Province')),
-            ],
-            child: _buildDropdownPill(
-              icon: Icons.location_on_outlined,
-              label: selectedProvince ?? 'Province',
-              isSelected: selectedProvince != null,
+            // Province Dropdown Pill
+            _buildCurvedItem(
+              screenWidth: screenWidth,
+              child: PopupMenuButton<String>(
+                initialValue: widget.selectedProvince ?? 'ALL',
+                tooltip: 'Select Province',
+                onSelected: (val) {
+                  widget.onProvinceSelected(val == 'ALL' ? null : val);
+                },
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                color: Colors.white,
+                elevation: 6,
+                itemBuilder: (context) => [
+                  'ALL',
+                  'Bagmati',
+                  'Gandaki',
+                  'Koshi',
+                  'Madhesh',
+                  'Lumbini',
+                ].map((pr) {
+                  final isSel = (widget.selectedProvince == null && pr == 'ALL') || (widget.selectedProvince == pr);
+                  final labelText = pr == 'ALL' ? 'All Provinces' : '$pr Province';
+                  return PopupMenuItem<String>(
+                    value: pr,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          labelText,
+                          style: TextStyle(
+                            fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                            color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
+                            fontSize: 13,
+                          ),
+                        ),
+                        if (isSel) ...[
+                          const Spacer(),
+                          const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
+                        ],
+                      ],
+                    ),
+                  );
+                }).toList(),
+                child: _buildDropdownPill(
+                  icon: Icons.location_on_outlined,
+                  label: widget.selectedProvince ?? 'Province',
+                  isSelected: widget.selectedProvince != null,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Category Dropdown Pill
+            _buildCurvedItem(
+              screenWidth: screenWidth,
+              child: PopupMenuButton<String>(
+                initialValue: widget.selectedCategory ?? 'ALL',
+                tooltip: 'Select Category',
+                onSelected: (val) {
+                  widget.onCategorySelected(val == 'ALL' ? null : val);
+                },
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                color: Colors.white,
+                elevation: 6,
+                itemBuilder: (context) => [
+                  'ALL',
+                  'Business',
+                  'Cultural',
+                  'Health',
+                  'Youth',
+                  'Social',
+                ].map((cat) {
+                  final isSel = (widget.selectedCategory == null && cat == 'ALL') || (widget.selectedCategory == cat);
+                  final labelText = cat == 'ALL' ? 'All Categories' : cat;
+                  return PopupMenuItem<String>(
+                    value: cat,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.category_outlined,
+                          size: 14,
+                          color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          labelText,
+                          style: TextStyle(
+                            fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                            color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
+                            fontSize: 13,
+                          ),
+                        ),
+                        if (isSel) ...[
+                          const Spacer(),
+                          const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
+                        ],
+                      ],
+                    ),
+                  );
+                }).toList(),
+                child: _buildDropdownPill(
+                  icon: Icons.category_outlined,
+                  label: widget.selectedCategory ?? 'Category',
+                  isSelected: widget.selectedCategory != null,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurvedItem({
+    required double screenWidth,
+    required Widget child,
+  }) {
+    return Builder(
+      builder: (context) {
+        double offsetY = 0.0;
+        double opacity = 1.0;
+        double scale = 1.0;
+
+        final renderBox = context.findRenderObject() as RenderBox?;
+        if (renderBox != null && renderBox.hasSize) {
+          final position = renderBox.localToGlobal(Offset.zero);
+          final pillWidth = renderBox.size.width;
+          final pillCenterX = position.dx + (pillWidth / 2);
+
+          const curveZone = 55.0;
+          const maxOffsetY = 7.0;
+
+          // Left Curve Border Zone
+          if (pillCenterX < curveZone) {
+            final t = ((curveZone - pillCenterX) / curveZone).clamp(0.0, 1.0);
+            offsetY = t * t * maxOffsetY;
+            opacity = 1.0 - (t * 0.35);
+            scale = 1.0 - (t * 0.05);
+          }
+          // Right Curve Border Zone
+          else if (pillCenterX > screenWidth - curveZone) {
+            final t = ((pillCenterX - (screenWidth - curveZone)) / curveZone).clamp(0.0, 1.0);
+            offsetY = t * t * maxOffsetY;
+            opacity = 1.0 - (t * 0.35);
+            scale = 1.0 - (t * 0.05);
+          }
+        }
+
+        return Transform.translate(
+          offset: Offset(0, offsetY),
+          child: Transform.scale(
+            scale: scale,
+            child: Opacity(
+              opacity: opacity,
+              child: child,
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
