@@ -290,10 +290,8 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           // 4 Stat Cards Row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: const [
+            child: Row(
+              children: const [
                 Expanded(
                   child: _StatCard(
                     icon: Icons.account_balance_rounded,
@@ -334,7 +332,6 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                   ),
                 ),
               ],
-              ),
             ),
           ),
           const SizedBox(height: 22),
@@ -917,6 +914,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 96,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
       decoration: BoxDecoration(
         color: bgColor,
@@ -964,7 +962,7 @@ class _BranchCard extends StatelessWidget {
       onTap: () => context.push('/locations/$slug'),
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        height: 100,
+        height: 110,
         padding: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: const Color(0xFFFFFBF9),

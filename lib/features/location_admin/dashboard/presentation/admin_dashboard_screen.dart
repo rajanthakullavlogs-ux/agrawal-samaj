@@ -95,7 +95,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         : _activities.where((a) => a.category == _filter).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFFCF9F6),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(bottom: 20),
@@ -128,61 +128,58 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.15,
+              child: Column(
                 children: [
-                  _MetricCard(
-                    icon: Icons.people_alt_rounded,
-                    iconBg: const Color(0xFFDCEBFD),
-                    iconColor: const Color(0xFF2E6FE0),
-                    cardBg: const Color(0xFFF3F8FE),
-                    title: 'Total Members',
-                    value: '$totalMembers',
-                    trend: '12.5% from last month',
-                    trendColor: const Color(0xFF2E6FE0),
-                    sparkColor: const Color(0xFF2E6FE0),
-                    sparkPoints: const [2, 4, 3, 5, 4, 6, 8],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.people_alt_rounded,
+                          iconBg: const Color(0xFFDCEBFD),
+                          iconColor: const Color(0xFF2E6FE0),
+                          cardBg: const Color(0xFFF3F8FE),
+                          title: 'Total Members',
+                          value: '$totalMembers',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.check_circle_rounded,
+                          iconBg: const Color(0xFFD8F0DE),
+                          iconColor: const Color(0xFF3E7C4A),
+                          cardBg: const Color(0xFFF2FAF4),
+                          title: 'Active Members',
+                          value: '$activeMembers',
+                        ),
+                      ),
+                    ],
                   ),
-                  _MetricCard(
-                    icon: Icons.check_circle_rounded,
-                    iconBg: const Color(0xFFD8F0DE),
-                    iconColor: const Color(0xFF3E7C4A),
-                    cardBg: const Color(0xFFF2FAF4),
-                    title: 'Active Members',
-                    value: '$activeMembers',
-                    trend: '8.3% from last month',
-                    trendColor: const Color(0xFF3E7C4A),
-                    sparkColor: const Color(0xFF3E7C4A),
-                    sparkPoints: const [3, 3, 5, 4, 6, 5, 7],
-                  ),
-                  _MetricCard(
-                    icon: Icons.event_note_rounded,
-                    iconBg: const Color(0xFFFBE0D2),
-                    iconColor: const Color(0xFFE8622C),
-                    cardBg: const Color(0xFFFDF3ED),
-                    title: 'Upcoming Events',
-                    value: '$upcomingEventsCount',
-                    trend: '3 new this week',
-                    trendColor: const Color(0xFFE8622C),
-                    sparkColor: const Color(0xFFE8622C),
-                    sparkPoints: const [4, 3, 5, 3, 6, 5, 8],
-                  ),
-                  _MetricCard(
-                    icon: Icons.history_rounded,
-                    iconBg: const Color(0xFFFAE9C6),
-                    iconColor: const Color(0xFFC4901E),
-                    cardBg: const Color(0xFFFCF7EB),
-                    title: 'Past Events',
-                    value: '$pastEventsCount',
-                    trend: '18 this month',
-                    trendColor: const Color(0xFFC4901E),
-                    sparkColor: const Color(0xFFC4901E),
-                    sparkPoints: const [5, 4, 5, 6, 5, 7, 8],
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.event_note_rounded,
+                          iconBg: const Color(0xFFFBE0D2),
+                          iconColor: const Color(0xFFE8622C),
+                          cardBg: const Color(0xFFFDF3ED),
+                          title: 'Upcoming Events',
+                          value: '$upcomingEventsCount',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.history_rounded,
+                          iconBg: const Color(0xFFFAE9C6),
+                          iconColor: const Color(0xFFC4901E),
+                          cardBg: const Color(0xFFFCF7EB),
+                          title: 'Past Events',
+                          value: '$pastEventsCount',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -192,39 +189,39 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             _sectionHeader('Quick Actions', onViewAll: () => context.go(AppConstants.adminEvents)),
             const SizedBox(height: 12),
             SizedBox(
-              height: 100,
+              height: 95,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
                   _ActionTile(
                     icon: Icons.person_add_alt_1_rounded,
-                    bg: const Color(0xFFE3EEFD),
-                    iconColor: const Color(0xFF2E6FE0),
+                    bg: const Color(0xFFFDEEEF),
+                    iconColor: const Color(0xFF500913),
                     label: 'Approve\nMembers',
                     onTap: () => context.go(AppConstants.adminMembers),
                   ),
                   const SizedBox(width: 10),
                   _ActionTile(
                     icon: Icons.add_box_rounded,
-                    bg: const Color(0xFFFBE0D2),
-                    iconColor: const Color(0xFFE8622C),
+                    bg: const Color(0xFFFDF0E1),
+                    iconColor: const Color(0xFF9E5606),
                     label: 'Create\nEvent',
                     onTap: () => _showCreateEventDialog(context, ref),
                   ),
                   const SizedBox(width: 10),
                   _ActionTile(
                     icon: Icons.photo_library_rounded,
-                    bg: const Color(0xFFEFE7FB),
-                    iconColor: const Color(0xFF7B4FD6),
+                    bg: const Color(0xFFEAF4EC),
+                    iconColor: const Color(0xFF2E5E35),
                     label: 'Manage\nGallery',
                     onTap: () => context.go(AppConstants.adminGallery),
                   ),
                   const SizedBox(width: 10),
                   _ActionTile(
                     icon: Icons.settings_rounded,
-                    bg: const Color(0xFFD8F0DE),
-                    iconColor: const Color(0xFF3E7C4A),
+                    bg: const Color(0xFFFDF0EB),
+                    iconColor: const Color(0xFFB54620),
                     label: 'Branch\nSettings',
                     onTap: () => context.go(AppConstants.adminSettings),
                   ),
@@ -316,15 +313,15 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : const Color(0xFFF0F0F0),
+          color: selected ? AppColors.primary : const Color(0xFFFCF5EE),
           borderRadius: BorderRadius.circular(100),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textSecondary,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+            color: selected ? Colors.white : AppColors.primary,
           ),
         ),
       ),
@@ -351,14 +348,14 @@ class _AdminTopBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                Icons.home_rounded,
+                Icons.menu_rounded,
                 size: 22,
-                color: AppColors.primary,
+                color: Colors.white,
               ),
             ),
           ),
@@ -408,51 +405,28 @@ class _AdminTopBar extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade100),
-                child: const Icon(Icons.notifications_none_rounded, size: 18, color: AppColors.textPrimary),
-              ),
+              const Icon(Icons.notifications_none_rounded, size: 28, color: AppColors.textPrimary),
               Positioned(
-                top: -2,
-                right: -2,
+                top: 0,
+                right: 2,
                 child: Container(
                   padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(color: Color(0xFFD64545), shape: BoxShape.circle),
-                  child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD64545),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFFCF9F6), width: 1.5),
+                  ),
+                  child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700, height: 1)),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 6),
-          // Exit Admin Button Label Chip
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text(
-                    'Exit',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
-              ),
-            ),
+          const SizedBox(width: 12),
+          // User Avatar
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.grey.shade300,
+            backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'),
           ),
         ],
       ),
@@ -471,49 +445,32 @@ class _GreetingHero extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
-        height: 150,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppColors.primary,
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -10,
-              bottom: -10,
-              child: Opacity(
-                opacity: 0.9,
-                child: Icon(Icons.temple_hindu_rounded, size: 140, color: AppColors.primary.withValues(alpha: 0.35)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: const [
-                      Text('Namaste, Administrator',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                      SizedBox(width: 6),
-                      Text('🙏', style: TextStyle(fontSize: 18)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: 220,
-                    child: Text(
-                      "Manage the Kathmandu chapter's activities, members and events from your command center.",
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35),
-                    ),
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Text('Namaste, Administrator',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+                  SizedBox(width: 6),
+                  Text('🙏', style: TextStyle(fontSize: 18)),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              SizedBox(
+                width: 220,
+                child: Text(
+                  "Manage the Kathmandu chapter's activities, members and events from your command center.",
+                  style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.35),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -530,10 +487,6 @@ class _MetricCard extends StatelessWidget {
   final Color cardBg;
   final String title;
   final String value;
-  final String trend;
-  final Color trendColor;
-  final Color sparkColor;
-  final List<double> sparkPoints;
 
   const _MetricCard({
     required this.icon,
@@ -542,50 +495,51 @@ class _MetricCard extends StatelessWidget {
     required this.cardBg,
     required this.title,
     required this.value,
-    required this.trend,
-    required this.trendColor,
-    required this.sparkColor,
-    required this.sparkPoints,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-                child: Icon(icon, size: 15, color: iconColor),
-              ),
-              SizedBox(width: 44, height: 20, child: CustomPaint(painter: _SparklinePainter(sparkPoints, sparkColor))),
-            ],
+          Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+            child: Icon(icon, size: 15, color: iconColor),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-              Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            ],
-          ),
+          const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Icon(Icons.arrow_upward_rounded, size: 10, color: trendColor),
-              const SizedBox(width: 2),
+              Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary, height: 1.0)),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  trend,
-                  style: TextStyle(fontSize: 9.5, color: trendColor, fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 2.0),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500, height: 1.1),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
@@ -594,43 +548,6 @@ class _MetricCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _SparklinePainter extends CustomPainter {
-  final List<double> points;
-  final Color color;
-  _SparklinePainter(this.points, this.color);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.isEmpty) return;
-    final maxVal = points.reduce((a, b) => a > b ? a : b);
-    final minVal = points.reduce((a, b) => a < b ? a : b);
-    final range = (maxVal - minVal) == 0 ? 1 : (maxVal - minVal);
-    final dx = size.width / (points.length - 1);
-
-    final path = Path();
-    for (int i = 0; i < points.length; i++) {
-      final x = dx * i;
-      final y = size.height - ((points[i] - minVal) / range) * size.height;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ---------------------------------------------------------------------------
@@ -657,18 +574,27 @@ class _ActionTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        width: 105,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 22, color: iconColor),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary, height: 1.2),
+            Icon(icon, size: 24, color: iconColor),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary, height: 1.2),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 16, color: iconColor),
+              ],
             ),
           ],
         ),
@@ -729,12 +655,20 @@ class _ActivityItem extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(activity.time, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
-              Text(activity.date, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
+              Row(
+                children: [
+                  Text(activity.time, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
+                  const SizedBox(width: 8),
+                  Container(width: 6, height: 6, decoration: BoxDecoration(color: activity.dotColor, shape: BoxShape.circle)),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Padding(
+                padding: const EdgeInsets.only(right: 14),
+                child: Text(activity.date, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade500)),
+              ),
             ],
           ),
-          const SizedBox(width: 6),
-          Container(width: 6, height: 6, decoration: BoxDecoration(color: activity.dotColor, shape: BoxShape.circle)),
         ],
       ),
     );
@@ -787,9 +721,9 @@ class _PendingApprovalsBanner extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Text('Review', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
-                SizedBox(width: 2),
-                Icon(Icons.arrow_forward_rounded, size: 12),
+                Text('Review Approvals', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                SizedBox(width: 4),
+                Icon(Icons.arrow_forward_rounded, size: 14),
               ],
             ),
           ),

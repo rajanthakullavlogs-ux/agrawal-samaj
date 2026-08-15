@@ -67,145 +67,185 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
             // Summary metrics grid
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.6,
+              child: Column(
                 children: [
-                  _MiniStat(
-                    title: 'Total Members',
-                    value: '${membersList.length}',
-                    icon: Icons.people_alt_rounded,
-                    color: const Color(0xFF2E6FE0),
-                    bg: const Color(0xFFF3F8FE),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.people_alt_rounded,
+                          iconBg: const Color(0xFFDCEBFD),
+                          iconColor: const Color(0xFF2E6FE0),
+                          cardBg: const Color(0xFFF3F8FE),
+                          title: 'Total Members',
+                          value: '1,248',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.person_rounded,
+                          iconBg: const Color(0xFFFBE0D2),
+                          iconColor: const Color(0xFFE8622C),
+                          cardBg: const Color(0xFFFDF3ED),
+                          title: 'Women Leaders',
+                          value: '152',
+                        ),
+                      ),
+                    ],
                   ),
-                  _MiniStat(
-                    title: 'Active Members',
-                    value: '$activeCount',
-                    icon: Icons.check_circle_rounded,
-                    color: const Color(0xFF3E7C4A),
-                    bg: const Color(0xFFF2FAF4),
-                  ),
-                  _MiniStat(
-                    title: 'Pending Review',
-                    value: '$pendingCount',
-                    icon: Icons.pending_actions_rounded,
-                    color: const Color(0xFFE8622C),
-                    bg: const Color(0xFFFDF3ED),
-                  ),
-                  _MiniStat(
-                    title: 'Trustees',
-                    value: '$trusteeCount',
-                    icon: Icons.workspace_premium_rounded,
-                    color: const Color(0xFFC4901E),
-                    bg: const Color(0xFFFCF7EB),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.female_rounded,
+                          iconBg: const Color(0xFFFBECEE),
+                          iconColor: const Color(0xFF9E4348),
+                          cardBg: const Color(0xFFFDF3F4),
+                          title: 'Young Female Members',
+                          value: '316',
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _MetricCard(
+                          icon: Icons.person_add_alt_1_rounded,
+                          iconBg: const Color(0xFFD8F0DE),
+                          iconColor: const Color(0xFF3E7C4A),
+                          cardBg: const Color(0xFFF2FAF4),
+                          title: 'New Requests',
+                          value: '24',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
-            // Quick Actions Strip
+            // Search and Review Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text('Quick Actions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 90,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
                 children: [
-                  _QuickActionTile(
-                    icon: Icons.person_add_alt_1_rounded,
-                    bg: const Color(0xFFE3EEFD),
-                    color: const Color(0xFF2E6FE0),
-                    label: 'Add New\nMember',
-                    onTap: () => _showAddMemberModal(context),
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        onChanged: (v) => setState(() => _searchQuery = v),
+                        decoration: InputDecoration(
+                          hintText: 'Search by name, phone or member ID...',
+                          hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 20),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.how_to_reg_rounded,
-                    bg: const Color(0xFFFCEAE0),
-                    color: const Color(0xFFE8622C),
-                    label: 'Pending\nApplications',
-                    onTap: () => setState(() => _filter = _MemberFilter.pending),
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.file_download_rounded,
-                    bg: const Color(0xFFE5F5E9),
-                    color: const Color(0xFF3E7C4A),
-                    label: 'Export\nDirectory',
-                    onTap: () {},
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.mark_email_read_rounded,
-                    bg: const Color(0xFFEFE7FB),
-                    color: const Color(0xFF7B4FD6),
-                    label: 'Send Bulk\nNotice',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                onChanged: (v) => setState(() => _searchQuery = v),
-                decoration: InputDecoration(
-                  hintText: 'Search member by name, ID or email...',
-                  hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-                  prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 20),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Filter Chips
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _filterChip('All Members', _MemberFilter.all),
                   const SizedBox(width: 8),
-                  _filterChip('Active', _MemberFilter.active),
-                  const SizedBox(width: 8),
-                  _filterChip('Pending (2)', _MemberFilter.pending),
-                  const SizedBox(width: 8),
-                  _filterChip('Inactive', _MemberFilter.inactive),
-                  const SizedBox(width: 8),
-                  _filterChip('Lifetime', _MemberFilter.lifetime),
+                  SizedBox(
+                    height: 44,
+                    width: 44,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF81161B),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: const Badge(
+                        label: Text('24', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 10)),
+                        backgroundColor: Color(0xFFFACC15), // bright yellow pop
+                        textColor: Color(0xFF81161B),
+                        offset: Offset(8, -8),
+                        child: Icon(Icons.person_add_alt_1_rounded, size: 22),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 14),
+
+            // Secondary Filters Row
+            SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  _filterDropdown('All Categories'),
+                  const SizedBox(width: 8),
+                  _filterDropdown('All Age Groups'),
+                  const SizedBox(width: 8),
+                  _filterDropdown('All Status'),
+                  const SizedBox(width: 8),
+                  _filterDropdown('Sort: Newest'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Members Header Row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: 'Members ',
+                      style: const TextStyle(
+                        fontFamily: 'PlayfairDisplay',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF4A1215),
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '(1,248)',
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Row(
+                      children: const [
+                        Icon(Icons.download_rounded, size: 16, color: Color(0xFF81161B)),
+                        SizedBox(width: 4),
+                        Text('Export Members', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF81161B))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Members List
             Padding(
@@ -229,6 +269,45 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                 ],
               ),
             ),
+            // Pagination Footer
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Showing 1-10 of 1248', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500)),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(4)),
+                        child: const Icon(Icons.chevron_left_rounded, size: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: const Color(0xFF81161B), borderRadius: BorderRadius.circular(4)),
+                        child: const Text('1', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('2', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 8),
+                      const Text('3', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 8),
+                      const Text('...', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(border: Border.all(color: AppColors.border), borderRadius: BorderRadius.circular(4)),
+                        child: const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF4A1215)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),
@@ -236,26 +315,28 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
     );
   }
 
-  Widget _filterChip(String label, _MemberFilter value) {
-    final selected = _filter == value;
-    return InkWell(
-      onTap: () => setState(() => _filter = value),
-      borderRadius: BorderRadius.circular(100),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : const Color(0xFFF0F0F0),
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textSecondary,
+  Widget _filterDropdown(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDF7F5),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: const Color(0xFFF1E3DF)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF81161B),
+            ),
           ),
-        ),
+          const SizedBox(width: 4),
+          const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: Color(0xFF81161B)),
+        ],
       ),
     );
   }
@@ -503,37 +584,42 @@ class _HeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: AppColors.primary,
         ),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Members Directory 👥',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Manage chapter registrations, review pending credentials, and support community members.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Members Management',
+                style: TextStyle(
+                  fontFamily: 'PlayfairDisplay', 
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                width: 220,
+                child: Text(
+                  'Oversee your branch members,\napprove new requests and\nstrengthen our community.',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.badge_rounded, color: AppColors.primary, size: 32),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -542,43 +628,64 @@ class _HeroBanner extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // MINI STAT
 // ---------------------------------------------------------------------------
-class _MiniStat extends StatelessWidget {
+class _MetricCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final Color color;
-  final Color bg;
+  final Color iconBg;
+  final Color iconColor;
+  final Color cardBg;
 
-  const _MiniStat({
+  const _MetricCard({
     required this.title,
     required this.value,
     required this.icon,
-    required this.color,
-    required this.bg,
+    required this.iconBg,
+    required this.iconColor,
+    required this.cardBg,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(value, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: color)),
-                Text(title, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700), overflow: TextOverflow.ellipsis),
-              ],
-            ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+                child: Icon(icon, size: 15, color: iconColor),
+              ),
+              const SizedBox(width: 8),
+              Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary, height: 1.0)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500, height: 1.1),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -586,51 +693,9 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// QUICK ACTION TILE
-// ---------------------------------------------------------------------------
-class _QuickActionTile extends StatelessWidget {
-  final IconData icon;
-  final Color bg;
-  final Color color;
-  final String label;
-  final VoidCallback onTap;
-
-  const _QuickActionTile({
-    required this.icon,
-    required this.bg,
-    required this.color,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 4),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // ---------------------------------------------------------------------------
 // MEMBER CARD
-// ---------------------------------------------------------------------------
 class _MemberCard extends StatelessWidget {
   final dynamic member;
   final VoidCallback onTap;
@@ -639,52 +704,109 @@ class _MemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPending = member.status == 'PENDING';
-    final isInactive = member.status == 'INACTIVE';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-        leading: CircleAvatar(
-          radius: 20,
-          backgroundColor: member.avatarBg,
-          child: Icon(Icons.person_rounded, color: member.avatarColor, size: 20),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: const Color(0xFFF1E3DF)),
         ),
-        title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-        subtitle: Text('ID: ${member.id} • ${member.memberType}',
-            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: isPending
-                ? const Color(0xFFFFF3E0)
-                : isInactive
-                    ? const Color(0xFFF5F5F5)
-                    : const Color(0xFFE8F5E9),
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: Text(
-            member.status,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              color: isPending
-                  ? const Color(0xFFE8622C)
-                  : isInactive
-                      ? Colors.grey.shade600
-                      : const Color(0xFF3E7C4A),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Avatar
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage('assets/images/profile_banner.jpg'), // Using dummy image for now
+              // If you have real avatars, use NetworkImage(member.avatarUrl)
             ),
-          ),
+            const SizedBox(width: 16),
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and Active Badge
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        member.name,
+                        style: const TextStyle(
+                          fontFamily: 'PlayfairDisplay',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF4A1215),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEAF5EF),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: const Text(
+                              'Active',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF3E7C4A)),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.more_vert_rounded, size: 18, color: Color(0xFF81161B)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Role Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFCEEE4),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      member.memberType,
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFB5704D),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Phone and ID
+                  Row(
+                    children: [
+                      const Icon(Icons.phone_rounded, size: 12, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${member.phone}   •   ${member.id}',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Joined Date
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Joined 12 Jan 2024',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
       ),
     );
   }
