@@ -220,8 +220,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   const SizedBox(width: 10),
                   _ActionTile(
                     icon: Icons.settings_rounded,
-                    bg: const Color(0xFFFDF0EB),
-                    iconColor: const Color(0xFFB54620),
+                    bg: const Color(0xFFFDEEEF),
+                    iconColor: const Color(0xFF500913),
                     label: 'Branch\nSettings',
                     onTap: () => context.go(AppConstants.adminSettings),
                   ),

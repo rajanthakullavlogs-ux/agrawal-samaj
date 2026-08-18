@@ -99,125 +99,193 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
             ),
             const SizedBox(height: 20),
 
-            // Metrics Summary Grid
+            // At a Glance Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _MiniStat(
+                  const Text('At a Glance',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Row(
+                      children: [
+                        Text('This Month', style: TextStyle(fontSize: 11, color: Colors.grey.shade700)),
+                        const SizedBox(width: 4),
+                        Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: Colors.grey.shade700),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Metrics Summary Row
+            SizedBox(
+              height: 125,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  _MetricCard(
                     title: 'Total Events',
-                    value: '$totalEvents',
-                    icon: Icons.event_note_rounded,
-                    color: const Color(0xFFE8622C),
-                    bg: const Color(0xFFFDF3ED),
+                    value: '24', // Use static matching screenshot or '$totalEvents'
+                    trend: '↑ 4 this month',
+                    trendColor: const Color(0xFF3E7C4A),
+                    icon: Icons.people_alt_rounded,
+                    iconColor: const Color(0xFFC7555D),
+                    iconBg: const Color(0xFFFAEAEC),
                   ),
-                  const _MiniStat(
+                  const SizedBox(width: 10),
+                  const _MetricCard(
                     title: 'New RSVPs',
-                    value: '+458',
-                    icon: Icons.group_add_rounded,
-                    color: Color(0xFF2E6FE0),
-                    bg: Color(0xFFF3F8FE),
+                    value: '36',
+                    trend: '↑ 6 this week',
+                    trendColor: Color(0xFFE8622C),
+                    icon: Icons.person_add_alt_1_rounded,
+                    iconColor: Color(0xFFE8622C),
+                    iconBg: Color(0xFFFDF3ED),
                   ),
-                  _MiniStat(
-                    title: 'Active Gatherings',
-                    value: '$activeEvents',
-                    icon: Icons.celebration_rounded,
-                    color: const Color(0xFF3E7C4A),
-                    bg: const Color(0xFFF2FAF4),
+                  const SizedBox(width: 10),
+                  const _MetricCard(
+                    title: 'Total RSVPs',
+                    value: '248',
+                    trend: '↑ 18 this month',
+                    trendColor: Color(0xFF3E7C4A),
+                    icon: Icons.local_activity_rounded,
+                    iconColor: Color(0xFF3E7C4A),
+                    iconBg: Color(0xFFE5F5E9),
                   ),
-                  const _MiniStat(
-                    title: 'Revenue Generated',
-                    value: 'NPR 45k',
-                    icon: Icons.payments_rounded,
-                    color: Color(0xFFC4901E),
-                    bg: Color(0xFFFCF7EB),
+                  const SizedBox(width: 10),
+                  const _MetricCard(
+                    title: 'Ongoing Events',
+                    value: '2',
+                    trend: 'In progress',
+                    trendColor: Color(0xFF757575), // Grey
+                    icon: Icons.event_available_rounded,
+                    iconColor: Color(0xFFC4901E),
+                    iconBg: Color(0xFFFCF7EB),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
-            // Quick Actions Strip
+            // Search & Filter Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text('Quick Actions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 90,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
                 children: [
-                  _QuickActionTile(
-                    icon: Icons.add_box_rounded,
-                    bg: const Color(0xFFFBE0D2),
-                    color: const Color(0xFFE8622C),
-                    label: 'Create New\nEvent',
-                    onTap: () => _showCreateEventDialog(context, ref),
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search events by title, category or location...',
+                          hintStyle: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
+                          filled: true,
+                          fillColor: const Color(0xFFFDFDFD),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.border),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.border),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.qr_code_scanner_rounded,
-                    bg: const Color(0xFFE3EEFD),
-                    color: const Color(0xFF2E6FE0),
-                    label: 'Scan Ticket\nQR',
-                    onTap: () => _showQrScannerModal(context),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 44,
+                    width: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: const Icon(Icons.filter_alt_outlined, color: AppColors.textPrimary, size: 20),
                   ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.download_rounded,
-                    bg: const Color(0xFFE5F5E9),
-                    color: const Color(0xFF3E7C4A),
-                    label: 'Download\nReport',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Downloading Events Attendance PDF Report...')),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.campaign_rounded,
-                    bg: const Color(0xFFEFE7FB),
-                    color: const Color(0xFF7B4FD6),
-                    label: 'Broadcast\nNotice',
-                    onTap: () => _showBroadcastModal(context),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 18),
+                        SizedBox(width: 6),
+                        Text('Calendar View', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-
-            // Filter Chips
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _filterChip('All Events', _EventFilter.all),
-                  const SizedBox(width: 8),
-                  _filterChip('Upcoming', _EventFilter.upcoming),
-                  const SizedBox(width: 8),
-                  _filterChip('Cultural', _EventFilter.cultural),
-                  const SizedBox(width: 8),
-                  _filterChip('Business', _EventFilter.business),
-                  const SizedBox(width: 8),
-                  _filterChip('Past Gatherings', _EventFilter.past),
-                ],
+            // New RSVPs Section
+            _sectionHeader('New RSVPs', onViewAll: () {}),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                ),
+                child: Column(
+                  children: [
+                    const _RsvpTile(
+                      name: 'Rohit Agrawal',
+                      eventName: 'Teej Festival 2026',
+                      time: 'Today, 10:30 AM',
+                      tickets: 2,
+                      avatarUrl: 'https://i.pravatar.cc/150?img=11',
+                    ),
+                    const Divider(height: 1, color: AppColors.border),
+                    const _RsvpTile(
+                      name: 'Pooja Agrawal',
+                      eventName: 'Youth Leadership Summit 2026',
+                      time: 'Today, 09:15 AM',
+                      tickets: 1,
+                      avatarUrl: 'https://i.pravatar.cc/150?img=5',
+                    ),
+                    const Divider(height: 1, color: AppColors.border),
+                    const _RsvpTile(
+                      name: 'Kartik Agrawal',
+                      eventName: 'Blood Donation Camp',
+                      time: 'Yesterday, 07:45 PM',
+                      tickets: 1,
+                      avatarUrl: 'https://i.pravatar.cc/150?img=8',
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 24),
 
-            // Events List
+            // Upcoming Events Section
+            _sectionHeader('Upcoming Events', onViewAll: () {}),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -241,26 +309,23 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
     );
   }
 
-  Widget _filterChip(String label, _EventFilter value) {
-    final selected = _filter == value;
-    return InkWell(
-      onTap: () => setState(() => _filter = value),
-      borderRadius: BorderRadius.circular(100),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : const Color(0xFFF0F0F0),
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textSecondary,
+  Widget _sectionHeader(String title, {required VoidCallback onViewAll}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+          InkWell(
+            onTap: onViewAll,
+            child: Row(
+              children: const [
+                Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -280,15 +345,15 @@ class _AdminTopBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
+            onTap: () {},
+            borderRadius: BorderRadius.circular(100),
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+              decoration: const BoxDecoration(
+                color: Color(0xFF81161B),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
+              child: const Icon(Icons.menu_rounded, size: 22, color: Colors.white),
             ),
           ),
           const SizedBox(width: 8),
@@ -304,25 +369,47 @@ class _AdminTopBar extends StatelessWidget {
                   style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  'Events Command Center',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                Row(
+                  children: [
+                    Text(
+                      'Kathmandu Branch',
+                      style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: Colors.grey.shade700),
+                  ],
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
-              child: Row(
-                children: const [
-                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(Icons.notifications_none_rounded, size: 26, color: AppColors.textPrimary),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: const Text('5', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 14),
+          Container(
+            height: 38,
+            width: 38,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: NetworkImage('https://i.pravatar.cc/150?img=11'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -341,82 +428,101 @@ class _HeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Events Management',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+            const SizedBox(height: 8),
+            Text('Create, manage and promote events\nto bring our community together.',
+                style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.35)),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                const Text('Events Command Center 📅',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Schedule cultural festivals, business summits, and track real-time attendee registrations.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+                Expanded(
+                  child: _HeroActionButton(
+                    icon: Icons.edit_calendar_rounded,
+                    title: 'Create Event',
+                    subtitle: 'Host a new event',
+                    color: Colors.white.withOpacity(0.15),
+                    iconColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _HeroActionButton(
+                    icon: Icons.campaign_rounded,
+                    title: 'Broadcast Notice',
+                    subtitle: 'Send announcement',
+                    color: Colors.white.withOpacity(0.15),
+                    iconColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _HeroActionButton(
+                    icon: Icons.insert_chart_outlined_rounded,
+                    title: 'Download Report',
+                    subtitle: 'Export event data',
+                    color: Colors.white.withOpacity(0.15),
+                    iconColor: Colors.white,
+                  ),
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.event_seat_rounded, color: AppColors.primary, size: 32),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// MINI STAT
-// ---------------------------------------------------------------------------
-class _MiniStat extends StatelessWidget {
-  final String title;
-  final String value;
+class _HeroActionButton extends StatelessWidget {
   final IconData icon;
+  final String title;
+  final String subtitle;
   final Color color;
-  final Color bg;
+  final Color iconColor;
 
-  const _MiniStat({
-    required this.title,
-    required this.value,
+  const _HeroActionButton({
     required this.icon,
+    required this.title,
+    required this.subtitle,
     required this.color,
-    required this.bg,
+    required this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-      child: Row(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18),
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 16),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(title,
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(value, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: color)),
-                Text(title, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700), overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
+          const SizedBox(height: 4),
+          Text(subtitle, style: const TextStyle(fontSize: 8, color: Colors.white70)),
         ],
       ),
     );
@@ -424,42 +530,128 @@ class _MiniStat extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// QUICK ACTION TILE
+// METRIC CARD
 // ---------------------------------------------------------------------------
-class _QuickActionTile extends StatelessWidget {
+class _MetricCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String trend;
+  final Color trendColor;
   final IconData icon;
-  final Color bg;
-  final Color color;
-  final String label;
-  final VoidCallback onTap;
+  final Color iconColor;
+  final Color iconBg;
 
-  const _QuickActionTile({
+  const _MetricCard({
+    required this.title,
+    required this.value,
+    required this.trend,
+    required this.trendColor,
     required this.icon,
-    required this.bg,
-    required this.color,
-    required this.label,
-    required this.onTap,
+    required this.iconColor,
+    required this.iconBg,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 4),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          ],
-        ),
+    return Container(
+      width: 115,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+            child: Icon(icon, color: iconColor, size: 16),
+          ),
+          const Spacer(),
+          Text(title, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 2),
+          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+          const Spacer(),
+          Text(trend, style: TextStyle(fontSize: 10, color: trendColor, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// RSVP TILE
+// ---------------------------------------------------------------------------
+class _RsvpTile extends StatelessWidget {
+  final String name;
+  final String eventName;
+  final String time;
+  final int tickets;
+  final String avatarUrl;
+
+  const _RsvpTile({
+    required this.name,
+    required this.eventName,
+    required this.time,
+    required this.tickets,
+    required this.avatarUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(image: NetworkImage(avatarUrl), fit: BoxFit.cover),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_rounded, size: 10, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(eventName, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 10, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(time, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5F5E9),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Text(
+              '$tickets Ticket${tickets > 1 ? 's' : ''}',
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF3E7C4A)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textSecondary),
+        ],
       ),
     );
   }
@@ -476,98 +668,111 @@ class _EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.border),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFBE0D2),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(item.category,
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFFE8622C))),
+          Container(
+            width: 100,
+            height: 110,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              gradient: LinearGradient(
+                colors: item.category == 'CULTURAL'
+                    ? [const Color(0xFF5A080D), const Color(0xFF81161B)]
+                    : [const Color(0xFFE8CAAB), const Color(0xFFDEAA7B)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5F5E9),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(item.status,
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF3E7C4A))),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(item.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(item.venue,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700), overflow: TextOverflow.ellipsis),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.people_outline_rounded, size: 14, color: AppColors.primary),
-                  const SizedBox(width: 4),
-                  Text('${item.registered} Registered',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                ],
-              ),
-              Text('${item.date} • ${item.time}',
-                  style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+            ),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  item.title.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    color: item.category == 'CULTURAL' ? Colors.white : const Color(0xFF5A080D),
                   ),
-                  child: const Text('Edit Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Opening attendee roster for ${item.title}...')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(item.title,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFBE0D2).withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(item.status == 'UPCOMING' ? 'Upcoming' : 'Active',
+                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Color(0xFFE8622C))),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.more_vert_rounded, size: 16, color: AppColors.textSecondary),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFBE0D2).withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(100),
                   ),
-                  child: const Text('View Roster', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  child: Text(item.category == 'CULTURAL' ? 'Cultural' : 'Seminar',
+                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: Color(0xFF5A080D))),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text('${item.date} • ', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                    const Icon(Icons.access_time_rounded, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(item.time, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(item.venue,
+                          style: TextStyle(fontSize: 10, color: Colors.grey.shade600), overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.people_alt_outlined, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text('${item.registered} registered',
+                        style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

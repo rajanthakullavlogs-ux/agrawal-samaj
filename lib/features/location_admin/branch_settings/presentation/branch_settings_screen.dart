@@ -378,11 +378,7 @@ class _HeroBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Row(
@@ -392,10 +388,10 @@ class _HeroBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Branch Settings ⚙️',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
                 const SizedBox(height: 4),
                 Text('Manage Kathmandu Central Branch profile, contact details, map location, and leadership bio.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+                    style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.35)),
               ],
             ),
           ),

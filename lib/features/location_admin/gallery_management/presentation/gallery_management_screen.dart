@@ -15,38 +15,46 @@ class GalleryManagementScreen extends StatefulWidget {
 
 class _GalleryManagementScreenState extends State<GalleryManagementScreen> {
   static const _albumsList = [
-    (
-      title: 'Maha Shivaratri Festival 2026',
-      date: 'Feb 15, 2026',
-      category: 'Cultural',
-      count: 124,
-      views: '4.8k',
-      color: Color(0xFFE3EEFD),
-    ),
-    (
-      title: 'Executive Committee Meeting',
-      date: 'Jan 22, 2026',
-      category: 'Admin',
-      count: 45,
-      views: '1.2k',
-      color: Color(0xFFFCEAE0),
-    ),
-    (
-      title: 'Vasant Panchami Celebration',
-      date: 'Feb 02, 2026',
-      category: 'Community',
-      count: 210,
-      views: '6.5k',
-      color: Color(0xFFE5F5E9),
-    ),
-    (
-      title: 'Teej Cultural Program Archives',
-      date: 'Sep 10, 2025',
-      category: 'Heritage',
-      count: 310,
-      views: '12.4k',
-      color: Color(0xFFEFE7FB),
-    ),
+    {
+      'title': 'Teej Festival 2026',
+      'date': '15 Aug 2026',
+      'category': 'CULTURAL',
+      'count': 18,
+      'likes': 126,
+      'comments': 18,
+      'views': '4.8k',
+      'color': Color(0xFF5A080D),
+    },
+    {
+      'title': 'Women Leadership Workshop',
+      'date': '05 Aug 2026',
+      'category': 'MEETINGS',
+      'count': 24,
+      'likes': 98,
+      'comments': 12,
+      'views': '1.2k',
+      'color': Color(0xFFE8CAAB),
+    },
+    {
+      'title': 'Community Cleanliness Drive',
+      'date': '28 Jul 2026',
+      'category': 'ACTIVITIES',
+      'count': 15,
+      'likes': 75,
+      'comments': 10,
+      'views': '6.5k',
+      'color': Color(0xFF5A080D),
+    },
+    {
+      'title': 'Blood Donation Camp',
+      'date': '12 Jul 2026',
+      'category': 'EVENTS',
+      'count': 10,
+      'likes': 156,
+      'comments': 24,
+      'views': '12.4k',
+      'color': Color(0xFF5A080D),
+    },
   ];
 
   @override
@@ -65,142 +73,204 @@ class _GalleryManagementScreenState extends State<GalleryManagementScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Stat Cards Grid
+            // Metrics Strip
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.6,
-                children: const [
-                  _MiniStat(
-                    title: 'Total Albums',
-                    value: '42',
-                    icon: Icons.photo_library_rounded,
-                    color: Color(0xFF2E6FE0),
-                    bg: Color(0xFFF3F8FE),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      children: const [
+                        _MetricCard(
+                          title: 'Total Posts',
+                          value: '128',
+                          trend: '↑ 18 this month',
+                          trendColor: Color(0xFF3E7C4A),
+                          icon: Icons.image_rounded,
+                          iconColor: Color(0xFFE8622C),
+                          iconBg: Color(0xFFFBE0D2),
+                        ),
+                        VerticalDivider(width: 1, color: AppColors.border),
+                        _MetricCard(
+                          title: 'Total Views',
+                          value: '2.4K',
+                          trend: '↑ 22% this month',
+                          trendColor: Color(0xFF3E7C4A),
+                          icon: Icons.visibility_rounded,
+                          iconColor: Color(0xFFC4901E),
+                          iconBg: Color(0xFFFCF7EB),
+                        ),
+                        VerticalDivider(width: 1, color: AppColors.border),
+                        _MetricCard(
+                          title: 'Total Likes',
+                          value: '856',
+                          trend: '↑ 15% this month',
+                          trendColor: Color(0xFF3E7C4A),
+                          icon: Icons.favorite_rounded,
+                          iconColor: Color(0xFFD64F64),
+                          iconBg: Color(0xFFFDECEF),
+                        ),
+                        VerticalDivider(width: 1, color: AppColors.border),
+                        _MetricCard(
+                          title: 'Total Comments',
+                          value: '142',
+                          trend: '↑ 10% this month',
+                          trendColor: Color(0xFF3E7C4A),
+                          icon: Icons.chat_rounded,
+                          iconColor: Color(0xFF3E7C4A),
+                          iconBg: Color(0xFFE5F5E9),
+                        ),
+                      ],
+                    ),
                   ),
-                  _MiniStat(
-                    title: 'Total Photos',
-                    value: '1,284',
-                    icon: Icons.image_rounded,
-                    color: Color(0xFF3E7C4A),
-                    bg: Color(0xFFF2FAF4),
-                  ),
-                  _MiniStat(
-                    title: 'Storage Used',
-                    value: '84%',
-                    icon: Icons.sd_card_rounded,
-                    color: Color(0xFFE8622C),
-                    bg: Color(0xFFFDF3ED),
-                  ),
-                  _MiniStat(
-                    title: 'Shared Views',
-                    value: '15.2k',
-                    icon: Icons.visibility_rounded,
-                    color: Color(0xFFC4901E),
-                    bg: Color(0xFFFCF7EB),
-                  ),
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Quick Actions Strip
+            // Search & Filter Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text('Quick Actions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 44,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search posts by title or event...',
+                          hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                          prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppColors.textSecondary),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.border),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.border),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE8622C).withValues(alpha: 0.3)),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.filter_alt_outlined, color: Color(0xFFE8622C), size: 18),
+                        SizedBox(width: 6),
+                        Text('Filters', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFE8622C))),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: AppColors.border),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: Row(
+                      children: const [
+                        Text('Newest First', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5A080D))),
+                        SizedBox(width: 6),
+                        Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF5A080D), size: 18),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
+
+            // Filter Chips
             SizedBox(
-              height: 90,
+              height: 36,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  _QuickActionTile(
-                    icon: Icons.cloud_upload_rounded,
-                    bg: const Color(0xFFE3EEFD),
-                    color: const Color(0xFF2E6FE0),
-                    label: 'Upload\nPhotos',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening Photo Upload Manager...')),
-                      );
-                    },
+                  Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6B1216),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: const Text('All Posts', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.create_new_folder_rounded,
-                    bg: const Color(0xFFFBE0D2),
-                    color: const Color(0xFFE8622C),
-                    label: 'Create\nAlbum',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Opening New Album Dialog...')),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.sd_card_rounded,
-                    bg: const Color(0xFFE5F5E9),
-                    color: const Color(0xFF3E7C4A),
-                    label: 'Storage\nUsage',
-                    onTap: () {},
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.share_rounded,
-                    bg: const Color(0xFFEFE7FB),
-                    color: const Color(0xFF7B4FD6),
-                    label: 'Share\nGallery',
-                    onTap: () {},
-                  ),
+                  const SizedBox(width: 8),
+                  _filterChip('Events'),
+                  const SizedBox(width: 8),
+                  _filterChip('Celebrations'),
+                  const SizedBox(width: 8),
+                  _filterChip('Meetings'),
+                  const SizedBox(width: 8),
+                  _filterChip('Activities'),
+                  const SizedBox(width: 8),
+                  _filterChip('Others'),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
-            // Recent Albums Header
+            // Albums Grid
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Recent Albums',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                  Row(
-                    children: [
-                      Text('Sort by: Date', style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600)),
-                      const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.textSecondary),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Albums List
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  for (final album in _albumsList) ...[
-                    _AlbumCard(album: album),
-                    const SizedBox(height: 12),
-                  ],
-                ],
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _albumsList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.82,
+                ),
+                itemBuilder: (context, index) {
+                  return _GalleryCard(item: _albumsList[index]);
+                },
               ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 3),
+    );
+  }
+
+  Widget _filterChip(String label) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Text(label, style: const TextStyle(color: Color(0xFF6B1216), fontSize: 12, fontWeight: FontWeight.w600)),
     );
   }
 }
@@ -219,15 +289,15 @@ class _AdminTopBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
+            onTap: () {},
+            borderRadius: BorderRadius.circular(100),
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+              decoration: const BoxDecoration(
+                color: Color(0xFF81161B),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
+              child: const Icon(Icons.menu_rounded, size: 22, color: Colors.white),
             ),
           ),
           const SizedBox(width: 8),
@@ -243,25 +313,47 @@ class _AdminTopBar extends StatelessWidget {
                   style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  'Gallery Management',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                Row(
+                  children: [
+                    Text(
+                      'Kathmandu Branch',
+                      style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: Colors.grey.shade700),
+                  ],
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
-              child: Row(
-                children: const [
-                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(Icons.notifications_none_rounded, size: 26, color: AppColors.textPrimary),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: const Text('5', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 14),
+          Container(
+            height: 38,
+            width: 38,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: NetworkImage('https://i.pravatar.cc/150?img=11'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -280,123 +372,33 @@ class _HeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Gallery Vault 🖼️',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Manage community photo archives, preserve cultural heritage, and organize event memories.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.photo_library_rounded, color: AppColors.primary, size: 32),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// MINI STAT
-// ---------------------------------------------------------------------------
-class _MiniStat extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  final Color bg;
-
-  const _MiniStat({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-    required this.bg,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(value, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: color)),
-                Text(title, style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700), overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// QUICK ACTION TILE
-// ---------------------------------------------------------------------------
-class _QuickActionTile extends StatelessWidget {
-  final IconData icon;
-  final Color bg;
-  final Color color;
-  final String label;
-  final VoidCallback onTap;
-
-  const _QuickActionTile({
-    required this.icon,
-    required this.bg,
-    required this.color,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 4),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            const Text('Gallery',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+            const SizedBox(height: 8),
+            const Text('Share and manage moments\nthat showcase our community.',
+                style: TextStyle(fontSize: 13, color: Colors.white70, height: 1.35, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Photos / Videos', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+              ),
+            ),
           ],
         ),
       ),
@@ -405,58 +407,159 @@ class _QuickActionTile extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// ALBUM CARD
+// MINI STAT
 // ---------------------------------------------------------------------------
-class _AlbumCard extends StatelessWidget {
-  final dynamic album;
+class _MetricCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String trend;
+  final Color trendColor;
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
 
-  const _AlbumCard({required this.album});
+  const _MetricCard({
+    required this.title,
+    required this.value,
+    required this.trend,
+    required this.trendColor,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 110,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+                child: Icon(icon, color: iconColor, size: 14),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(title,
+                    style: TextStyle(fontSize: 10, color: Colors.grey.shade800, fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF5A080D))),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Icon(Icons.arrow_upward_rounded, size: 10, color: trendColor),
+              const SizedBox(width: 2),
+              Expanded(
+                child: Text(trend, style: TextStyle(fontSize: 9, color: trendColor, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GALLERY CARD
+// ---------------------------------------------------------------------------
+class _GalleryCard extends StatelessWidget {
+  final Map<String, dynamic> item;
+
+  const _GalleryCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 120,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: album.color,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Icon(Icons.photo_album_rounded, size: 48, color: AppColors.primary.withValues(alpha: 0.4)),
-                ),
-              ],
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: item['color'],
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.md)),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(Icons.photo_library_outlined, size: 40, color: AppColors.primary.withValues(alpha: 0.2)),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.image_outlined, size: 10, color: Colors.white),
+                          const SizedBox(width: 4),
+                          Text('${item['count']}', style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(album.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                      const SizedBox(height: 2),
-                      Text('${album.date} • ${album.category} • ${album.views} views',
-                          style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-                    ],
-                  ),
+                Text(item['title'],
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF5A080D)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(item['date'], style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.more_vert_rounded, size: 20),
-                  onPressed: () {},
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.favorite_border_rounded, size: 12, color: Color(0xFF6B1216)),
+                          const SizedBox(width: 2),
+                          Text('${item['likes']}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B1216))),
+                          const SizedBox(width: 10),
+                          const Icon(Icons.chat_bubble_outline_rounded, size: 12, color: Color(0xFF6B1216)),
+                          const SizedBox(width: 2),
+                          Text('${item['comments']}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6B1216))),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.more_vert_rounded, size: 14, color: AppColors.textSecondary),
+                  ],
                 ),
               ],
             ),
