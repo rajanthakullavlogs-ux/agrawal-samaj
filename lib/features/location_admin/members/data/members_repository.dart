@@ -156,6 +156,10 @@ class MembersNotifier extends StateNotifier<List<MemberItem>> {
     ];
   }
 
+  void rejectMember(String memberId) {
+    state = state.where((m) => m.id != memberId).toList();
+  }
+
   void addMember(MemberItem newMember) {
     state = [newMember, ...state];
   }

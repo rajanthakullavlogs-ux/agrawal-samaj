@@ -14,6 +14,8 @@ class LocationsListScreen extends ConsumerStatefulWidget {
 }
 
 class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   String? _selectedBranchName; // null = show all
   String? _selectedProvince; // null = All
   String? _selectedTag; // null = All
@@ -63,8 +65,26 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
   ];
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final query = _searchController.text.trim().toLowerCase();
+
     final filtered = _branches.where((b) {
+      if (query.isNotEmpty) {
+        final matchName = b.name.toLowerCase().contains(query);
+        final matchAddress = b.address.toLowerCase().contains(query);
+        final matchProvince = b.province.toLowerCase().contains(query);
+        final matchTag = b.tag.toLowerCase().contains(query);
+        if (!matchName && !matchAddress && !matchProvince && !matchTag) {
+          return false;
+        }
+      }
       if (_selectedBranchName != null && b.name != _selectedBranchName) {
         return false;
       }
@@ -75,6 +95,15 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
         return false;
       }
       return true;
+    }).toList();
+
+    final dropdownSuggestions = _branches.where((b) {
+      if (query.isEmpty) return true;
+      final matchName = b.name.toLowerCase().contains(query);
+      final matchAddress = b.address.toLowerCase().contains(query);
+      final matchProvince = b.province.toLowerCase().contains(query);
+      final matchTag = b.tag.toLowerCase().contains(query);
+      return matchName || matchAddress || matchProvince || matchTag;
     }).toList();
 
     return Scaffold(
@@ -147,83 +176,113 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
         children: [
           const SizedBox(height: 10),
 
-          // Select Location Dropdown Bar
+          // Interactive Location Search & Selector Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () => setState(() => _isLocationDropdownOpen = !_isLocationDropdownOpen),
-                  child: Container(
-                    height: 50,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFBF9),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: _isLocationDropdownOpen || _selectedBranchName != null
-                            ? const Color(0xFF500913)
-                            : const Color(0xFFEBE5E1),
-                        width: _isLocationDropdownOpen || _selectedBranchName != null ? 1.5 : 1.0,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF500913).withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                Container(
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBF9),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: _searchFocusNode.hasFocus || _isLocationDropdownOpen || _searchController.text.isNotEmpty || _selectedBranchName != null
+                          ? const Color(0xFF500913)
+                          : const Color(0xFFEBE5E1),
+                      width: _searchFocusNode.hasFocus || _isLocationDropdownOpen || _searchController.text.isNotEmpty || _selectedBranchName != null ? 1.5 : 1.0,
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF500913).withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF500913).withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search_rounded, size: 22, color: Color(0xFF500913)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                          onTap: () {
+                            setState(() {
+                              _isLocationDropdownOpen = true;
+                            });
+                          },
+                          onChanged: (val) {
+                            setState(() {
+                              _isLocationDropdownOpen = true;
+                              if (val.isEmpty) {
+                                _selectedBranchName = null;
+                              }
+                            });
+                          },
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E1615),
                           ),
-                          child: const Icon(Icons.location_on_rounded, size: 18, color: Color(0xFF500913)),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            _selectedBranchName ?? 'Select Location',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedBranchName != null
-                                  ? const Color(0xFF1E1615)
-                                  : const Color(0xFF9E958F),
+                          decoration: const InputDecoration(
+                            hintText: 'Search location, city, or branch name...',
+                            hintStyle: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF9E958F),
                             ),
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
                           ),
                         ),
-                        if (_selectedBranchName != null)
-                          GestureDetector(
-                            onTap: () => setState(() {
+                      ),
+                      if (_searchController.text.isNotEmpty || _selectedBranchName != null)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _searchController.clear();
                               _selectedBranchName = null;
                               _isLocationDropdownOpen = false;
-                            }),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFEBE5E1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF500913)),
+                            });
+                            _searchFocusNode.unfocus();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEBE5E1),
+                              shape: BoxShape.circle,
                             ),
-                          )
-                        else
-                          AnimatedRotation(
+                            child: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF500913)),
+                          ),
+                        )
+                      else
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isLocationDropdownOpen = !_isLocationDropdownOpen;
+                            });
+                            if (_isLocationDropdownOpen) {
+                              _searchFocusNode.requestFocus();
+                            } else {
+                              _searchFocusNode.unfocus();
+                            }
+                          },
+                          child: AnimatedRotation(
                             turns: _isLocationDropdownOpen ? 0.5 : 0.0,
                             duration: const Duration(milliseconds: 200),
                             child: const Icon(Icons.keyboard_arrow_down_rounded, size: 22, color: Color(0xFF500913)),
                           ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                 ),
 
-                // Scrollable Dropdown List
+                // Scrollable Search Dropdown Suggestions List
                 AnimatedCrossFade(
                   firstChild: const SizedBox.shrink(),
                   secondChild: Container(
@@ -251,19 +310,23 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
                           _buildLocationDropdownItem(
                             name: 'All Locations',
                             subtitle: 'Show all branches',
-                            isSelected: _selectedBranchName == null,
+                            isSelected: _selectedBranchName == null && _searchController.text.isEmpty,
                             onTap: () => setState(() {
+                              _searchController.clear();
                               _selectedBranchName = null;
                               _isLocationDropdownOpen = false;
+                              _searchFocusNode.unfocus();
                             }),
                           ),
-                          ..._branches.map((b) => _buildLocationDropdownItem(
+                          ...dropdownSuggestions.map((b) => _buildLocationDropdownItem(
                             name: b.name,
                             subtitle: '${b.tag} • ${b.province}',
-                            isSelected: _selectedBranchName == b.name,
+                            isSelected: _selectedBranchName == b.name || _searchController.text.trim().toLowerCase() == b.name.toLowerCase(),
                             onTap: () => setState(() {
+                              _searchController.text = b.name;
                               _selectedBranchName = b.name;
                               _isLocationDropdownOpen = false;
+                              _searchFocusNode.unfocus();
                             }),
                           )),
                         ],

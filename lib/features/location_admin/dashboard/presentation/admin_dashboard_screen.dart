@@ -8,6 +8,7 @@ import '../../../../shared/models/event.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 import '../../../events/data/events_repository.dart';
 import '../../members/data/members_repository.dart';
+import '../../shared/branch_admin_nav_bar.dart';
 
 /// Location Admin Dashboard — /admin/dashboard
 class AdminDashboardScreen extends ConsumerStatefulWidget {
@@ -21,6 +22,33 @@ enum _ActivityFilter { all, registrations, events, donations, announcements }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   _ActivityFilter _filter = _ActivityFilter.all;
+  final ScrollController _quickActionsScrollController = ScrollController();
+  bool _showSwipeHint = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _quickActionsScrollController.addListener(_onQuickActionsScroll);
+  }
+
+  void _onQuickActionsScroll() {
+    if (!_quickActionsScrollController.hasClients) return;
+    final maxScroll = _quickActionsScrollController.position.maxScrollExtent;
+    final currentScroll = _quickActionsScrollController.offset;
+    final atEnd = currentScroll >= (maxScroll - 15);
+    if (atEnd && _showSwipeHint) {
+      setState(() => _showSwipeHint = false);
+    } else if (!atEnd && !_showSwipeHint) {
+      setState(() => _showSwipeHint = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _quickActionsScrollController.removeListener(_onQuickActionsScroll);
+    _quickActionsScrollController.dispose();
+    super.dispose();
+  }
 
   static const _activities = [
     (
@@ -85,7 +113,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     final members = ref.watch(membersNotifierProvider);
     final events = ref.watch(eventsNotifierProvider);
 
-    final totalMembers = members.length;
+    final totalMembers = members.where((m) => m.status != 'PENDING').length;
     final activeMembers = members.where((m) => m.status == 'ACTIVE').length;
     final upcomingEventsCount = events.where((e) => e.isUpcoming).length;
     final pastEventsCount = events.where((e) => !e.isUpcoming).length;
@@ -108,20 +136,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             ),
             const SizedBox(height: 22),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Overview',
-                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                  Row(
-                    children: [
-                      Text('This Month', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-                      const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textSecondary),
-                    ],
-                  ),
-                ],
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Overview',
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
               ),
             ),
             const SizedBox(height: 10),
@@ -140,6 +159,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFF3F8FE),
                           title: 'Total Members',
                           value: '$totalMembers',
+                          onTap: () => context.go('${AppConstants.adminMembers}?filter=ALL'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -151,6 +171,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFF2FAF4),
                           title: 'Active Members',
                           value: '$activeMembers',
+                          onTap: () => context.go('${AppConstants.adminMembers}?filter=ACTIVE'),
                         ),
                       ),
                     ],
@@ -166,6 +187,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFFDF3ED),
                           title: 'Upcoming Events',
                           value: '$upcomingEventsCount',
+                          onTap: () => context.go('${AppConstants.adminEvents}?filter=UPCOMING'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -177,6 +199,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFFCF7EB),
                           title: 'Past Events',
                           value: '$pastEventsCount',
+                          onTap: () => context.go('${AppConstants.adminEvents}?filter=PAST'),
                         ),
                       ),
                     ],
@@ -186,11 +209,46 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             ),
             const SizedBox(height: 22),
 
-            _sectionHeader('Quick Actions', onViewAll: () => context.go(AppConstants.adminEvents)),
+            _sectionHeader(
+              'Quick Actions',
+              rightWidget: AnimatedOpacity(
+                duration: const Duration(milliseconds: 220),
+                opacity: _showSwipeHint ? 1.0 : 0.0,
+                child: _showSwipeHint
+                    ? GestureDetector(
+                        onTap: () {
+                          if (_quickActionsScrollController.hasClients) {
+                            _quickActionsScrollController.animateTo(
+                              _quickActionsScrollController.position.maxScrollExtent,
+                              duration: const Duration(milliseconds: 350),
+                              curve: Curves.easeOutCubic,
+                            );
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF500913).withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text('Swipe', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF500913))),
+                              SizedBox(width: 3),
+                              Icon(Icons.arrow_forward_rounded, size: 11, color: Color(0xFF500913)),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
             const SizedBox(height: 12),
             SizedBox(
               height: 95,
               child: ListView(
+                controller: _quickActionsScrollController,
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
@@ -230,24 +288,42 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             ),
             const SizedBox(height: 22),
 
-            _sectionHeader('Recent Activities'),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _filterChip('All', _ActivityFilter.all),
-                  const SizedBox(width: 8),
-                  _filterChip('Registrations', _ActivityFilter.registrations),
-                  const SizedBox(width: 8),
-                  _filterChip('Events', _ActivityFilter.events),
-                  const SizedBox(width: 8),
-                  _filterChip('Donations', _ActivityFilter.donations),
-                  const SizedBox(width: 8),
-                  _filterChip('Announcements', _ActivityFilter.announcements),
+            _sectionHeader(
+              'Recent Activities',
+              rightWidget: PopupMenuButton<_ActivityFilter>(
+                initialValue: _filter,
+                onSelected: (val) => setState(() => _filter = val),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                color: Colors.white,
+                elevation: 6,
+                itemBuilder: (context) => [
+                  _buildActivityMenuItem(_ActivityFilter.all, 'All Activities', Icons.grid_view_rounded, Colors.grey.shade700),
+                  _buildActivityMenuItem(_ActivityFilter.registrations, 'Registrations', Icons.person_add_alt_1_rounded, const Color(0xFF2E6FE0)),
+                  _buildActivityMenuItem(_ActivityFilter.events, 'Event RSVPs', Icons.edit_calendar_rounded, const Color(0xFFE8622C)),
+                  _buildActivityMenuItem(_ActivityFilter.donations, 'Donations', Icons.volunteer_activism_rounded, const Color(0xFF3E7C4A)),
+                  _buildActivityMenuItem(_ActivityFilter.announcements, 'Announcements', Icons.campaign_rounded, const Color(0xFF7B4FD6)),
                 ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF500913).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF500913).withValues(alpha: 0.15)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.filter_list_rounded, size: 13, color: Color(0xFF500913)),
+                      const SizedBox(width: 5),
+                      Text(
+                        _activityFilterName(_filter),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF500913)),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.keyboard_arrow_down_rounded, size: 15, color: Color(0xFF500913)),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -279,51 +355,72 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 0),
     );
   }
 
-  Widget _sectionHeader(String title, {VoidCallback? onViewAll}) {
+  Widget _sectionHeader(String title, {VoidCallback? onViewAll, Widget? rightWidget}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-          GestureDetector(
-            onTap: onViewAll,
-            child: Row(
-              children: const [
-                Text('View All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary)),
-                Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.primary),
-              ],
+          if (rightWidget != null)
+            rightWidget
+          else if (onViewAll != null)
+            GestureDetector(
+              onTap: onViewAll,
+              child: Row(
+                children: const [
+                  Text('View All', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary)),
+                  Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.primary),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _filterChip(String label, _ActivityFilter value) {
-    final selected = _filter == value;
-    return InkWell(
-      onTap: () => setState(() => _filter = value),
-      borderRadius: BorderRadius.circular(100),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : const Color(0xFFFCF5EE),
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-            color: selected ? Colors.white : AppColors.primary,
+  String _activityFilterName(_ActivityFilter f) {
+    switch (f) {
+      case _ActivityFilter.all:
+        return 'All Activities';
+      case _ActivityFilter.registrations:
+        return 'Registrations';
+      case _ActivityFilter.events:
+        return 'Event RSVPs';
+      case _ActivityFilter.donations:
+        return 'Donations';
+      case _ActivityFilter.announcements:
+        return 'Announcements';
+    }
+  }
+
+  PopupMenuItem<_ActivityFilter> _buildActivityMenuItem(_ActivityFilter val, String label, IconData icon, Color color) {
+    final isSelected = _filter == val;
+    return PopupMenuItem<_ActivityFilter>(
+      value: val,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
+            child: Icon(icon, size: 14, color: color),
           ),
-        ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                color: isSelected ? const Color(0xFF500913) : AppColors.textPrimary,
+              ),
+            ),
+          ),
+          if (isSelected) const Icon(Icons.check_rounded, size: 16, color: Color(0xFF500913)),
+        ],
       ),
     );
   }
@@ -342,24 +439,6 @@ class _AdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Button to Exit Admin & Return to Home Screen
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.menu_rounded,
-                size: 22,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
           const NasLogo(size: 38),
           const SizedBox(width: 8),
           Expanded(
@@ -402,31 +481,48 @@ class _AdminTopBar extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           // Notifications Bell
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 28, color: AppColors.textPrimary),
-              Positioned(
-                top: 0,
-                right: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD64545),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFFCF9F6), width: 1.5),
+          InkWell(
+            onTap: () => context.push(AppConstants.notifications),
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.notifications_none_rounded, size: 28, color: AppColors.textPrimary),
+                  Positioned(
+                    top: 0,
+                    right: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD64545),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFFCF9F6), width: 1.5),
+                      ),
+                      child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700, height: 1)),
+                    ),
                   ),
-                  child: const Text('5', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700, height: 1)),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-          const SizedBox(width: 12),
-          // User Avatar
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.grey.shade300,
-            backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=11'),
+          const SizedBox(width: 10),
+          // Exit Admin Panel Button
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -445,32 +541,81 @@ class _GreetingHero extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.primary,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: const [
-                  Text('Namaste, Administrator',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
-                  SizedBox(width: 6),
-                  Text('🙏', style: TextStyle(fontSize: 18)),
-                ],
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: 220,
-                child: Text(
-                  "Manage the Kathmandu chapter's activities, members and events from your command center.",
-                  style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.35),
-                ),
-              ),
-            ],
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF500913), Color(0xFF3F050C)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF500913).withValues(alpha: 0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -15,
+              bottom: -20,
+              child: Opacity(
+                opacity: 0.12,
+                child: const Icon(Icons.temple_hindu_rounded, size: 150, color: Colors.white),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.circle, size: 8, color: Color(0xFF4CE688)),
+                          SizedBox(width: 6),
+                          Text(
+                            'Kathmandu Branch — Live Session',
+                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: const [
+                    Text(
+                      'Namaste, Administrator',
+                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.3),
+                    ),
+                    SizedBox(width: 6),
+                    Text('🙏', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const SizedBox(
+                  width: 260,
+                  child: Text(
+                    "Manage your branch members, host events, publish media, and update executive committee settings.",
+                    style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.35),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -487,6 +632,7 @@ class _MetricCard extends StatelessWidget {
   final Color cardBg;
   final String title;
   final String value;
+  final VoidCallback? onTap;
 
   const _MetricCard({
     required this.icon,
@@ -495,56 +641,62 @@ class _MetricCard extends StatelessWidget {
     required this.cardBg,
     required this.title,
     required this.value,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            width: 30,
-            height: 30,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-            child: Icon(icon, size: 15, color: iconColor),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary, height: 1.0)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 2.0),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: Container(
+        width: double.infinity,
+        height: 98,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: const Color(0xFFF1E3DF)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+              child: Icon(icon, size: 16, color: iconColor),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: AppColors.primary, height: 1.0),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500, height: 1.1),
-                    maxLines: 2,
+                    style: const TextStyle(fontSize: 11.5, color: Color(0xFF500913), fontWeight: FontWeight.w700, height: 1.1),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -678,11 +830,14 @@ class _ActivityItem extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // PENDING APPROVALS BANNER
 // ---------------------------------------------------------------------------
-class _PendingApprovalsBanner extends StatelessWidget {
+class _PendingApprovalsBanner extends ConsumerWidget {
   const _PendingApprovalsBanner();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final members = ref.watch(membersNotifierProvider);
+    final pendingCount = members.where((m) => m.status == 'PENDING').length;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -702,15 +857,18 @@ class _PendingApprovalsBanner extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
-                SizedBox(height: 2),
-                Text('8 members awaiting approval', style: TextStyle(color: Colors.white70, fontSize: 11)),
+              children: [
+                const Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
+                const SizedBox(height: 2),
+                Text(
+                  '$pendingCount ${pendingCount == 1 ? 'member' : 'members'} awaiting approval',
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                ),
               ],
             ),
           ),
           ElevatedButton(
-            onPressed: () => context.go(AppConstants.adminMembers),
+            onPressed: () => context.go('${AppConstants.adminMembers}?filter=PENDING'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: AppColors.primary,
@@ -733,143 +891,447 @@ class _PendingApprovalsBanner extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ADMIN BOTTOM NAV: Dashboard • Members • Events • Gallery • Settings
-// ---------------------------------------------------------------------------
-class _AdminBottomNavBar extends StatelessWidget {
-  final int activeIndex;
-  const _AdminBottomNavBar({required this.activeIndex});
-
-  static const _items = [
-    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
-    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
-    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
-    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
-    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -2))],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            for (int i = 0; i < _items.length; i++)
-              Expanded(
-                child: InkWell(
-                  onTap: () => context.go(_items[i].route),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: i == activeIndex
-                            ? BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                        child: Icon(
-                          _items[i].icon,
-                          size: 20,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        _items[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
+String _formatTimeOfDay(TimeOfDay tod) {
+  final hour = tod.hourOfPeriod == 0 ? 12 : tod.hourOfPeriod;
+  final minute = tod.minute.toString().padLeft(2, '0');
+  final period = tod.period == DayPeriod.am ? 'AM' : 'PM';
+  return '${hour.toString().padLeft(2, '0')}:$minute $period';
 }
 
 void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
   final titleController = TextEditingController();
-  final venueController = TextEditingController();
-  String selectedCategory = 'Cultural';
+  final venueController = TextEditingController(text: 'Samaj Bhawan Hall, Kathmandu');
+  final timeController = TextEditingController(text: '05:00 PM – 9:00 PM');
+  final organizerController = TextEditingController(text: 'Kathmandu Chapter');
+  final descController = TextEditingController();
+  final posterUrlController = TextEditingController();
 
-  showDialog(
+  String category = 'Cultural';
+  DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+  String status = 'upcoming';
+  String? errorMsg;
+
+  final presetPosters = {
+    'Cultural': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+    'Business': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
+    'Health': 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=800&q=80',
+    'Youth': 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80',
+    'Social': 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+  };
+
+  posterUrlController.text = presetPosters[category]!;
+
+  showModalBottomSheet(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-      title: Row(
-        children: const [
-          Icon(Icons.add_box_rounded, color: AppColors.primary),
-          SizedBox(width: 8),
-          Text('Create New Event', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Event Title',
-                hintText: 'e.g. Teej Mahotsav 2026',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (modalContext) => StatefulBuilder(
+      builder: (ctx, setModalState) {
+        return Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.88),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top Drag Handle
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0E0E0),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Header Banner Card
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF500913), Color(0xFF3F050C)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF500913).withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.add_box_rounded, color: Color(0xFFE5C158), size: 24),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Publish New Event',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Fill in all details to publish live into Events section',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Form Fields List
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (errorMsg != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDE8E8),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE53935)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.error_outline_rounded, color: Color(0xFFE53935), size: 18),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      errorMsg!,
+                                      style: const TextStyle(color: Color(0xFFE53935), fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+
+                          // 1. Event Category Selector
+                          const Text('Event Category *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF1E1615))),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: ['Cultural', 'Business', 'Youth', 'Social', 'Health'].map((cat) {
+                              final isSel = category == cat;
+                              return GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    category = cat;
+                                    posterUrlController.text = presetPosters[cat] ?? posterUrlController.text;
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    cat,
+                                    style: TextStyle(
+                                      color: isSel ? Colors.white : const Color(0xFF500913),
+                                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // 2. Event Title Input
+                          TextField(
+                            controller: titleController,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Event Title *',
+                              hintText: 'e.g. Maharaja Agrasen Jayanti Gala 2026',
+                              prefixIcon: const Icon(Icons.event_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 3. Date & Time Row
+                          Row(
+                            children: [
+                              // Date Picker Box
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: ctx,
+                                      initialDate: selectedDate,
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime.now().add(const Duration(days: 730)),
+                                    );
+                                    if (picked != null) {
+                                      setModalState(() {
+                                        selectedDate = picked;
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0xFFC7BDB8)),
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: const Color(0xFFFFFBF9),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF500913)),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E1615)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // Time Picker Box
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final startTime = await showTimePicker(
+                                      context: ctx,
+                                      initialTime: const TimeOfDay(hour: 17, minute: 0),
+                                      helpText: 'SELECT START TIME',
+                                    );
+                                    if (startTime != null) {
+                                      final startStr = _formatTimeOfDay(startTime);
+                                      final endTime = await showTimePicker(
+                                        context: ctx,
+                                        initialTime: TimeOfDay(
+                                          hour: (startTime.hour + 4) % 24,
+                                          minute: startTime.minute,
+                                        ),
+                                        helpText: 'SELECT END TIME (OPTIONAL)',
+                                      );
+                                      if (endTime != null) {
+                                        final endStr = _formatTimeOfDay(endTime);
+                                        setModalState(() {
+                                          timeController.text = '$startStr – $endStr';
+                                        });
+                                      } else {
+                                        setModalState(() {
+                                          timeController.text = startStr;
+                                        });
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0xFFC7BDB8)),
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: const Color(0xFFFFFBF9),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.access_time_filled_rounded, size: 18, color: Color(0xFF500913)),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            timeController.text.isNotEmpty ? timeController.text : 'Select Time',
+                                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF1E1615)),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 4. Venue Address Input
+                          TextField(
+                            controller: venueController,
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Venue Address *',
+                              hintText: 'e.g. Samaj Bhawan, Kamaladi, Kathmandu',
+                              prefixIcon: const Icon(Icons.location_on_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 5. Organized By Chapter Input
+                          TextField(
+                            controller: organizerController,
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Organized By',
+                              hintText: 'e.g. Kathmandu Chapter',
+                              prefixIcon: const Icon(Icons.business_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 6. Detailed Description Multiline Input
+                          TextField(
+                            controller: descController,
+                            maxLines: 3,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(
+                              labelText: 'Event Description & Details *',
+                              hintText: 'Provide event agenda, program highlights, entry guidelines...',
+                              alignLabelWithHint: true,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.all(14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 7. Poster Image URL Input
+                          TextField(
+                            controller: posterUrlController,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(
+                              labelText: 'Banner / Poster Image URL',
+                              hintText: 'https://...',
+                              prefixIcon: const Icon(Icons.image_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Publish Action Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (titleController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter an Event Title');
+                                  return;
+                                }
+                                if (venueController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter the Venue Address');
+                                  return;
+                                }
+                                if (descController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter Event Description & Details');
+                                  return;
+                                }
+
+                                final newEvent = Event(
+                                  id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
+                                  title: titleController.text.trim(),
+                                  description: descController.text.trim(),
+                                  category: category,
+                                  eventDate: selectedDate,
+                                  eventTime: timeController.text.trim().isNotEmpty ? timeController.text.trim() : '05:00 PM – 9:00 PM',
+                                  venue: venueController.text.trim(),
+                                  organizedBy: organizerController.text.trim().isNotEmpty ? organizerController.text.trim() : 'Kathmandu Chapter',
+                                  posterUrl: posterUrlController.text.trim().isNotEmpty ? posterUrlController.text.trim() : presetPosters[category],
+                                  status: status,
+                                  createdAt: DateTime.now(),
+                                );
+
+                                ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
+                                Navigator.pop(modalContext);
+
+                                // Direct user to Events section
+                                context.go(AppConstants.events);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('🎉 Event "${newEvent.title}" published live! Directing to Events page...'),
+                                    backgroundColor: const Color(0xFF500913),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF500913),
+                                foregroundColor: Colors.white,
+                                elevation: 4,
+                                shadowColor: const Color(0xFF500913).withValues(alpha: 0.3),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                              ),
+                              child: const Text(
+                                'Publish Event Live',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: venueController,
-              decoration: InputDecoration(
-                labelText: 'Venue Address',
-                hintText: 'e.g. Samaj Bhawan, Kamaladi',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-        ElevatedButton(
-          onPressed: () {
-            if (titleController.text.isNotEmpty) {
-              final newEvent = Event(
-                id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
-                title: titleController.text,
-                description: 'Organized by Kathmandu Chapter Admin',
-                category: selectedCategory,
-                eventDate: DateTime.now().add(const Duration(days: 14)),
-                eventTime: '04:00 PM',
-                venue: venueController.text.isNotEmpty ? venueController.text : 'Kathmandu Samaj Hall',
-                organizedBy: 'Kathmandu Chapter',
-                status: 'upcoming',
-                createdAt: DateTime.now(),
-              );
-              ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
-              Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Event "${newEvent.title}" published successfully!')),
-              );
-            }
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-          child: const Text('Publish Event', style: TextStyle(fontWeight: FontWeight.w700)),
-        ),
-      ],
+          ),
+        );
+      },
     ),
   );
 }

@@ -6,6 +6,7 @@ import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 import '../../../settings/data/settings_repository.dart';
+import '../../shared/branch_admin_nav_bar.dart';
 
 /// B5 — Branch Settings Screen (Location Admin)
 class BranchSettingsScreen extends ConsumerStatefulWidget {
@@ -223,7 +224,6 @@ class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 4),
     );
   }
 
@@ -314,19 +314,6 @@ class _AdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
-            ),
-          ),
-          const SizedBox(width: 8),
           const NasLogo(size: 38),
           const SizedBox(width: 8),
           Expanded(
@@ -407,70 +394,4 @@ class _HeroBanner extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ADMIN BOTTOM NAV
-// ---------------------------------------------------------------------------
-class _AdminBottomNavBar extends StatelessWidget {
-  final int activeIndex;
-  const _AdminBottomNavBar({required this.activeIndex});
 
-  static const _items = [
-    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
-    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
-    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
-    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
-    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -2))],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            for (int i = 0; i < _items.length; i++)
-              Expanded(
-                child: InkWell(
-                  onTap: () => context.go(_items[i].route),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: i == activeIndex
-                            ? BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                        child: Icon(
-                          _items[i].icon,
-                          size: 20,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        _items[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -208,34 +208,28 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Admin Quick Action (if admin) ───────────────────
-          if (profile.isLocationAdmin || profile.isSuperAdmin)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: SizedBox(
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    if (profile.isSuperAdmin) {
-                      context.push(AppConstants.superAdminDashboard);
-                    } else {
-                      context.push(AppConstants.adminDashboard);
-                    }
-                  },
-                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 18),
-                  label: Text(
-                    profile.isSuperAdmin ? 'Open Super Admin Dashboard' : 'Open Branch Admin Panel',
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
-                  ),
+          // ── Admin Quick Action ───────────────────
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () => context.push(AppConstants.adminDashboard),
+                icon: const Icon(Icons.admin_panel_settings_rounded, size: 20),
+                label: const Text(
+                  'Open Branch Admin Panel',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF700D15),
+                  foregroundColor: Colors.white,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),
+          ),
 
           // ── My Information ─────────────────────────────────
           const Text('My Information', style: AppText.h2),

@@ -7,10 +7,12 @@ import '../../../../core/design_tokens.dart';
 import '../../../../shared/models/event.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 import '../../../events/data/events_repository.dart';
+import '../../shared/branch_admin_nav_bar.dart';
 
 /// B3 — Events Management Screen (Location Admin)
 class EventsManagementScreen extends ConsumerStatefulWidget {
-  const EventsManagementScreen({super.key});
+  final String? initialFilter;
+  const EventsManagementScreen({super.key, this.initialFilter});
 
   @override
   ConsumerState<EventsManagementScreen> createState() => _EventsManagementScreenState();
@@ -19,7 +21,38 @@ class EventsManagementScreen extends ConsumerStatefulWidget {
 enum _EventFilter { all, upcoming, cultural, business, past }
 
 class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen> {
-  _EventFilter _filter = _EventFilter.all;
+  late _EventFilter _filter;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialFilter == 'UPCOMING') {
+      _filter = _EventFilter.upcoming;
+    } else if (widget.initialFilter == 'PAST') {
+      _filter = _EventFilter.past;
+    } else {
+      _filter = _EventFilter.all;
+    }
+
+    if (widget.initialFilter != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            220.0,
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   static const _eventsList = [
     (
@@ -89,6 +122,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: ListView(
+          controller: _scrollController,
           padding: const EdgeInsets.only(bottom: 20),
           children: [
             const _AdminTopBar(),
@@ -186,6 +220,7 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
                     child: SizedBox(
                       height: 44,
                       child: TextField(
+                        onTapOutside: (_) => FocusScope.of(context).unfocus(),
                         decoration: InputDecoration(
                           hintText: 'Search events by title, category or location...',
                           hintStyle: TextStyle(fontSize: 11, color: Colors.grey.shade500),
@@ -305,7 +340,6 @@ class _EventsManagementScreenState extends ConsumerState<EventsManagementScreen>
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
-      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 2),
     );
   }
 
@@ -344,19 +378,6 @@ class _AdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF81161B),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.menu_rounded, size: 22, color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 8),
           const NasLogo(size: 38),
           const SizedBox(width: 8),
           Expanded(
@@ -382,34 +403,19 @@ class _AdminTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 26, color: AppColors.textPrimary),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Text('5', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 14),
-          Container(
-            height: 38,
-            width: 38,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage('https://i.pravatar.cc/150?img=11'),
-                fit: BoxFit.cover,
+          const SizedBox(width: 6),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
               ),
             ),
           ),
@@ -624,7 +630,14 @@ class _RsvpTile extends StatelessWidget {
                   children: [
                     const Icon(Icons.calendar_today_rounded, size: 10, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
-                    Text(eventName, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Expanded(
+                      child: Text(
+                        eventName,
+                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 2),
@@ -632,7 +645,14 @@ class _RsvpTile extends StatelessWidget {
                   children: [
                     const Icon(Icons.access_time_rounded, size: 10, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
-                    Text(time, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                    Expanded(
+                      child: Text(
+                        time,
+                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -780,143 +800,444 @@ class _EventCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ADMIN BOTTOM NAV
-// ---------------------------------------------------------------------------
-class _AdminBottomNavBar extends StatelessWidget {
-  final int activeIndex;
-  const _AdminBottomNavBar({required this.activeIndex});
-
-  static const _items = [
-    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
-    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
-    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
-    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
-    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -2))],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            for (int i = 0; i < _items.length; i++)
-              Expanded(
-                child: InkWell(
-                  onTap: () => context.go(_items[i].route),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: i == activeIndex
-                            ? BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                        child: Icon(
-                          _items[i].icon,
-                          size: 20,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        _items[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
+String _formatTimeOfDay(TimeOfDay tod) {
+  final hour = tod.hourOfPeriod == 0 ? 12 : tod.hourOfPeriod;
+  final minute = tod.minute.toString().padLeft(2, '0');
+  final period = tod.period == DayPeriod.am ? 'AM' : 'PM';
+  return '${hour.toString().padLeft(2, '0')}:$minute $period';
 }
 
 void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
   final titleController = TextEditingController();
-  final venueController = TextEditingController();
-  String category = 'Cultural';
+  final venueController = TextEditingController(text: 'Samaj Bhawan Hall, Kathmandu');
+  final timeController = TextEditingController(text: '05:00 PM – 9:00 PM');
+  final organizerController = TextEditingController(text: 'Kathmandu Chapter');
+  final descController = TextEditingController();
+  final posterUrlController = TextEditingController();
 
-  showDialog(
+  String category = 'Cultural';
+  DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+  String status = 'upcoming';
+  String? errorMsg;
+
+  final presetPosters = {
+    'Cultural': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+    'Business': 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
+    'Health': 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=800&q=80',
+    'Youth': 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80',
+    'Social': 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
+  };
+
+  posterUrlController.text = presetPosters[category]!;
+
+  showModalBottomSheet(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-      title: Row(
-        children: const [
-          Icon(Icons.add_box_rounded, color: AppColors.primary),
-          SizedBox(width: 8),
-          Text('Create New Event', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Event Title',
-                hintText: 'e.g. Dashain Cultural Gala 2026',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (modalContext) => StatefulBuilder(
+      builder: (ctx, setModalState) {
+        return Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.88),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top Drag Handle
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE0E0E0),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Header Banner Card
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF500913), Color(0xFF3F050C)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF500913).withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.add_box_rounded, color: Color(0xFFE5C158), size: 24),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Publish New Event',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Fill in all details to display in the main Events section',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Form Fields List
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (errorMsg != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDE8E8),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFFE53935)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.error_outline_rounded, color: Color(0xFFE53935), size: 18),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      errorMsg!,
+                                      style: const TextStyle(color: Color(0xFFE53935), fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+
+                          // 1. Event Category Selector
+                          const Text('Event Category *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF1E1615))),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: ['Cultural', 'Business', 'Youth', 'Social', 'Health'].map((cat) {
+                              final isSel = category == cat;
+                              return GestureDetector(
+                                onTap: () {
+                                  setModalState(() {
+                                    category = cat;
+                                    posterUrlController.text = presetPosters[cat] ?? posterUrlController.text;
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    cat,
+                                    style: TextStyle(
+                                      color: isSel ? Colors.white : const Color(0xFF500913),
+                                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // 2. Event Title Input
+                          TextField(
+                            controller: titleController,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Event Title *',
+                              hintText: 'e.g. Maharaja Agrasen Jayanti Gala 2026',
+                              prefixIcon: const Icon(Icons.event_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 3. Date & Time Row
+                          Row(
+                            children: [
+                              // Date Picker Box
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: ctx,
+                                      initialDate: selectedDate,
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime.now().add(const Duration(days: 730)),
+                                    );
+                                    if (picked != null) {
+                                      setModalState(() {
+                                        selectedDate = picked;
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0xFFC7BDB8)),
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: const Color(0xFFFFFBF9),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF500913)),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E1615)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // Time Picker Box
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final startTime = await showTimePicker(
+                                      context: ctx,
+                                      initialTime: const TimeOfDay(hour: 17, minute: 0),
+                                      helpText: 'SELECT START TIME',
+                                    );
+                                    if (startTime != null) {
+                                      final startStr = _formatTimeOfDay(startTime);
+                                      final endTime = await showTimePicker(
+                                        context: ctx,
+                                        initialTime: TimeOfDay(
+                                          hour: (startTime.hour + 4) % 24,
+                                          minute: startTime.minute,
+                                        ),
+                                        helpText: 'SELECT END TIME (OPTIONAL)',
+                                      );
+                                      if (endTime != null) {
+                                        final endStr = _formatTimeOfDay(endTime);
+                                        setModalState(() {
+                                          timeController.text = '$startStr – $endStr';
+                                        });
+                                      } else {
+                                        setModalState(() {
+                                          timeController.text = startStr;
+                                        });
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: const Color(0xFFC7BDB8)),
+                                      borderRadius: BorderRadius.circular(14),
+                                      color: const Color(0xFFFFFBF9),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.access_time_filled_rounded, size: 18, color: Color(0xFF500913)),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            timeController.text.isNotEmpty ? timeController.text : 'Select Time',
+                                            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF1E1615)),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 4. Venue Address Input
+                          TextField(
+                            controller: venueController,
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Venue Address *',
+                              hintText: 'e.g. Samaj Bhawan, Kamaladi, Kathmandu',
+                              prefixIcon: const Icon(Icons.location_on_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 5. Organized By Chapter Input
+                          TextField(
+                            controller: organizerController,
+                            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            decoration: InputDecoration(
+                              labelText: 'Organized By',
+                              hintText: 'e.g. Kathmandu Chapter',
+                              prefixIcon: const Icon(Icons.business_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 6. Detailed Description Multiline Input
+                          TextField(
+                            controller: descController,
+                            maxLines: 3,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(
+                              labelText: 'Event Description & Details *',
+                              hintText: 'Provide event agenda, program highlights, entry guidelines...',
+                              alignLabelWithHint: true,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.all(14),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 7. Poster Image URL Input
+                          TextField(
+                            controller: posterUrlController,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(
+                              labelText: 'Banner / Poster Image URL',
+                              hintText: 'https://...',
+                              prefixIcon: const Icon(Icons.image_rounded, color: Color(0xFF500913), size: 20),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Publish Action Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (titleController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter an Event Title');
+                                  return;
+                                }
+                                if (venueController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter the Venue Address');
+                                  return;
+                                }
+                                if (descController.text.trim().isEmpty) {
+                                  setModalState(() => errorMsg = 'Please enter Event Description & Details');
+                                  return;
+                                }
+
+                                final newEvent = Event(
+                                  id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
+                                  title: titleController.text.trim(),
+                                  description: descController.text.trim(),
+                                  category: category,
+                                  eventDate: selectedDate,
+                                  eventTime: timeController.text.trim().isNotEmpty ? timeController.text.trim() : '05:00 PM – 9:00 PM',
+                                  venue: venueController.text.trim(),
+                                  organizedBy: organizerController.text.trim().isNotEmpty ? organizerController.text.trim() : 'Kathmandu Chapter',
+                                  posterUrl: posterUrlController.text.trim().isNotEmpty ? posterUrlController.text.trim() : presetPosters[category],
+                                  status: status,
+                                  createdAt: DateTime.now(),
+                                );
+
+                                ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
+                                Navigator.pop(modalContext);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('🎉 Event "${newEvent.title}" published live to Events section!'),
+                                    backgroundColor: const Color(0xFF500913),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF500913),
+                                foregroundColor: Colors.white,
+                                elevation: 4,
+                                shadowColor: const Color(0xFF500913).withValues(alpha: 0.3),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                              ),
+                              child: const Text(
+                                'Publish Event Live',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: venueController,
-              decoration: InputDecoration(
-                labelText: 'Venue Address',
-                hintText: 'e.g. Samaj Bhawan Hall',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-        ElevatedButton(
-          onPressed: () {
-            if (titleController.text.isNotEmpty) {
-              final newEvent = Event(
-                id: 'ev-${DateTime.now().millisecondsSinceEpoch}',
-                title: titleController.text,
-                description: 'Organized by Location Admin',
-                category: category,
-                eventDate: DateTime.now().add(const Duration(days: 10)),
-                eventTime: '05:00 PM',
-                venue: venueController.text.isNotEmpty ? venueController.text : 'Kathmandu Samaj Hall',
-                organizedBy: 'Kathmandu Chapter',
-                status: 'upcoming',
-                createdAt: DateTime.now(),
-              );
-              ref.read(eventsNotifierProvider.notifier).addEvent(newEvent);
-              Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Event "${newEvent.title}" published successfully!')),
-              );
-            }
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-          child: const Text('Publish Event', style: TextStyle(fontWeight: FontWeight.w700)),
-        ),
-      ],
+          ),
+        );
+      },
     ),
   );
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
+import '../../shared/branch_admin_nav_bar.dart';
 
 /// B4 — Gallery Management Screen (Location Admin)
 class GalleryManagementScreen extends StatefulWidget {
@@ -257,7 +258,6 @@ class _GalleryManagementScreenState extends State<GalleryManagementScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const _AdminBottomNavBar(activeIndex: 3),
     );
   }
 
@@ -288,19 +288,6 @@ class _AdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF81161B),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.menu_rounded, size: 22, color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 8),
           const NasLogo(size: 38),
           const SizedBox(width: 8),
           Expanded(
@@ -326,34 +313,19 @@ class _AdminTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 26, color: AppColors.textPrimary),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Text('5', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 14),
-          Container(
-            height: 38,
-            width: 38,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage('https://i.pravatar.cc/150?img=11'),
-                fit: BoxFit.cover,
+          const SizedBox(width: 6),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
               ),
             ),
           ),
@@ -570,70 +542,4 @@ class _GalleryCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// ADMIN BOTTOM NAV
-// ---------------------------------------------------------------------------
-class _AdminBottomNavBar extends StatelessWidget {
-  final int activeIndex;
-  const _AdminBottomNavBar({required this.activeIndex});
 
-  static const _items = [
-    (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.adminDashboard),
-    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.adminMembers),
-    (icon: Icons.event_rounded, label: 'Events', route: AppConstants.adminEvents),
-    (icon: Icons.photo_library_rounded, label: 'Gallery', route: AppConstants.adminGallery),
-    (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.adminSettings),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, -2))],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            for (int i = 0; i < _items.length; i++)
-              Expanded(
-                child: InkWell(
-                  onTap: () => context.go(_items[i].route),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: i == activeIndex
-                            ? BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              )
-                            : null,
-                        child: Icon(
-                          _items[i].icon,
-                          size: 20,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        _items[i].label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: i == activeIndex ? FontWeight.w700 : FontWeight.w500,
-                          color: i == activeIndex ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}

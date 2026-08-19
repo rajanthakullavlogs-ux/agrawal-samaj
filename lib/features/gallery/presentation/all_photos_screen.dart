@@ -29,8 +29,6 @@ class AllPhotosScreen extends StatefulWidget {
 }
 
 class _AllPhotosScreenState extends State<AllPhotosScreen> {
-  String _selectedCategory = 'All';
-
   static const List<_PhotoArchiveItem> _photos = [
     _PhotoArchiveItem(
       id: 'ph-1',
@@ -92,10 +90,7 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredPhotos = _photos.where((p) {
-      if (_selectedCategory == 'All') return true;
-      return p.category == _selectedCategory;
-    }).toList();
+    final filteredPhotos = _photos;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F5),
@@ -208,75 +203,6 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          // Category Popup Menu Filter Button
-                          PopupMenuButton<String>(
-                            initialValue: _selectedCategory,
-                            onSelected: (cat) => setState(() => _selectedCategory = cat),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            color: Colors.white,
-                            elevation: 6,
-                            itemBuilder: (context) => ['All', 'Business', 'Cultural', 'Social Service', 'Youth', 'Health'].map((cat) {
-                              final isSel = cat == _selectedCategory;
-                              return PopupMenuItem<String>(
-                                value: cat,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.collections_outlined,
-                                      size: 14,
-                                      color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      cat == 'All' ? 'All Categories' : cat,
-                                      style: TextStyle(
-                                        fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
-                                        color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    if (isSel) ...[
-                                      const Spacer(),
-                                      const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
-                                    ],
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF500913),
-                                borderRadius: BorderRadius.circular(18),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF500913).withValues(alpha: 0.25),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.filter_alt_rounded, size: 13, color: Colors.white),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    _selectedCategory == 'All' ? 'All Categories' : _selectedCategory,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Colors.white),
-                                ],
-                              ),
                             ),
                           ),
                         ],

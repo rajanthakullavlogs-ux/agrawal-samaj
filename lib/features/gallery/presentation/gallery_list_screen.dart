@@ -47,7 +47,6 @@ class GalleryListScreen extends ConsumerStatefulWidget {
 }
 
 class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
-  String _selectedCategory = 'All'; // 'All', 'Business Events', 'Cultural Events', 'Social Service', 'Youth Activities'
 
   static const _HighlightPhoto _tallLeftPhoto = _HighlightPhoto(
     id: 'p-1',
@@ -139,13 +138,6 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
               onProfile: () => context.push(AppConstants.profile),
             ),
             const SizedBox(height: 16),
-
-            // Horizontal Category Filter Pills Bar
-            _GalleryCategoryPillsBar(
-              selectedCategory: _selectedCategory,
-              onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
-            ),
-            const SizedBox(height: 24),
 
             // Photo Highlights Section Header
             Padding(
@@ -543,81 +535,7 @@ class _GalleryHeroSection extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 2. HORIZONTAL CATEGORY FILTER PILLS BAR
-// ---------------------------------------------------------------------------
-class _GalleryCategoryPillsBar extends StatelessWidget {
-  final String selectedCategory;
-  final ValueChanged<String> onCategorySelected;
-
-  const _GalleryCategoryPillsBar({
-    required this.selectedCategory,
-    required this.onCategorySelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final categories = [
-      {'label': 'All', 'icon': Icons.grid_view_rounded},
-      {'label': 'Business Events', 'icon': Icons.business_center_rounded},
-      {'label': 'Cultural Events', 'icon': Icons.theater_comedy_rounded},
-      {'label': 'Social Service', 'icon': Icons.volunteer_activism_rounded},
-      {'label': 'Youth Activities', 'icon': Icons.groups_rounded},
-    ];
-
-    return SizedBox(
-      height: 38,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
-        itemBuilder: (context, i) {
-          final cat = categories[i];
-          final label = cat['label'] as String;
-          final icon = cat['icon'] as IconData;
-          final isSelected = label == selectedCategory;
-
-          return GestureDetector(
-            onTap: () => onCategorySelected(label),
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF500913) : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF500913) : const Color(0xFFE5D0D0),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    size: 14,
-                    color: isSelected ? Colors.white : const Color(0xFF700D15),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: isSelected ? Colors.white : const Color(0xFF1E1615),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 3. PHOTO HIGHLIGHT CARD ITEM
+// 2. PHOTO HIGHLIGHT CARD ITEM
 // ---------------------------------------------------------------------------
 class _PhotoGridCard extends StatelessWidget {
   final _HighlightPhoto photo;

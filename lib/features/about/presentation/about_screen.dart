@@ -43,6 +43,35 @@ class AboutScreen extends ConsumerWidget {
                 onTap: () => context.push(AppConstants.about),
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Open Branch Admin Panel Shortcut Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push(AppConstants.adminDashboard),
+                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 22, color: Color(0xFFE5C158)),
+                  label: const Text(
+                    'Open Branch Admin Panel',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF500913),
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shadowColor: const Color(0xFF500913).withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // "My Activity" Section Header & 3-Column Card
@@ -382,7 +411,7 @@ class _SamajHeaderBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// 3. MY ACTIVITY SECTION (3 COLUMNS CARD)
+// 3. MY ACTIVITY SECTION (SYMMETRICAL 3-COLUMN CARD)
 // ---------------------------------------------------------------------------
 class _MyActivityCard extends StatelessWidget {
   final VoidCallback onRegistrationsTap;
@@ -398,111 +427,129 @@ class _MyActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE5D0D0), width: 0.9),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF500913).withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // Column 1: My Registrations
-          Expanded(
-            child: _buildActivityColumn(
-              icon: Icons.calendar_today_outlined,
-              iconBg: const Color(0xFFFDF0F0),
-              iconColor: const Color(0xFF700D15),
-              title: 'My Registrations',
-              subtitle: 'Events you\'ve\nregistered for',
-              onTap: onRegistrationsTap,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 6),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Column 1: Registrations
+            Expanded(
+              child: _buildSymmetricalColumn(
+                icon: Icons.event_available_rounded,
+                iconBg: const Color(0xFFFDF0F0),
+                iconColor: const Color(0xFF700D15),
+                badgeText: 'Events',
+                title: 'Registrations',
+                subtitle: 'Registered\npasses & events',
+                onTap: onRegistrationsTap,
+              ),
             ),
-          ),
-          Container(width: 1, height: 60, color: const Color(0xFFE5D0D0).withValues(alpha: 0.6)),
+            const VerticalDivider(width: 1, color: Color(0xFFE5D0D0), thickness: 0.8, indent: 4, endIndent: 4),
 
-          // Column 2: My Contributions
-          Expanded(
-            child: _buildActivityColumn(
-              icon: Icons.favorite_outline_rounded,
-              iconBg: const Color(0xFFF0EEFF),
-              iconColor: const Color(0xFF6B4FD6),
-              title: 'My Contributions',
-              subtitle: 'Your activities &\nparticipations',
-              onTap: onContributionsTap,
+            // Column 2: Contributions
+            Expanded(
+              child: _buildSymmetricalColumn(
+                icon: Icons.volunteer_activism_rounded,
+                iconBg: const Color(0xFFF0EEFF),
+                iconColor: const Color(0xFF6B4FD6),
+                badgeText: 'Activity',
+                title: 'Contributions',
+                subtitle: 'Community\nparticipations',
+                onTap: onContributionsTap,
+              ),
             ),
-          ),
-          Container(width: 1, height: 60, color: const Color(0xFFE5D0D0).withValues(alpha: 0.6)),
+            const VerticalDivider(width: 1, color: Color(0xFFE5D0D0), thickness: 0.8, indent: 4, endIndent: 4),
 
-          // Column 3: Announcements
-          Expanded(
-            child: _buildActivityColumn(
-              icon: Icons.campaign_outlined,
-              iconBg: const Color(0xFFFFF4E8),
-              iconColor: const Color(0xFFE67E22),
-              title: 'Announcements',
-              subtitle: 'Official notices &\nimportant updates',
-              onTap: onAnnouncementsTap,
+            // Column 3: Announcements
+            Expanded(
+              child: _buildSymmetricalColumn(
+                icon: Icons.campaign_rounded,
+                iconBg: const Color(0xFFFFF4E8),
+                iconColor: const Color(0xFFE67E22),
+                badgeText: 'Notices',
+                title: 'Announcements',
+                subtitle: 'Official news\n& updates',
+                onTap: onAnnouncementsTap,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildActivityColumn({
+  Widget _buildSymmetricalColumn({
     required IconData icon,
     required Color iconBg,
     required Color iconColor,
+    required String badgeText,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Icon in rounded tile
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
             ),
-            child: Icon(icon, color: iconColor, size: 22),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF1E1615),
+            const SizedBox(height: 8),
+
+            // Title
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E1615),
+                  letterSpacing: -0.2,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 3),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF666666),
-              height: 1.2,
+            const SizedBox(height: 3),
+
+            // Subtitle
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF756A67),
+                height: 1.2,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

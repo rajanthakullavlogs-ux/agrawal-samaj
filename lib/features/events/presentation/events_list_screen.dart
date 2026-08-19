@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants.dart';
+import '../../../shared/models/event.dart';
 import '../../../shared/widgets/widgets.dart';
+import '../data/events_repository.dart';
 
 class _EventItem {
   final String id;
@@ -255,8 +257,44 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final riverpodEvents = ref.watch(eventsNotifierProvider);
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+    final staticIds = _events.map((e) => e.id).toSet();
+    final publishedItems = <_EventItem>[];
+
+    for (final e in riverpodEvents) {
+      if (!staticIds.contains(e.id)) {
+        final d = e.eventDate;
+        publishedItems.add(
+          _EventItem(
+            id: e.id,
+            month: monthNames[d.month - 1],
+            day: d.day.toString().padLeft(2, '0'),
+            year: d.year.toString(),
+            title: e.title,
+            subtitle: e.organizedBy ?? 'Agrawal Samaj Event',
+            time: e.eventTime ?? '05:00 PM – 9:00 PM',
+            location: e.venue ?? 'Kathmandu, Nepal',
+            organizer: e.organizedBy ?? 'Location Admin',
+            desc: e.description ?? 'Official event organized by Nepal Agrawal Samaj.',
+            imageUrl: e.posterUrl ?? 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+            isFeatured: true,
+            isBookmarked: false,
+            status: e.status,
+            category: e.category ?? 'Cultural',
+            province: 'Bagmati',
+            tags: [e.category ?? 'Event', 'Community'],
+            tagType: (e.category ?? 'cultural').toLowerCase(),
+          ),
+        );
+      }
+    }
+
+    final allEvents = [...publishedItems, ..._events];
+
     // Filter logic
-    final filteredEvents = _events.where((e) {
+    final filteredEvents = allEvents.where((e) {
       if (_selectedStatusFilter == 'Upcoming' && e.status != 'upcoming') return false;
       if (_selectedStatusFilter == 'Past' && e.status != 'past') return false;
       if (_selectedProvince != null && e.province != _selectedProvince) return false;

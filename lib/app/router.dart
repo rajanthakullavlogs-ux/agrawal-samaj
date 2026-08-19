@@ -28,6 +28,7 @@ import '../features/location_admin/dashboard/presentation/admin_dashboard_screen
 import '../features/location_admin/events_management/presentation/events_management_screen.dart';
 import '../features/location_admin/gallery_management/presentation/gallery_management_screen.dart';
 import '../features/location_admin/members/presentation/members_management_screen.dart';
+import '../features/location_admin/shared/branch_admin_shell_screen.dart';
 import '../features/super_admin/analytics/presentation/analytics_coming_soon_screen.dart';
 import '../features/super_admin/analytics/presentation/member_analytics_screen.dart';
 import '../features/super_admin/centralized_events_screen.dart';
@@ -191,26 +192,59 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const _UnauthorizedScreen(),
       ),
 
-      // ── Location Admin Routes ──────────────────────────────
-      GoRoute(
-        path: AppConstants.adminDashboard,
-        builder: (_, _) => const AdminDashboardScreen(),
-      ),
-      GoRoute(
-        path: AppConstants.adminMembers,
-        builder: (_, _) => const MembersManagementScreen(),
-      ),
-      GoRoute(
-        path: AppConstants.adminEvents,
-        builder: (_, _) => const EventsManagementScreen(),
-      ),
-      GoRoute(
-        path: AppConstants.adminGallery,
-        builder: (_, _) => const GalleryManagementScreen(),
-      ),
-      GoRoute(
-        path: AppConstants.adminSettings,
-        builder: (_, _) => const BranchSettingsScreen(),
+      // ── Location Admin Routes (StatefulShellRoute for Zero-Lag Tab Switching) ──
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return BranchAdminShellScreen(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppConstants.adminDashboard,
+                builder: (_, _) => const AdminDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppConstants.adminMembers,
+                builder: (_, state) {
+                  final filter = state.uri.queryParameters['filter'];
+                  return MembersManagementScreen(initialFilter: filter);
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppConstants.adminEvents,
+                builder: (_, state) {
+                  final filter = state.uri.queryParameters['filter'];
+                  return EventsManagementScreen(initialFilter: filter);
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppConstants.adminGallery,
+                builder: (_, _) => const GalleryManagementScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppConstants.adminSettings,
+                builder: (_, _) => const BranchSettingsScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
 
       // ── Super Admin Routes ─────────────────────────────────
