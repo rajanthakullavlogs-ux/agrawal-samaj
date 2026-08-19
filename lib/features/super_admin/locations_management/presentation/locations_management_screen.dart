@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,212 +6,45 @@ import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 
-/// C3 — Locations Management Screen (Super Admin)
-class LocationsManagementScreen extends StatefulWidget {
+class LocationsManagementScreen extends StatelessWidget {
   const LocationsManagementScreen({super.key});
 
   @override
-  State<LocationsManagementScreen> createState() => _LocationsManagementScreenState();
-}
-
-class _LocationsManagementScreenState extends State<LocationsManagementScreen> {
-  String _selectedProvince = 'All';
-  String _searchQuery = '';
-
-  static const _chaptersList = [
-    (
-      name: 'Kathmandu Central Chapter',
-      province: 'Bagmati',
-      leader: 'Shree Ram Agrawal',
-      members: 1248,
-      status: 'ACTIVE',
-    ),
-    (
-      name: 'Biratnagar Branch Chapter',
-      province: 'Koshi',
-      leader: 'Prakash Mittal',
-      members: 850,
-      status: 'ACTIVE',
-    ),
-    (
-      name: 'Pokhara Regional Chapter',
-      province: 'Gandaki',
-      leader: 'Suresh Goyal',
-      members: 620,
-      status: 'ACTIVE',
-    ),
-    (
-      name: 'Birgunj Border Chapter',
-      province: 'Madhesh',
-      leader: 'Ramesh Bansal',
-      members: 910,
-      status: 'ACTIVE',
-    ),
-    (
-      name: 'Butwal Industrial Chapter',
-      province: 'Lumbini',
-      leader: 'Anil Agrawal',
-      members: 540,
-      status: 'ACTIVE',
-    ),
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    final filtered = _chaptersList.where((c) {
-      final matchesProvince = _selectedProvince == 'All' || c.province == _selectedProvince;
-      final matchesQuery = _searchQuery.isEmpty ||
-          c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          c.leader.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesProvince && matchesQuery;
-    }).toList();
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(bottom: 20),
-          children: [
-            const _SuperAdminTopBar(),
-            const SizedBox(height: 14),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+          children: const [
+            _SuperAdminTopBar(),
+            SizedBox(height: 14),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: _HeroBanner(),
             ),
-            const SizedBox(height: 20),
-
-            // Stat Cards Grid
+            SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.6,
-                children: const [
-                  _MiniStat(
-                    title: 'Total Chapters',
-                    value: '18',
-                    icon: Icons.location_city_rounded,
-                    color: Color(0xFF2E6FE0),
-                    bg: Color(0xFFF3F8FE),
-                  ),
-                  _MiniStat(
-                    title: 'Provinces Covered',
-                    value: '7 of 7',
-                    icon: Icons.map_rounded,
-                    color: Color(0xFF3E7C4A),
-                    bg: Color(0xFFF2FAF4),
-                  ),
-                  _MiniStat(
-                    title: 'Chapter Heads',
-                    value: '18',
-                    icon: Icons.badge_rounded,
-                    color: Color(0xFFE8622C),
-                    bg: Color(0xFFFDF3ED),
-                  ),
-                  _MiniStat(
-                    title: 'New Requests',
-                    value: '3 Pending',
-                    icon: Icons.add_location_alt_rounded,
-                    color: Color(0xFFC4901E),
-                    bg: Color(0xFFFCF7EB),
-                  ),
-                ],
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _OverviewSection(),
             ),
-            const SizedBox(height: 20),
-
-            // Search Bar
+            SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                onChanged: (v) => setState(() => _searchQuery = v),
-                decoration: InputDecoration(
-                  hintText: 'Search chapter name or leader...',
-                  hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-                  prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 20),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-                  ),
-                ),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _BranchesUpdateOverview(),
             ),
-            const SizedBox(height: 12),
-
-            // Province Chips
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: ['All', 'Bagmati', 'Koshi', 'Gandaki', 'Madhesh', 'Lumbini'].map((prov) {
-                  final selected = _selectedProvince == prov;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InkWell(
-                      onTap: () => setState(() => _selectedProvince = prov),
-                      borderRadius: BorderRadius.circular(100),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: selected ? AppColors.primary : const Color(0xFFF0F0F0),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          prov,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                            color: selected ? Colors.white : AppColors.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // Chapters List
+            SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  for (final item in filtered) ...[
-                    _ChapterCard(item: item),
-                    const SizedBox(height: 10),
-                  ],
-                ],
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _BranchActivitySummary(),
+            ),
+            SizedBox(height: 24),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _BranchesNeedingAttention(),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Opening Add New Chapter Wizard...')),
-          );
-        },
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add_location_alt_rounded, color: Colors.white),
       ),
       bottomNavigationBar: const _SuperAdminBottomNavBar(activeIndex: 2),
     );
@@ -218,7 +52,7 @@ class _LocationsManagementScreenState extends State<LocationsManagementScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// TOP BAR WITH EXIT BUTTON
+// TOP BAR
 // ---------------------------------------------------------------------------
 class _SuperAdminTopBar extends StatelessWidget {
   const _SuperAdminTopBar();
@@ -230,21 +64,8 @@ class _SuperAdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const NasLogo(size: 38),
-          const SizedBox(width: 8),
+          const NasLogo(size: 40),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,30 +73,37 @@ class _SuperAdminTopBar extends StatelessWidget {
               children: [
                 const Text(
                   'Nepal Agrawal Samaj',
-                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   'Locations Management',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
-              child: Row(
-                children: const [
-                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
+          Stack(
+            children: [
+              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
+                ),
               ),
-            ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          const CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
           ),
         ],
       ),
@@ -291,36 +119,146 @@ class _HeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        children: [
-          Expanded(
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Branch Locations 🏙️',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Manage 18 regional branch chapters, assign chapter leaders, and review expansion requests.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'Locations Overview',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Monitor and oversee all branches\nacross Nepal.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
+        ),
+        Positioned(
+          bottom: -16,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: const Icon(Icons.location_city_rounded, color: AppColors.primary, size: 22),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// OVERVIEW SECTION
+// ---------------------------------------------------------------------------
+class _OverviewSection extends StatelessWidget {
+  const _OverviewSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Overview', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        const SizedBox(height: 12),
+        Row(
+          children: const [
+            Expanded(
+              child: _OverviewCard(
+                icon: Icons.account_balance_rounded,
+                value: '24',
+                label: 'Total Branches',
+                trend: '↑ 2 this month',
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _OverviewCard(
+                icon: Icons.location_on_rounded,
+                value: '77',
+                label: 'Districts Covered',
+                trend: '↑ 5 this month',
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _OverviewCard(
+                icon: Icons.groups_rounded,
+                value: '18',
+                label: 'Provinces Covered',
+                trend: '↑ 1 this month',
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _OverviewCard extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final String trend;
+
+  const _OverviewCard({required this.icon, required this.value, required this.label, required this.trend});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.location_city_rounded, color: AppColors.primary, size: 32),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 24),
           ),
+          const SizedBox(height: 16),
+          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary)),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(fontSize: 10, color: Colors.grey.shade800, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 12),
+          Text(trend, style: const TextStyle(fontSize: 9, color: AppColors.primary, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -328,92 +266,284 @@ class _HeroBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// MINI STAT
+// BRANCHES UPDATE OVERVIEW
 // ---------------------------------------------------------------------------
-class _MiniStat extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  final Color bg;
+class _BranchesUpdateOverview extends StatelessWidget {
+  const _BranchesUpdateOverview();
 
-  const _MiniStat({
-    required this.title,
-    required this.value,
-    required this.icon,
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Branches Update Overview', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 4,
+                child: SizedBox(
+                  height: 120,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      PieChart(
+                        PieChartData(
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 36,
+                          sections: [
+                            PieChartSectionData(color: AppColors.primary, value: 42, title: '', radius: 24),
+                            PieChartSectionData(color: AppColors.primary.withValues(alpha: 0.5), value: 33, title: '', radius: 24),
+                            PieChartSectionData(color: AppColors.primary.withValues(alpha: 0.2), value: 25, title: '', radius: 24),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('24', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                          Text('Total Branches', style: TextStyle(fontSize: 8, color: Colors.grey.shade700, fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 6,
+                child: Column(
+                  children: const [
+                    _UpdateLegendItem(
+                      color: AppColors.primary,
+                      title: 'Updated This Month',
+                      subtitle: '10 branches (42%)',
+                      pillText: '↑ 42%',
+                      pillColor: Color(0xFFE8F5E9),
+                      pillTextColor: Color(0xFF2E7D32),
+                    ),
+                    SizedBox(height: 12),
+                    _UpdateLegendItem(
+                      color: Color(0xFFB37373), // approximate AppColors.primary with 0.5 opacity
+                      title: 'No Update This Month',
+                      subtitle: '8 branches (33%)',
+                      pillText: '↓ 33%',
+                      pillColor: Color(0xFFFFF3E0),
+                      pillTextColor: Color(0xFFE65100),
+                    ),
+                    SizedBox(height: 12),
+                    _UpdateLegendItem(
+                      color: Color(0xFFE6D0D0), // approximate AppColors.primary with 0.2 opacity
+                      title: 'Not Updated for 2+ Months',
+                      subtitle: '6 branches (25%)',
+                      pillText: '↑ 25%',
+                      pillColor: Color(0xFFFFEBEE),
+                      pillTextColor: Color(0xFFC62828),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UpdateLegendItem extends StatelessWidget {
+  final Color color;
+  final String title;
+  final String subtitle;
+  final String pillText;
+  final Color pillColor;
+  final Color pillTextColor;
+
+  const _UpdateLegendItem({
     required this.color,
-    required this.bg,
+    required this.title,
+    required this.subtitle,
+    required this.pillText,
+    required this.pillColor,
+    required this.pillTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18),
+    return Row(
+      children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: TextStyle(fontSize: 9, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
-                Text(title, style: TextStyle(fontSize: 10, color: Colors.grey.shade700), overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(color: pillColor, borderRadius: BorderRadius.circular(100)),
+          child: Text(pillText, style: TextStyle(fontSize: 9, color: pillTextColor, fontWeight: FontWeight.w700)),
+        ),
+      ],
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// CHAPTER CARD
+// BRANCH ACTIVITY SUMMARY
 // ---------------------------------------------------------------------------
-class _ChapterCard extends StatelessWidget {
-  final dynamic item;
+class _BranchActivitySummary extends StatelessWidget {
+  const _BranchActivitySummary();
 
-  const _ChapterCard({required this.item});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Branch Activity Summary', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: const [
+              Expanded(child: _ActivityStat(icon: Icons.event_note_rounded, value: '156', label: 'Events Organized\n(This Month)')),
+              _VerticalDivider(),
+              Expanded(child: _ActivityStat(icon: Icons.photo_library_rounded, value: '2.4K', label: 'Photos Shared\n(This Month)')),
+              _VerticalDivider(),
+              Expanded(child: _ActivityStat(icon: Icons.campaign_rounded, value: '32', label: 'Notices Broadcast\n(This Month)')),
+              _VerticalDivider(),
+              Expanded(child: _ActivityStat(icon: Icons.person_add_alt_1_rounded, value: '325', label: 'New Members Added\n(This Month)')),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActivityStat extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+
+  const _ActivityStat({required this.icon, required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.08), shape: BoxShape.circle),
+          child: Icon(icon, color: AppColors.primary, size: 20),
+        ),
+        const SizedBox(height: 12),
+        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        const SizedBox(height: 4),
+        Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 8, color: Colors.grey.shade700, fontWeight: FontWeight.w500, height: 1.3)),
+      ],
+    );
+  }
+}
+
+class _VerticalDivider extends StatelessWidget {
+  const _VerticalDivider();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-        leading: CircleAvatar(
-          radius: 20,
-          backgroundColor: const Color(0xFFE3EEFD),
-          child: const Icon(Icons.location_city_rounded, color: Color(0xFF2E6FE0), size: 20),
+      width: 1,
+      height: 60,
+      color: Colors.grey.shade200,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// BRANCHES NEEDING ATTENTION
+// ---------------------------------------------------------------------------
+class _BranchesNeedingAttention extends StatelessWidget {
+  const _BranchesNeedingAttention();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Branches Needing Attention', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+            Row(
+              children: const [
+                Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+              ],
+            ),
+          ],
         ),
-        title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-        subtitle: Text('Leader: ${item.leader} • Province: ${item.province}',
-            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE8F5E9),
-            borderRadius: BorderRadius.circular(100),
+        const SizedBox(height: 16),
+        const _AttentionTile(title: 'Dolakha Branch', subtitle: 'No update for 65 days'),
+        const _AttentionTile(title: 'Rukum Branch', subtitle: 'No update for 48 days'),
+        const _AttentionTile(title: 'Bajhang Branch', subtitle: 'No update for 40 days'),
+      ],
+    );
+  }
+}
+
+class _AttentionTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _AttentionTile({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.08), shape: BoxShape.circle),
+            child: const Icon(Icons.account_balance_rounded, color: AppColors.primary, size: 20),
           ),
-          child: Text(
-            '${item.members} members',
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF3E7C4A)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+              ],
+            ),
           ),
-        ),
-      ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(color: const Color(0xFFFFEBEE), borderRadius: BorderRadius.circular(100)),
+            child: const Text('No Update', style: TextStyle(fontSize: 9, color: Color(0xFFC62828), fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right_rounded, color: AppColors.primary, size: 16),
+        ],
       ),
     );
   }

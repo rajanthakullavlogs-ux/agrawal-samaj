@@ -5,251 +5,49 @@ import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 
-/// C1 — Super Admin Strategic Dashboard Screen
 class SuperAdminDashboardScreen extends StatelessWidget {
   const SuperAdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFFCF9F9), // Match the very light background
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(bottom: 20),
-          children: [
-            const _SuperAdminTopBar(),
-            const SizedBox(height: 14),
-            const Padding(
+          padding: const EdgeInsets.only(bottom: 30),
+          children: const [
+            _SuperAdminTopBar(),
+            SizedBox(height: 16),
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: _HeroBanner(),
             ),
-            const SizedBox(height: 20),
-
-            // Nationwide Metric Cards Grid
+            SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 1.15,
-                children: const [
-                  _MetricCard(
-                    icon: Icons.location_city_rounded,
-                    iconBg: Color(0xFFDCEBFD),
-                    iconColor: Color(0xFF2E6FE0),
-                    cardBg: Color(0xFFF3F8FE),
-                    title: 'Active Chapters',
-                    value: '18',
-                    trend: '↗ 2 added this month',
-                    trendColor: Color(0xFF2E6FE0),
-                  ),
-                  _MetricCard(
-                    icon: Icons.groups_rounded,
-                    iconBg: Color(0xFFD8F0DE),
-                    iconColor: Color(0xFF3E7C4A),
-                    cardBg: Color(0xFFF2FAF4),
-                    title: 'Total Members',
-                    value: '5,200+',
-                    trend: '↗ +12% growth in 2026',
-                    trendColor: Color(0xFF3E7C4A),
-                  ),
-                  _MetricCard(
-                    icon: Icons.event_note_rounded,
-                    iconBg: Color(0xFFFBE0D2),
-                    iconColor: Color(0xFFE8622C),
-                    cardBg: Color(0xFFFDF3ED),
-                    title: 'Total Events',
-                    value: '130+',
-                    trend: '↗ 24 upcoming',
-                    trendColor: Color(0xFFE8622C),
-                  ),
-                  _MetricCard(
-                    icon: Icons.photo_library_rounded,
-                    iconBg: Color(0xFFFAE9C6),
-                    iconColor: Color(0xFFC4901E),
-                    cardBg: Color(0xFFFCF7EB),
-                    title: 'Media Vault',
-                    value: '12.8k',
-                    trend: '↗ 1.2 TB archived',
-                    trendColor: Color(0xFFC4901E),
-                  ),
-                ],
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _DatePicker(),
             ),
-            const SizedBox(height: 22),
-
-            // Quick Actions Strip
+            SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text('Quick Actions',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _MetricsRow(),
             ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 90,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _QuickActionTile(
-                    icon: Icons.add_location_alt_rounded,
-                    bg: const Color(0xFFE3EEFD),
-                    color: const Color(0xFF2E6FE0),
-                    label: 'Add New\nChapter',
-                    onTap: () => context.go(AppConstants.superAdminLocations),
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.event_available_rounded,
-                    bg: const Color(0xFFFBE0D2),
-                    color: const Color(0xFFE8622C),
-                    label: 'Create National\nEvent',
-                    onTap: () => context.go(AppConstants.superAdminEvents),
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.analytics_rounded,
-                    bg: const Color(0xFFE5F5E9),
-                    color: const Color(0xFF3E7C4A),
-                    label: 'Member\nAnalytics',
-                    onTap: () => context.go(AppConstants.superAdminAnalytics),
-                  ),
-                  const SizedBox(width: 10),
-                  _QuickActionTile(
-                    icon: Icons.admin_panel_settings_rounded,
-                    bg: const Color(0xFFEFE7FB),
-                    color: const Color(0xFF7B4FD6),
-                    label: 'System\nSettings',
-                    onTap: () => context.go(AppConstants.superAdminSettings),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 22),
-
-            // Management Modules Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Text('Executive Management Modules',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            ),
-            const SizedBox(height: 12),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  _moduleTile(
-                    context: context,
-                    icon: Icons.analytics_rounded,
-                    iconBg: const Color(0xFFE3EEFD),
-                    iconColor: const Color(0xFF2E6FE0),
-                    title: 'Member Analytics',
-                    subtitle: 'Demographic insights & growth trends across Nepal',
-                    route: AppConstants.superAdminAnalytics,
-                  ),
-                  const SizedBox(height: 10),
-                  _moduleTile(
-                    context: context,
-                    icon: Icons.location_city_rounded,
-                    iconBg: const Color(0xFFE5F5E9),
-                    iconColor: const Color(0xFF3E7C4A),
-                    title: 'Locations Management',
-                    subtitle: 'Manage 18 regional branch chapters & leaders',
-                    route: AppConstants.superAdminLocations,
-                  ),
-                  const SizedBox(height: 10),
-                  _moduleTile(
-                    context: context,
-                    icon: Icons.event_note_rounded,
-                    iconBg: const Color(0xFFFBE0D2),
-                    iconColor: const Color(0xFFE8622C),
-                    title: 'Centralized Events Overview',
-                    subtitle: 'Coordinate 130+ nationwide chapter events',
-                    route: AppConstants.superAdminEvents,
-                  ),
-                  const SizedBox(height: 10),
-                  _moduleTile(
-                    context: context,
-                    icon: Icons.photo_library_rounded,
-                    iconBg: const Color(0xFFEFE7FB),
-                    iconColor: const Color(0xFF7B4FD6),
-                    title: 'Centralized Media Vault',
-                    subtitle: 'National archive of cultural photos & media',
-                    route: AppConstants.superAdminGallery,
-                  ),
-                  const SizedBox(height: 10),
-                  _moduleTile(
-                    context: context,
-                    icon: Icons.settings_applications_rounded,
-                    iconBg: const Color(0xFFFAE9C6),
-                    iconColor: const Color(0xFFC4901E),
-                    title: 'Global System Settings',
-                    subtitle: 'Configure RBAC roles, security & admin permissions',
-                    route: AppConstants.superAdminSettings,
-                  ),
-                ],
-              ),
-            ),
+            SizedBox(height: 24),
+            _QuickActionsSection(),
+            SizedBox(height: 24),
+            _TopPerformingSection(),
+            SizedBox(height: 24),
+            _RecentActivitiesSection(),
           ],
         ),
       ),
       bottomNavigationBar: const _SuperAdminBottomNavBar(activeIndex: 0),
     );
   }
-
-  Widget _moduleTile({
-    required BuildContext context,
-    required IconData icon,
-    required Color iconBg,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required String route,
-  }) {
-    return InkWell(
-      onTap: () => context.go(route),
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textSecondary),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
-// TOP BAR WITH EXIT BUTTON
+// TOP BAR
 // ---------------------------------------------------------------------------
 class _SuperAdminTopBar extends StatelessWidget {
   const _SuperAdminTopBar();
@@ -257,56 +55,59 @@ class _SuperAdminTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const NasLogo(size: 38),
-          const SizedBox(width: 8),
+          const NasLogo(size: 46),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   'Nepal Agrawal Samaj',
-                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
-                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
-                  'Super Admin Board',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w600),
+                  'Super Admin Panel',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
-              child: Row(
-                children: const [
-                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
+              Positioned(
+                right: -2,
+                top: -2,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text(
+                    '8',
+                    style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-            ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          const CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
           ),
         ],
       ),
@@ -323,34 +124,33 @@ class _HeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Super Admin Portal 👑',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Strategic national command center overseeing 18 chapters and 5,200+ members across Nepal.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
-              ],
+          const Text(
+            'Welcome, Super Admin!',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.workspace_premium_rounded, color: AppColors.primary, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            'Oversee and empower every branch,\nstrengthen our community.',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.9),
+              height: 1.4,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -359,57 +159,30 @@ class _HeroBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// METRIC CARD
+// DATE PICKER
 // ---------------------------------------------------------------------------
-class _MetricCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconBg;
-  final Color iconColor;
-  final Color cardBg;
-  final String title;
-  final String value;
-  final String trend;
-  final Color trendColor;
-
-  const _MetricCard({
-    required this.icon,
-    required this.iconBg,
-    required this.iconColor,
-    required this.cardBg,
-    required this.title,
-    required this.value,
-    required this.trend,
-    required this.trendColor,
-  });
+class _DatePicker extends StatelessWidget {
+  const _DatePicker();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: cardBg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
         children: [
-          Container(
-            width: 30,
-            height: 30,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-            child: Icon(icon, size: 15, color: iconColor),
+          const Icon(Icons.calendar_today_rounded, color: AppColors.primary, size: 20),
+          const SizedBox(width: 12),
+          const Text(
+            'May 1 – May 31, 2025',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
-              Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            ],
-          ),
-          Text(
-            trend,
-            style: TextStyle(fontSize: 9.5, color: trendColor, fontWeight: FontWeight.w600),
-            overflow: TextOverflow.ellipsis,
-          ),
+          const Spacer(),
+          const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
         ],
       ),
     );
@@ -417,49 +190,372 @@ class _MetricCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// QUICK ACTION TILE
+// METRICS ROW
 // ---------------------------------------------------------------------------
-class _QuickActionTile extends StatelessWidget {
+class _MetricsRow extends StatelessWidget {
+  const _MetricsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: const [
+            Expanded(child: _MetricItem(icon: Icons.account_balance_rounded, number: '24', title: 'Total Branches')),
+            SizedBox(width: 12),
+            Expanded(child: _MetricItem(icon: Icons.people_alt_rounded, number: '48', title: 'Branch Admins')),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: const [
+            Expanded(child: _MetricItem(icon: Icons.group_rounded, number: '12.4K', title: 'Total Members')),
+            SizedBox(width: 12),
+            Expanded(child: _MetricItem(icon: Icons.event_available_rounded, number: '156', title: 'Events Organized')),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricItem extends StatelessWidget {
   final IconData icon;
-  final Color bg;
-  final Color color;
+  final String number;
+  final String title;
+
+  const _MetricItem({required this.icon, required this.number, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(number, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary)),
+          const SizedBox(height: 2),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// QUICK ACTIONS
+// ---------------------------------------------------------------------------
+class _QuickActionsSection extends StatelessWidget {
+  const _QuickActionsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Expanded(child: _QuickActionItem(icon: Icons.account_balance_rounded, label: 'Manage\nBranches', onTap: () => context.go(AppConstants.superAdminLocations))),
+              const SizedBox(width: 8),
+              Expanded(child: _QuickActionItem(icon: Icons.person_rounded, label: 'Manage\nAdmins', onTap: () => context.go(AppConstants.superAdminSettings))),
+              const SizedBox(width: 8),
+              Expanded(child: _QuickActionItem(icon: Icons.assessment_rounded, label: 'View\nReports', onTap: () => context.go(AppConstants.superAdminAnalytics))),
+              const SizedBox(width: 8),
+              Expanded(child: _QuickActionItem(icon: Icons.campaign_rounded, label: 'Broadcast\nNotice', onTap: () {})),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickActionItem extends StatelessWidget {
+  final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _QuickActionTile({
-    required this.icon,
-    required this.bg,
-    required this.color,
-    required this.label,
-    required this.onTap,
-  });
+  const _QuickActionItem({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 4),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-          ],
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 24),
+          const SizedBox(height: 8),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black87)),
+        ],
+      ),
+    ));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TOP PERFORMING BRANCHES (CHART)
+// ---------------------------------------------------------------------------
+class _TopPerformingSection extends StatelessWidget {
+  const _TopPerformingSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Top Performing Branches', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: const [
+                    Text('By Events', style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                    SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.primary),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: SizedBox(
+            height: 180,
+            child: Stack(
+              children: [
+                // Y-axis grid lines
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(5, (index) {
+                    return Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          child: Text(
+                            '${(4 - index) * 10}',
+                            style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: Colors.grey.shade200,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+                // Bars
+                Positioned.fill(
+                  left: 28,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _Bar(value: 32, max: 40, label: 'Kathmandu\nBranch'),
+                      _Bar(value: 24, max: 40, label: 'Pokhara\nBranch'),
+                      _Bar(value: 18, max: 40, label: 'Chitwan\nBranch'),
+                      _Bar(value: 14, max: 40, label: 'Butwal\nBranch'),
+                      _Bar(value: 10, max: 40, label: 'Biratnagar\nBranch'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Bar extends StatelessWidget {
+  final double value;
+  final double max;
+  final String label;
+
+  const _Bar({required this.value, required this.max, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    // 160 is the height of the chart area roughly
+    final height = (value / max) * 135;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text(value.toInt().toString(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primary)),
+        const SizedBox(height: 4),
+        Container(
+          width: 40,
+          height: height,
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w500, height: 1.2),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// RECENT ACTIVITIES
+// ---------------------------------------------------------------------------
+class _RecentActivitiesSection extends StatelessWidget {
+  const _RecentActivitiesSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('Recent Activities', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+              Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: const [
+              _ActivityItem(
+                icon: Icons.event_available_rounded,
+                title: 'New event "Women Leadership Workshop"',
+                subtitle: 'by Kathmandu Branch',
+                time: '2h ago',
+              ),
+              SizedBox(height: 12),
+              _ActivityItem(
+                icon: Icons.group_add_rounded,
+                title: '25 new members joined',
+                subtitle: 'from Pokhara Branch',
+                time: '5h ago',
+              ),
+              SizedBox(height: 12),
+              _ActivityItem(
+                icon: Icons.photo_library_rounded,
+                title: 'Pokhara Branch added 36 new photos',
+                subtitle: 'to album "Teej Festival 2025"',
+                time: '1d ago',
+              ),
+              SizedBox(height: 12),
+              _ActivityItem(
+                icon: Icons.campaign_rounded,
+                title: 'Notice broadcasted by Biratnagar Branch',
+                subtitle: 'on "Blood Donation Camp"',
+                time: '2d ago',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActivityItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String time;
+
+  const _ActivityItem({required this.icon, required this.title, required this.subtitle, required this.time});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(time, style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// SUPER ADMIN BOTTOM NAV: Dashboard • Analytics • Locations • Events • Settings
+// BOTTOM NAV BAR
 // ---------------------------------------------------------------------------
 class _SuperAdminBottomNavBar extends StatelessWidget {
   final int activeIndex;

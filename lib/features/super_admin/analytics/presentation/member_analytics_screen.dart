@@ -6,7 +6,6 @@ import '../../../../core/constants.dart';
 import '../../../../core/design_tokens.dart';
 import '../../../../shared/widgets/nas_logo.dart';
 
-/// C2 — Member Distribution Analytics Screen (Super Admin)
 class MemberAnalyticsScreen extends StatelessWidget {
   const MemberAnalyticsScreen({super.key});
 
@@ -21,149 +20,28 @@ class MemberAnalyticsScreen extends StatelessWidget {
             const _SuperAdminTopBar(),
             const SizedBox(height: 14),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: _HeroBanner(),
             ),
-            const SizedBox(height: 20),
-
-            // Stat Cards Grid
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 1.2,
-                children: const [
-                  _MiniStat(
-                    title: 'TOTAL MEMBERS',
-                    value: '12,842',
-                    icon: Icons.groups_rounded,
-                    color: Color(0xFF2E6FE0),
-                    bg: Color(0xFFF3F8FE),
-                  ),
-                  _MiniStat(
-                    title: 'NEW REGISTRATIONS',
-                    value: '+432',
-                    icon: Icons.person_add_rounded,
-                    color: Color(0xFF3E7C4A),
-                    bg: Color(0xFFF2FAF4),
-                  ),
-                  _MiniStat(
-                    title: 'PROVINCES',
-                    value: '7',
-                    icon: Icons.map_rounded,
-                    color: Color(0xFFE8622C),
-                    bg: Color(0xFFFDF3ED),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _MetricsRow(),
             ),
-            const SizedBox(height: 20),
-
-            // Date range filter card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_month_rounded, size: 20, color: AppColors.primary),
-                    const SizedBox(width: 8),
-                    const Text('Date Range:', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text('01/01/2026 to 31/12/2026',
-                          style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700)),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-                      ),
-                      child: const Text('Apply', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _MembersByBranch(),
             ),
-            const SizedBox(height: 20),
-
-            // Chart Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Members by Province',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                    const SizedBox(height: 4),
-                    Text('Distribution of registered Agrawal members across Nepal\'s 7 provinces',
-                        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600)),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      height: 200,
-                      child: BarChart(
-                        BarChartData(
-                          alignment: BarChartAlignment.spaceAround,
-                          maxY: 5000,
-                          barTouchData: BarTouchData(enabled: false),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (val, meta) {
-                                  const titles = ['Bagmati', 'Koshi', 'Lumbini', 'Madhesh', 'Gandaki', 'Sudurp.', 'Karnali'];
-                                  final idx = val.toInt();
-                                  if (idx >= 0 && idx < titles.length) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Text(titles[idx], style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                            ),
-                            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          ),
-                          borderData: FlBorderData(show: false),
-                          gridData: const FlGridData(show: false),
-                          barGroups: [
-                            _makeGroup(0, 4850, const Color(0xFF570000)),
-                            _makeGroup(1, 2400, const Color(0xFF795900)),
-                            _makeGroup(2, 1850, const Color(0xFF2E6FE0)),
-                            _makeGroup(3, 1620, const Color(0xFF3E7C4A)),
-                            _makeGroup(4, 1100, const Color(0xFFE8622C)),
-                            _makeGroup(5, 620, const Color(0xFF7B4FD6)),
-                            _makeGroup(6, 400, Colors.grey),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _MemberDemographics(),
+            ),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _RecentMembers(),
             ),
           ],
         ),
@@ -171,24 +49,10 @@ class MemberAnalyticsScreen extends StatelessWidget {
       bottomNavigationBar: const _SuperAdminBottomNavBar(activeIndex: 1),
     );
   }
-
-  BarChartGroupData _makeGroup(int x, double y, Color color) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: y,
-          color: color,
-          width: 20,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-        ),
-      ],
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
-// TOP BAR WITH EXIT BUTTON
+// TOP BAR
 // ---------------------------------------------------------------------------
 class _SuperAdminTopBar extends StatelessWidget {
   const _SuperAdminTopBar();
@@ -200,21 +64,8 @@ class _SuperAdminTopBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.home_rounded, size: 22, color: AppColors.primary),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const NasLogo(size: 38),
-          const SizedBox(width: 8),
+          const NasLogo(size: 40),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,30 +73,37 @@ class _SuperAdminTopBar extends StatelessWidget {
               children: [
                 const Text(
                   'Nepal Agrawal Samaj',
-                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 14),
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'Member Analytics',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 11.5, fontWeight: FontWeight.w500),
+                  'Members Management',
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => context.go(AppConstants.home),
-            borderRadius: BorderRadius.circular(100),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
-              child: Row(
-                children: const [
-                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                  SizedBox(width: 2),
-                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
-                ],
+          Stack(
+            children: [
+              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
+                ),
               ),
-            ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          const CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
           ),
         ],
       ),
@@ -261,35 +119,134 @@ class _HeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Members Overview',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Manage and connect with members\nacross all branches.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -16,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: const Icon(Icons.people_alt_rounded, color: AppColors.primary, size: 22),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// METRICS ROW
+// ---------------------------------------------------------------------------
+class _MetricsRow extends StatelessWidget {
+  const _MetricsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(
+          child: _MetricCard(
+            icon: Icons.groups_rounded,
+            value: '12.4K',
+            label: 'Total Members',
+            trend: '↑ 8% this month',
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: _MetricCard(
+            icon: Icons.person_add_alt_1_rounded,
+            value: '325',
+            label: 'New Members',
+            trend: '↑ 12% this month',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricCard extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final String trend;
+
+  const _MetricCard({required this.icon, required this.value, required this.label, required this.trend});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
         children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 28),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Member Analytics 📊',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Demographic distribution, provincial growth trends, and community growth metrics across Nepal.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+                Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                const SizedBox(height: 2),
+                Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 6),
+                Text(trend, style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600)),
               ],
             ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.analytics_rounded, color: AppColors.primary, size: 32),
           ),
         ],
       ),
@@ -298,37 +255,400 @@ class _HeroBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// MINI STAT
+// MEMBERS BY BRANCH
 // ---------------------------------------------------------------------------
-class _MiniStat extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  final Color bg;
-
-  const _MiniStat({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-    required this.bg,
-  });
+class _MembersByBranch extends StatelessWidget {
+  const _MembersByBranch();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
-          Text(title,
-              style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Members by Branch', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+              Row(
+                children: const [
+                  Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                  Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _BranchBar(name: 'Kathmandu Branch', value: 2850, maxValue: 3000),
+          const SizedBox(height: 16),
+          _BranchBar(name: 'Pokhara Branch', value: 1980, maxValue: 3000),
+          const SizedBox(height: 16),
+          _BranchBar(name: 'Chitwan Branch', value: 1620, maxValue: 3000),
+          const SizedBox(height: 16),
+          _BranchBar(name: 'Butwal Branch', value: 1250, maxValue: 3000),
+          const SizedBox(height: 16),
+          _BranchBar(name: 'Biratnagar Branch', value: 950, maxValue: 3000),
+          const SizedBox(height: 16),
+          
+          // X-Axis labels
+          Row(
+            children: [
+              const SizedBox(width: 100), // Match label width
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('0', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                    Text('1K', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                    Text('2K', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                    Text('3K', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 40), // Match trailing value width
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BranchBar extends StatelessWidget {
+  final String name;
+  final int value;
+  final int maxValue;
+
+  const _BranchBar({required this.name, required this.value, required this.maxValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(name, style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w500)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double percent = value / maxValue;
+              return Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  Container(
+                    height: 8,
+                    width: constraints.maxWidth * percent,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 32,
+          child: Text(value.toString(), style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// MEMBER DEMOGRAPHICS
+// ---------------------------------------------------------------------------
+class _MemberDemographics extends StatelessWidget {
+  const _MemberDemographics();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Member Demographics', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+            Row(
+              children: const [
+                Text('View Report', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gender Distribution
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Gender Distribution', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 110,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                PieChart(
+                                  PieChartData(
+                                    sectionsSpace: 0,
+                                    centerSpaceRadius: 28,
+                                    sections: [
+                                      PieChartSectionData(color: AppColors.primary, value: 60, title: '', radius: 12),
+                                      PieChartSectionData(color: AppColors.primary.withValues(alpha: 0.6), value: 38, title: '', radius: 12),
+                                      PieChartSectionData(color: AppColors.primary.withValues(alpha: 0.2), value: 2, title: '', radius: 12),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text('12.4K', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                                    Text('Total', style: TextStyle(fontSize: 9, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                _LegendItem(color: AppColors.primary, label: 'Male', val1: '7,460', val2: '60%'),
+                                SizedBox(height: 8),
+                                _LegendItem(color: Color(0xFFB37373), label: 'Female', val1: '4,680', val2: '38%'),
+                                SizedBox(height: 8),
+                                _LegendItem(color: Color(0xFFE6D0D0), label: 'Others', val1: '260', val2: '2%'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Age Group
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Age Group', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                    const SizedBox(height: 16),
+                    _AgeBar(label: '18 - 30', val1: '2,860', val2: '(23%)', percent: 0.23),
+                    const SizedBox(height: 12),
+                    _AgeBar(label: '31 - 45', val1: '5,120', val2: '(41%)', percent: 0.41),
+                    const SizedBox(height: 12),
+                    _AgeBar(label: '46 - 60', val1: '3,450', val2: '(28%)', percent: 0.28),
+                    const SizedBox(height: 12),
+                    _AgeBar(label: '60+', val1: '970', val2: '(8%)', percent: 0.08),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final Color color;
+  final String label;
+  final String val1;
+  final String val2;
+
+  const _LegendItem({required this.color, required this.label, required this.val1, required this.val2});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            const SizedBox(width: 4),
+            Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primary)),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Text('$val1 ($val2)', style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w500)),
+        ),
+      ],
+    );
+  }
+}
+
+class _AgeBar extends StatelessWidget {
+  final String label;
+  final String val1;
+  final String val2;
+  final double percent;
+
+  const _AgeBar({required this.label, required this.val1, required this.val2, required this.percent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 40,
+          child: Text(label, style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+        ),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                children: [
+                  Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  Container(
+                    height: 6,
+                    width: constraints.maxWidth * (percent / 0.45), // Scale relative to max 41%
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 50,
+          child: Text('$val1 $val2', style: TextStyle(fontSize: 8, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+        ),
+      ],
+    );
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// RECENT MEMBERS
+// ---------------------------------------------------------------------------
+class _RecentMembers extends StatelessWidget {
+  const _RecentMembers();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Recent Members', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+            Row(
+              children: const [
+                Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _MemberTile(name: 'Aman Agrawal', email: 'aman.agrawal@email.com', branch: 'Kathmandu Branch', time: '2h ago'),
+        _MemberTile(name: 'Pooja Agrawal', email: 'pooja.agrawal@email.com', branch: 'Pokhara Branch', time: '5h ago'),
+        _MemberTile(name: 'Rohit Agrawal', email: 'rohit.agrawal@email.com', branch: 'Chitwan Branch', time: '1d ago'),
+        _MemberTile(name: 'Neha Agrawal', email: 'neha.agrawal@email.com', branch: 'Butwal Branch', time: '2d ago'),
+      ],
+    );
+  }
+}
+
+class _MemberTile extends StatelessWidget {
+  final String name;
+  final String email;
+  final String branch;
+  final String time;
+
+  const _MemberTile({required this.name, required this.email, required this.branch, required this.time});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            child: const Icon(Icons.person_rounded, color: AppColors.primary, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                const SizedBox(height: 2),
+                Text(email, style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(branch, style: TextStyle(fontSize: 10, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(time, style: TextStyle(fontSize: 9, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+            ],
+          ),
         ],
       ),
     );
@@ -344,9 +664,9 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.superAdminDashboard),
-    (icon: Icons.analytics_rounded, label: 'Analytics', route: AppConstants.superAdminAnalytics),
-    (icon: Icons.location_city_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
-    (icon: Icons.event_note_rounded, label: 'Events', route: AppConstants.superAdminEvents),
+    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
+    (icon: Icons.location_on_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
+    (icon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.superAdminEvents),
     (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.superAdminSettings),
   ];
 
