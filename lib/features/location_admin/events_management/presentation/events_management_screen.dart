@@ -1288,27 +1288,49 @@ void _showBroadcastModal(BuildContext context) {
           Text('Broadcast Event Notice', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
         ],
       ),
-      content: TextField(
-        controller: messageController,
-        maxLines: 3,
-        decoration: InputDecoration(
-          hintText: 'Type announcement message to send to all registered attendees...',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: messageController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Type announcement message to send to all registered attendees...',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Announcement broadcasted to 1,240 attendees via SMS & App Notification!')),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                    child: const Text('Send'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(ctx);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Announcement broadcasted to 1,240 attendees via SMS & App Notification!')),
-            );
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-          child: const Text('Send Broadcast'),
-        ),
-      ],
     ),
   );
 }

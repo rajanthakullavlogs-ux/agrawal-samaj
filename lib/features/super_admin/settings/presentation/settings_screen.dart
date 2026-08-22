@@ -311,7 +311,7 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.superAdminDashboard),
-    (icon: Icons.analytics_rounded, label: 'Analytics', route: AppConstants.superAdminAnalytics),
+    (icon: Icons.people_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
     (icon: Icons.location_city_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
     (icon: Icons.event_note_rounded, label: 'Events', route: AppConstants.superAdminEvents),
     (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.superAdminSettings),

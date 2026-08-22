@@ -83,31 +83,20 @@ class _SuperAdminTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
-              Positioned(
-                right: -2,
-                top: -2,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '8',
-                    style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                  ),
-                ),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          const CircleAvatar(
-            radius: 18,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+            ),
           ),
         ],
       ),
@@ -282,7 +271,7 @@ class _QuickActionsSection extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(child: _QuickActionItem(icon: Icons.assessment_rounded, label: 'View\nReports', onTap: () => context.go(AppConstants.superAdminAnalytics))),
               const SizedBox(width: 8),
-              Expanded(child: _QuickActionItem(icon: Icons.campaign_rounded, label: 'Broadcast\nNotice', onTap: () {})),
+              Expanded(child: _QuickActionItem(icon: Icons.campaign_rounded, label: 'Broadcast\nNotice', onTap: () => _showBroadcastModal(context))),
             ],
           ),
         ),
@@ -563,7 +552,7 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.superAdminDashboard),
-    (icon: Icons.analytics_rounded, label: 'Analytics', route: AppConstants.superAdminAnalytics),
+    (icon: Icons.people_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
     (icon: Icons.location_city_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
     (icon: Icons.event_note_rounded, label: 'Events', route: AppConstants.superAdminEvents),
     (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.superAdminSettings),
@@ -620,4 +609,64 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showBroadcastModal(BuildContext context) {
+  final messageController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: Row(
+        children: const [
+          Icon(Icons.campaign_rounded, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text('Broadcast Notice', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: messageController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Type announcement message to broadcast to all branches...',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Notice broadcasted successfully to all branches!')),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                    child: const Text('Send'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
 }

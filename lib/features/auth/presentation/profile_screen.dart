@@ -209,27 +209,50 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // ── Admin Quick Action ───────────────────
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () => context.push(AppConstants.adminDashboard),
-                icon: const Icon(Icons.admin_panel_settings_rounded, size: 20),
-                label: const Text(
-                  'Open Branch Admin Panel',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF700D15),
-                  foregroundColor: Colors.white,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          if (profile.isSuperAdmin)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push(AppConstants.superAdminDashboard),
+                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 20, color: Color(0xFFE5C158)),
+                  label: const Text(
+                    'Open Super Admin Panel',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF500913),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
                 ),
               ),
             ),
-          ),
+          if (profile.isLocationAdmin && !profile.isSuperAdmin)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push(AppConstants.adminDashboard),
+                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 20),
+                  label: const Text(
+                    'Open Branch Admin Panel',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF700D15),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+            ),
 
           // ── My Information ─────────────────────────────────
           const Text('My Information', style: AppText.h2),

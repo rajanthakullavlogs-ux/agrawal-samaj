@@ -83,27 +83,20 @@ class _SuperAdminTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Stack(
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
-              Positioned(
-                right: 2,
-                top: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text('8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
-                ),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          const CircleAvatar(
-            radius: 18,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+            ),
           ),
         ],
       ),
@@ -401,6 +394,7 @@ class _MemberDemographics extends StatelessWidget {
             // Gender Distribution
             Expanded(
               child: Container(
+                height: 180,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -468,6 +462,7 @@ class _MemberDemographics extends StatelessWidget {
             // Age Group
             Expanded(
               child: Container(
+                height: 180,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -476,15 +471,12 @@ class _MemberDemographics extends StatelessWidget {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Age Group', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                    const SizedBox(height: 16),
                     _AgeBar(label: '18 - 30', val1: '2,860', val2: '(23%)', percent: 0.23),
-                    const SizedBox(height: 12),
                     _AgeBar(label: '31 - 45', val1: '5,120', val2: '(41%)', percent: 0.41),
-                    const SizedBox(height: 12),
                     _AgeBar(label: '46 - 60', val1: '3,450', val2: '(28%)', percent: 0.28),
-                    const SizedBox(height: 12),
                     _AgeBar(label: '60+', val1: '970', val2: '(8%)', percent: 0.08),
                   ],
                 ),
@@ -664,7 +656,7 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.superAdminDashboard),
-    (icon: Icons.people_alt_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
+    (icon: Icons.people_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
     (icon: Icons.location_on_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
     (icon: Icons.calendar_today_rounded, label: 'Events', route: AppConstants.superAdminEvents),
     (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.superAdminSettings),

@@ -45,34 +45,7 @@ class AboutScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // Open Branch Admin Panel Shortcut Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () => context.push(AppConstants.adminDashboard),
-                  icon: const Icon(Icons.admin_panel_settings_rounded, size: 22, color: Color(0xFFE5C158)),
-                  label: const Text(
-                    'Open Branch Admin Panel',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF500913),
-                    foregroundColor: Colors.white,
-                    elevation: 3,
-                    shadowColor: const Color(0xFF500913).withValues(alpha: 0.3),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
+
 
             // "My Activity" Section Header & 3-Column Card
             const Padding(

@@ -78,27 +78,20 @@ class _SuperAdminTopBar extends StatelessWidget {
               ],
             ),
           ),
-          Stack(
-            children: [
-              const Icon(Icons.notifications_none_rounded, size: 28, color: Colors.black87),
-              Positioned(
-                right: 2,
-                top: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text('8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
-                ),
+          InkWell(
+            onTap: () => context.go(AppConstants.home),
+            borderRadius: BorderRadius.circular(100),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(100)),
+              child: Row(
+                children: const [
+                  Text('Exit', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  SizedBox(width: 2),
+                  Icon(Icons.logout_rounded, size: 12, color: Colors.white),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          const CircleAvatar(
-            radius: 18,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
+            ),
           ),
         ],
       ),
@@ -564,7 +557,7 @@ class _SuperAdminBottomNavBar extends StatelessWidget {
 
   static const _items = [
     (icon: Icons.dashboard_rounded, label: 'Dashboard', route: AppConstants.superAdminDashboard),
-    (icon: Icons.analytics_rounded, label: 'Analytics', route: AppConstants.superAdminAnalytics),
+    (icon: Icons.people_rounded, label: 'Members', route: AppConstants.superAdminAnalytics),
     (icon: Icons.location_city_rounded, label: 'Locations', route: AppConstants.superAdminLocations),
     (icon: Icons.event_note_rounded, label: 'Events', route: AppConstants.superAdminEvents),
     (icon: Icons.settings_rounded, label: 'Settings', route: AppConstants.superAdminSettings),

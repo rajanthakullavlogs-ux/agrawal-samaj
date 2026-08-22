@@ -250,23 +250,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Super Admin Routes ─────────────────────────────────
       GoRoute(
         path: AppConstants.superAdminDashboard,
-        builder: (_, _) => const SuperAdminDashboardScreen(),
+        pageBuilder: (_, state) {
+          final isReverse = _superAdminLastTabIndex > 0;
+          _superAdminLastTabIndex = 0;
+          return _superAdminTransitionPage(const SuperAdminDashboardScreen(), isReverse: isReverse, key: state.pageKey);
+        },
       ),
       GoRoute(
         path: AppConstants.superAdminAnalytics,
-        builder: (_, _) => const MemberAnalyticsScreen(),
+        pageBuilder: (_, state) {
+          final isReverse = _superAdminLastTabIndex > 1;
+          _superAdminLastTabIndex = 1;
+          return _superAdminTransitionPage(const MemberAnalyticsScreen(), isReverse: isReverse, key: state.pageKey);
+        },
       ),
       GoRoute(
         path: AppConstants.superAdminLocations,
-        builder: (_, _) => const LocationsManagementScreen(),
+        pageBuilder: (_, state) {
+          final isReverse = _superAdminLastTabIndex > 2;
+          _superAdminLastTabIndex = 2;
+          return _superAdminTransitionPage(const LocationsManagementScreen(), isReverse: isReverse, key: state.pageKey);
+        },
       ),
       GoRoute(
         path: AppConstants.superAdminEvents,
-        builder: (_, _) => const CentralizedEventsScreen(),
+        pageBuilder: (_, state) {
+          final isReverse = _superAdminLastTabIndex > 3;
+          _superAdminLastTabIndex = 3;
+          return _superAdminTransitionPage(const CentralizedEventsScreen(), isReverse: isReverse, key: state.pageKey);
+        },
       ),
       GoRoute(
         path: AppConstants.superAdminGallery,
-        builder: (_, _) => const CentralizedGalleryScreen(),
+        builder: (_, _) => const CentralizedGalleryScreen(), // This is not in the standard nav bar flow requested by user. Let's keep it as is.
       ),
       GoRoute(
         path: AppConstants.superAdminComingSoon,
@@ -274,11 +290,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppConstants.superAdminSettings,
-        builder: (_, _) => const SettingsScreen(),
+        pageBuilder: (_, state) {
+          final isReverse = _superAdminLastTabIndex > 4;
+          _superAdminLastTabIndex = 4;
+          return _superAdminTransitionPage(const SettingsScreen(), isReverse: isReverse, key: state.pageKey);
+        },
       ),
     ],
   );
 });
+
+int _superAdminLastTabIndex = 0;
+
+CustomTransitionPage<void> _superAdminTransitionPage(Widget child, {required bool isReverse, LocalKey? key}) {
+  return CustomTransitionPage<void>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 250),
+    reverseTransitionDuration: const Duration(milliseconds: 250),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final beginOffset = isReverse ? const Offset(-1.0, 0.0) : const Offset(1.0, 0.0);
+      final offsetTween = Tween<Offset>(
+        begin: beginOffset,
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeInOut));
+      return SlideTransition(
+        position: animation.drive(offsetTween),
+        child: child,
+      );
+    },
+  );
+}
 
 /// Slide-from-right on push, slide-from-left on pop — natural page transitions.
 CustomTransitionPage<void> _slideTransitionPage(Widget child) {
