@@ -54,6 +54,7 @@ class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
   }
 
   void _saveSettings() {
+    FocusScope.of(context).unfocus();
     final updated = BranchSettingsModel(
       branchName: _branchNameController.text,
       mission: _missionController.text,
@@ -66,8 +67,136 @@ class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
     );
     ref.read(branchSettingsNotifierProvider.notifier).updateSettings(updated);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Branch settings saved & synced successfully!')),
+    _showSaveSuccessModal(context);
+  }
+
+  void _showSaveSuccessModal(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogCtx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon Badge with Soft Emerald Glow
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F5E9),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFA5D6A7), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withValues(alpha: 0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF2E7D32),
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Title
+              const Text(
+                'Settings Saved!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF500913),
+                  letterSpacing: -0.3,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                'Branch details and leadership profile have been successfully updated & synced.',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Colors.grey.shade700,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+
+              // Saved Summary Box
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F6F0),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFEFE8E5)),
+                ),
+                child: Column(
+                  children: [
+                    _summaryRow(Icons.storefront_rounded, 'Branch', _branchNameController.text),
+                    const Divider(height: 16, color: Color(0xFFEFE8E5)),
+                    _summaryRow(Icons.phone_rounded, 'Contact', _phoneController.text),
+                    const Divider(height: 16, color: Color(0xFFEFE8E5)),
+                    _summaryRow(Icons.person_rounded, 'Leader', _leaderNameController.text),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 22),
+
+              // Done Button
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(dialogCtx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF500913),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                  ),
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.3),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _summaryRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 15, color: const Color(0xFFE8622C)),
+        const SizedBox(width: 8),
+        Text(
+          '$label:',
+          style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value.isEmpty ? 'Not set' : value,
+            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF500913)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
     );
   }
 
@@ -75,10 +204,14 @@ class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 20),
-          children: [
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: SafeArea(
+          child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.only(bottom: 20),
+            children: [
             const _AdminTopBar(),
             const SizedBox(height: 14),
             const Padding(
@@ -224,8 +357,9 @@ class _BranchSettingsScreenState extends ConsumerState<BranchSettingsScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _inputField(String label, TextEditingController controller, {int maxLines = 1}) {
     return Column(

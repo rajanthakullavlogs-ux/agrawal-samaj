@@ -145,53 +145,7 @@ class _HeaderSection extends StatelessWidget {
                   // Notification Bell & Profile Buttons
                   Row(
                     children: [
-                      // Bell Button with Red Badge "3"
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          InkWell(
-                            onTap: onBellTap,
-                            borderRadius: BorderRadius.circular(18),
-                            child: Container(
-                              width: 34,
-                              height: 34,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.notifications_none_rounded,
-                                color: Color(0xFF500913),
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: -1,
-                            right: -1,
-                            child: Container(
-                              padding: const EdgeInsets.all(2.5),
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFE53935),
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 14,
-                                minHeight: 14,
-                              ),
-                              child: const Text(
-                                '3',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      NASNotificationButton(onTap: onBellTap),
                       const SizedBox(width: 8),
 
                       // Profile Button
@@ -609,6 +563,7 @@ class _UpcomingEventsSection extends StatelessWidget {
 
   static const _events = [
     (
+      id: 'ev-guru',
       title: 'Guru Purnima Satsang',
       dateMonth: 'MAY',
       dateDay: '25',
@@ -617,6 +572,7 @@ class _UpcomingEventsSection extends StatelessWidget {
       imageUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=600&q=80',
     ),
     (
+      id: 'ev-3',
       title: 'Blood Donation Camp',
       dateMonth: 'JUN',
       dateDay: '08',
@@ -625,6 +581,7 @@ class _UpcomingEventsSection extends StatelessWidget {
       imageUrl: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=600&q=80',
     ),
     (
+      id: 'ev-youth',
       title: 'Youth Entrepreneurship Seminar',
       dateMonth: 'JUN',
       dateDay: '22',
@@ -711,160 +668,163 @@ class _UpcomingEventsSection extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 12),
                 child: SizedBox(
                   width: 160,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Event Image + Date Badge Overlay
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                              child: SizedBox(
-                                height: 96,
-                                width: double.infinity,
-                                child: CachedNetworkImage(
-                                  imageUrl: ev.imageUrl,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(color: const Color(0xFFF0F0F0)),
-                                  errorWidget: (context, url, error) => Container(
-                                    color: const Color(0xFFE5D5D5),
-                                    child: const Icon(Icons.event, color: Color(0xFF700D15)),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // Date Badge Overlay (Top-Left)
-                            Positioned(
-                              top: 6,
-                              left: 6,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xEE221B1C),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      ev.dateMonth,
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 8.5,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                    Text(
-                                      ev.dateDay,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.05,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Card Details Body
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                  child: GestureDetector(
+                    onTap: () => context.push('/events/${ev.id}'),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Event Image + Date Badge Overlay
+                          Stack(
                             children: [
-                              Text(
-                                ev.title,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E1615),
-                                  height: 1.2,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(Icons.access_time_outlined, size: 11, color: Color(0xFF8C7A75)),
-                                  const SizedBox(width: 3),
-                                  Expanded(
-                                    child: Text(
-                                      ev.time,
-                                      style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Row(
-                                children: [
-                                  const Icon(Icons.location_on_outlined, size: 11, color: Color(0xFF8C7A75)),
-                                  const SizedBox(width: 3),
-                                  Expanded(
-                                    child: Text(
-                                      ev.location,
-                                      style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // View Details Pill Button
-                              GestureDetector(
-                                onTap: () => context.go(AppConstants.events),
-                                child: Container(
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                child: SizedBox(
+                                  height: 96,
                                   width: double.infinity,
-                                  height: 26,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFDEAEA),
-                                    borderRadius: BorderRadius.circular(13),
+                                  child: CachedNetworkImage(
+                                    imageUrl: ev.imageUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(color: const Color(0xFFF0F0F0)),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: const Color(0xFFE5D5D5),
+                                      child: const Icon(Icons.event, color: Color(0xFF700D15)),
+                                    ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
+                                ),
+                              ),
+
+                              // Date Badge Overlay (Top-Left)
+                              Positioned(
+                                top: 6,
+                                left: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xEE221B1C),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
                                       Text(
-                                        'View Details',
-                                        style: TextStyle(
-                                          color: Color(0xFF700D15),
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w700,
+                                        ev.dateMonth,
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.3,
                                         ),
                                       ),
-                                      SizedBox(width: 3),
-                                      Icon(Icons.arrow_forward_rounded, size: 11, color: Color(0xFF700D15)),
+                                      Text(
+                                        ev.dateDay,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          height: 1.05,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+
+                          // Card Details Body
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  ev.title,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF1E1615),
+                                    height: 1.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.access_time_outlined, size: 11, color: Color(0xFF8C7A75)),
+                                    const SizedBox(width: 3),
+                                    Expanded(
+                                      child: Text(
+                                        ev.time,
+                                        style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on_outlined, size: 11, color: Color(0xFF8C7A75)),
+                                    const SizedBox(width: 3),
+                                    Expanded(
+                                      child: Text(
+                                        ev.location,
+                                        style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // View Details Pill Button
+                                GestureDetector(
+                                  onTap: () => context.push('/events/${ev.id}'),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 26,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFDEAEA),
+                                      borderRadius: BorderRadius.circular(13),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        Text(
+                                          'View Details',
+                                          style: TextStyle(
+                                            color: Color(0xFF700D15),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        SizedBox(width: 3),
+                                        Icon(Icons.arrow_forward_rounded, size: 11, color: Color(0xFF700D15)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -910,24 +870,44 @@ class _FromOurCommunitySection extends StatelessWidget {
 
   static const _items = [
     (
+      id: 'com-1',
       title: 'Mahila Sashaktikaran Program',
+      category: 'Social Service',
+      date: 'May 18, 2026',
+      location: 'Kathmandu Chapter',
       timeAgo: '2d ago',
-      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=500&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80',
+      description: 'An empowering workshop organized by the Women Wing focusing on financial independence, leadership development, and digital skills for community women.',
     ),
     (
-      title: 'Tree Plantation Drive',
+      id: 'com-2',
+      title: 'Tree Plantation & Environmental Drive',
+      category: 'Social Service',
+      date: 'May 15, 2026',
+      location: 'Lalitpur Green Belt',
       timeAgo: '5d ago',
-      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=500&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+      description: 'Over 500 saplings planted across public spaces in Lalitpur by Youth Wing volunteers as part of our green community environmental initiative.',
     ),
     (
+      id: 'com-3',
       title: 'Business Networking Meet',
+      category: 'Business',
+      date: 'May 10, 2026',
+      location: 'Hotel Radisson, Kathmandu',
       timeAgo: '1w ago',
-      imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=500&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
+      description: 'Exclusive networking evening bringing together Agrawal business owners, startup founders, and industry leaders to build strategic partnerships.',
     ),
     (
-      title: 'Teej Celebration',
+      id: 'com-4',
+      title: 'Teej Festival Cultural Celebration',
+      category: 'Cultural',
+      date: 'May 02, 2026',
+      location: 'Samaj Bhawan, Kathmandu',
       timeAgo: '2w ago',
-      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
+      description: 'Vibrant Teej celebrations with traditional music, folk dance performances, feast, and cultural honoring of community elders.',
     ),
   ];
 
@@ -1003,63 +983,81 @@ class _FromOurCommunitySection extends StatelessWidget {
             itemCount: _items.length,
             itemBuilder: (context, i) {
               final item = _items[i];
-              return Container(
-                width: 155,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+              return GestureDetector(
+                onTap: () {
+                  showPhotoViewerModal(
+                    context,
+                    PhotoViewerItem(
+                      id: item.id,
+                      title: item.title,
+                      imageUrl: item.imageUrl,
+                      category: item.category,
+                      date: item.date,
+                      location: item.location,
+                      description: item.description,
+                      actionLabel: 'View Full Gallery',
+                      onActionTap: () => context.push(AppConstants.gallery),
                     ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-                      child: SizedBox(
-                        height: 95,
-                        width: double.infinity,
-                        child: CachedNetworkImage(
-                          imageUrl: item.imageUrl,
-                          fit: BoxFit.cover,
+                  );
+                },
+                child: Container(
+                  width: 155,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                        child: SizedBox(
+                          height: 95,
+                          width: double.infinity,
+                          child: CachedNetworkImage(
+                            imageUrl: item.imageUrl,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(9),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.title,
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1E1615),
-                              height: 1.25,
+                      Padding(
+                        padding: const EdgeInsets.all(9),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.title,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E1615),
+                                height: 1.25,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.timeAgo,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFF9E9E9E),
-                              fontWeight: FontWeight.w500,
+                            const SizedBox(height: 4),
+                            Text(
+                              item.timeAgo,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF9E9E9E),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
@@ -1068,6 +1066,7 @@ class _FromOurCommunitySection extends StatelessWidget {
       ],
     );
   }
+
 }
 
 // ---------------------------------------------------------------------------

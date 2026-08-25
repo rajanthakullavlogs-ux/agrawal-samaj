@@ -27,13 +27,10 @@ class AboutScreen extends ConsumerWidget {
                   context.go(AppConstants.home);
                 }
               },
-              onNotification: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notifications opened')),
-                );
-              },
+              onNotification: () => context.push(AppConstants.notifications),
               onProfile: () => context.push(AppConstants.profile),
             ),
+
             const SizedBox(height: 16),
 
             // Samaj Header Banner Card
@@ -228,36 +225,7 @@ class _MoreTopBar extends StatelessWidget {
           // Right Actions: Notification Bell + Profile Circle
           Row(
             children: [
-              GestureDetector(
-                onTap: onNotification,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF0EAE8),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.notifications_outlined, color: Color(0xFF500913), size: 20),
-                    ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE53935),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              NASNotificationButton(onTap: onNotification),
               const SizedBox(width: 8),
               InkWell(
                 onTap: onProfile,

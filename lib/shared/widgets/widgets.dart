@@ -10,4 +10,5 @@ export 'nas_form_fields.dart';
 export 'nas_layout.dart';
 export 'nas_navigation.dart';
 export 'nas_logo.dart';
+export 'photo_viewer_modal.dart';
 

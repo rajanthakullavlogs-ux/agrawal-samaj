@@ -10,13 +10,23 @@ class _HighlightPhoto {
   final String id;
   final String url;
   final String title;
+  final String category;
+  final String date;
+  final String location;
+  final String description;
   final int photoCount;
+  final String? eventId;
 
   const _HighlightPhoto({
     required this.id,
     required this.url,
     required this.title,
+    required this.category,
+    required this.date,
+    required this.location,
+    required this.description,
     required this.photoCount,
+    this.eventId,
   });
 }
 
@@ -52,20 +62,34 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
     id: 'p-1',
     url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
     title: 'Annual Business Summit Keynote Audience',
+    category: 'Business',
+    date: 'Nov 15, 2026',
+    location: 'Hotel Yak & Yeti, Kathmandu',
+    description: 'Keynote speech session bringing together over 500 business leaders, corporate executives, and young entrepreneurs to discuss trade innovation and economic expansion.',
     photoCount: 24,
+    eventId: 'ev-2',
   );
 
   static const _HighlightPhoto _midTopPhoto = _HighlightPhoto(
     id: 'p-2',
     url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
     title: 'Nepali Traditional Harmonium Performance',
+    category: 'Cultural',
+    date: 'Oct 24, 2026',
+    location: 'Samaj Bhawan, Kamaladi',
+    description: 'Enchanting musical performance during Maharaja Agrasen Jayanti, featuring classical Harmonium, Bhajans, and traditional songs by renowned community artists.',
     photoCount: 18,
+    eventId: 'ev-1',
   );
 
   static const _HighlightPhoto _midBottomPhoto = _HighlightPhoto(
     id: 'p-3',
     url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
     title: 'Youth Tree Plantation Social Service',
+    category: 'Social Service',
+    date: 'Sep 10, 2026',
+    location: 'Lalitpur Heritage Park',
+    description: 'Youth Wing members actively participating in a green environment drive, planting over 300 native tree saplings across municipal gardens.',
     photoCount: 16,
   );
 
@@ -73,14 +97,24 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
     id: 'p-4',
     url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
     title: 'Teej Festival Temple Dance Group',
+    category: 'Cultural',
+    date: 'Aug 18, 2026',
+    location: 'Biratnagar Community Grounds',
+    description: 'Celebratory Teej festival group dance performance organized by Koshi Regional Chapter, showcasing rich cultural heritage and vibrant community spirit.',
     photoCount: 32,
+    eventId: 'ev-4',
   );
 
   static const _HighlightPhoto _rightBottomPhoto = _HighlightPhoto(
     id: 'p-5',
     url: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=800&q=80',
     title: 'Mega Blood Donation Drive Volunteers',
+    category: 'Health',
+    date: 'Jul 22, 2026',
+    location: 'Birgunj Chapter Grounds',
+    description: 'Blood donation camp organized in association with Red Cross Society, collecting over 180 units of blood from selfless community volunteers.',
     photoCount: 20,
+    eventId: 'ev-3',
   );
 
   static const List<_AlbumItem> _albums = [
@@ -386,57 +420,28 @@ class _GalleryListScreenState extends ConsumerState<GalleryListScreen> {
   }
 
   void _showZoomableLightbox(BuildContext context, _HighlightPhoto photo) {
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: const EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      photo.title,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white),
-                    onPressed: () => Navigator.pop(dialogCtx),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: Container(
-                constraints: const BoxConstraints(maxHeight: 450),
-                child: InteractiveViewer(
-                  minScale: 1.0,
-                  maxScale: 4.0,
-                  child: CachedNetworkImage(
-                    imageUrl: photo.url,
-                    fit: BoxFit.contain,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF700D15)),
-                    ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.broken_image_rounded, size: 64, color: Colors.white54),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+    showPhotoViewerModal(
+      context,
+      PhotoViewerItem(
+        id: photo.id,
+        title: photo.title,
+        imageUrl: photo.url,
+        category: photo.category,
+        date: photo.date,
+        location: photo.location,
+        description: photo.description,
+        actionLabel: photo.eventId != null ? 'View Event Details' : 'View All Photos',
+        onActionTap: () {
+          if (photo.eventId != null) {
+            context.push('/events/${photo.eventId}');
+          } else {
+            context.push(AppConstants.allPhotos);
+          }
+        },
       ),
     );
   }
+
 }
 
 // ---------------------------------------------------------------------------
@@ -485,19 +490,26 @@ class _GalleryHeroSection extends StatelessWidget {
                   letterSpacing: -0.3,
                 ),
               ),
-              InkWell(
-                onTap: onProfile,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+              Row(
+                children: [
+                  const NASNotificationButton(),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: onProfile,
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
+                    ),
                   ),
-                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
-                ),
+                ],
               ),
+
             ],
           ),
           const SizedBox(height: 20),

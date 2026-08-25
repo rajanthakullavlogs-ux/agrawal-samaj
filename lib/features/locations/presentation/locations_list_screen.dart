@@ -134,22 +134,30 @@ class _LocationsListScreenState extends ConsumerState<LocationsListScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: InkWell(
-                onTap: () => context.push('/profile'),
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const NASNotificationButton(),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () => context.push('/profile'),
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
+                    ),
                   ),
-                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
-                ),
+                ],
               ),
             ),
           ),
         ],
+
       ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),

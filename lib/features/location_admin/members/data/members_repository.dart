@@ -8,6 +8,7 @@ class MemberItem {
   final String name;
   final String status; // ACTIVE, PENDING, INACTIVE
   final String memberType; // Lifetime Member, Standard Member, Trustee Member
+  final String category; // 'General', 'Women Leader', 'Young Woman'
   final String location;
   final String phone;
   final String email;
@@ -19,6 +20,7 @@ class MemberItem {
     required this.name,
     required this.status,
     required this.memberType,
+    this.category = 'General',
     required this.location,
     required this.phone,
     required this.email,
@@ -31,6 +33,7 @@ class MemberItem {
     String? name,
     String? status,
     String? memberType,
+    String? category,
     String? location,
     String? phone,
     String? email,
@@ -42,6 +45,7 @@ class MemberItem {
       name: name ?? this.name,
       status: status ?? this.status,
       memberType: memberType ?? this.memberType,
+      category: category ?? this.category,
       location: location ?? this.location,
       phone: phone ?? this.phone,
       email: email ?? this.email,
@@ -53,11 +57,18 @@ class MemberItem {
   factory MemberItem.fromJson(Map<String, dynamic> json) {
     final status = (json['membership_status'] ?? 'pending').toString().toUpperCase();
     final type = (json['membership_type'] ?? 'normal').toString() == 'business' ? 'Trustee Member' : 'Lifetime Member';
+    final category = (json['role'] ?? '').toString().contains('women')
+        ? 'Women Leader'
+        : (json['role'] ?? '').toString().contains('youth')
+            ? 'Young Woman'
+            : 'General';
+
     return MemberItem(
       id: json['id']?.toString().substring(0, 8) ?? 'NAS-${json['hashCode']}',
       name: json['full_name'] ?? 'Agrawal Member',
       status: status,
       memberType: type,
+      category: category,
       location: json['address'] ?? 'Kathmandu',
       phone: json['phone'] ?? '+977-98510XXXXX',
       email: json['email'] ?? 'member@agrawal.org',
@@ -78,6 +89,7 @@ class MembersNotifier extends StateNotifier<List<MemberItem>> {
       name: 'Rahul Agrawal',
       status: 'ACTIVE',
       memberType: 'Lifetime Member',
+      category: 'General',
       location: 'Kathmandu',
       phone: '+977-98510XXXXX',
       email: 'rahul@agrawal.org',
@@ -89,6 +101,7 @@ class MembersNotifier extends StateNotifier<List<MemberItem>> {
       name: 'Sneha Mittal',
       status: 'PENDING',
       memberType: 'Standard Member',
+      category: 'Young Woman',
       location: 'Kathmandu',
       phone: '+977-98412XXXXX',
       email: 'sneha.m@gmail.com',
@@ -97,23 +110,25 @@ class MembersNotifier extends StateNotifier<List<MemberItem>> {
     ),
     MemberItem(
       id: 'NAS-1205',
-      name: 'Deepak Goyal',
+      name: 'Sunita Agrawal',
       status: 'ACTIVE',
       memberType: 'Trustee Member',
+      category: 'Women Leader',
       location: 'Kathmandu',
       phone: '+977-98011XXXXX',
-      email: 'deepak.goyal@nabil.com',
-      avatarBg: Color(0xFFE5F5E9),
-      avatarColor: Color(0xFF3E7C4A),
+      email: 'sunita.agrawal@nabil.com',
+      avatarBg: Color(0xFFFBECEE),
+      avatarColor: Color(0xFF9E4348),
     ),
     MemberItem(
       id: 'NAS-5510',
-      name: 'Vikram Bansal',
-      status: 'INACTIVE',
+      name: 'Ananya Garg',
+      status: 'ACTIVE',
       memberType: 'Standard Member',
+      category: 'Young Woman',
       location: 'Kathmandu',
       phone: '+977-98600XXXXX',
-      email: 'vikram.bansal@gmail.com',
+      email: 'ananya.garg@gmail.com',
       avatarBg: Color(0xFFEFE7FB),
       avatarColor: Color(0xFF7B4FD6),
     ),
@@ -122,6 +137,7 @@ class MembersNotifier extends StateNotifier<List<MemberItem>> {
       name: 'Pooja Agrawal',
       status: 'PENDING',
       memberType: 'Lifetime Member',
+      category: 'Women Leader',
       location: 'Kathmandu',
       phone: '+977-98130XXXXX',
       email: 'pooja.a@agrawal.org',

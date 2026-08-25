@@ -17,7 +17,7 @@ class MembersManagementScreen extends ConsumerStatefulWidget {
   ConsumerState<MembersManagementScreen> createState() => _MembersManagementScreenState();
 }
 
-enum _MemberFilter { all, active, pending, inactive, lifetime }
+enum _MemberFilter { all, pending, womenLeaders, youngWomens }
 
 class _MembersManagementScreenState extends ConsumerState<MembersManagementScreen> {
   late _MemberFilter _filter;
@@ -29,17 +29,45 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
   @override
   void initState() {
     super.initState();
-    if (widget.initialFilter == 'ACTIVE') {
-      _filter = _MemberFilter.active;
-    } else if (widget.initialFilter == 'PENDING') {
+    if (widget.initialFilter == 'PENDING') {
       _filter = _MemberFilter.pending;
-    } else if (widget.initialFilter == 'LIFETIME') {
-      _filter = _MemberFilter.lifetime;
+    } else if (widget.initialFilter == 'WOMEN') {
+      _filter = _MemberFilter.womenLeaders;
+    } else if (widget.initialFilter == 'YOUTH') {
+      _filter = _MemberFilter.youngWomens;
     } else {
       _filter = _MemberFilter.all;
     }
 
     if (widget.initialFilter != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            240.0,
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeOutCubic,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant MembersManagementScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialFilter != null) {
+      setState(() {
+        if (widget.initialFilter == 'PENDING') {
+          _filter = _MemberFilter.pending;
+        } else if (widget.initialFilter == 'WOMEN') {
+          _filter = _MemberFilter.womenLeaders;
+        } else if (widget.initialFilter == 'YOUTH') {
+          _filter = _MemberFilter.youngWomens;
+        } else {
+          _filter = _MemberFilter.all;
+        }
+        _currentPage = 1;
+      });
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
@@ -72,20 +100,19 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
       switch (_filter) {
         case _MemberFilter.all:
           return m.status != 'PENDING';
-        case _MemberFilter.active:
-          return m.status == 'ACTIVE';
         case _MemberFilter.pending:
           return m.status == 'PENDING';
-        case _MemberFilter.inactive:
-          return m.status == 'INACTIVE';
-        case _MemberFilter.lifetime:
-          return m.status != 'PENDING' && m.memberType.contains('Lifetime');
+        case _MemberFilter.womenLeaders:
+          return m.category == 'Women Leader';
+        case _MemberFilter.youngWomens:
+          return m.category == 'Young Woman';
       }
     }).toList();
 
     final officialCount = membersList.where((m) => m.status != 'PENDING').length;
-    final activeCount = membersList.where((m) => m.status == 'ACTIVE').length;
     final pendingCount = membersList.where((m) => m.status == 'PENDING').length;
+    final womenLeadersCount = membersList.where((m) => m.category == 'Women Leader').length;
+    final youngWomensCount = membersList.where((m) => m.category == 'Young Woman').length;
 
     final totalItems = filtered.length;
     final totalPages = (totalItems / _itemsPerPage).ceil().clamp(1, 9999);
@@ -99,7 +126,7 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
       body: SafeArea(
         child: ListView(
           controller: _scrollController,
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 12),
           children: [
             const _AdminTopBar(),
             const SizedBox(height: 14),
@@ -109,13 +136,14 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
             ),
             const SizedBox(height: 20),
 
-            // Summary metrics grid
+            // 4 Summary Metrics Grid: Total Members, Pending Requests, Women Leaders, Young Womens
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
                   Row(
                     children: [
+                      // 1. Total Members
                       Expanded(
                         child: _MetricCard(
                           icon: Icons.people_alt_rounded,
@@ -124,17 +152,29 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                           cardBg: const Color(0xFFF3F8FE),
                           title: 'Total Members',
                           value: '$officialCount',
+                          isSelected: _filter == _MemberFilter.all,
+                          onTap: () => setState(() {
+                            _filter = _MemberFilter.all;
+                            _currentPage = 1;
+                          }),
                         ),
                       ),
                       const SizedBox(width: 12),
+
+                      // 2. Pending Requests
                       Expanded(
                         child: _MetricCard(
-                          icon: Icons.person_rounded,
-                          iconBg: const Color(0xFFFBE0D2),
-                          iconColor: const Color(0xFFE8622C),
-                          cardBg: const Color(0xFFFDF3ED),
-                          title: 'Active Members',
-                          value: '$activeCount',
+                          icon: Icons.person_add_alt_1_rounded,
+                          iconBg: const Color(0xFFFFF3DC),
+                          iconColor: const Color(0xFFD97706),
+                          cardBg: const Color(0xFFFFFBEB),
+                          title: 'Pending Requests',
+                          value: '$pendingCount',
+                          isSelected: _filter == _MemberFilter.pending,
+                          onTap: () => setState(() {
+                            _filter = _MemberFilter.pending;
+                            _currentPage = 1;
+                          }),
                         ),
                       ),
                     ],
@@ -142,25 +182,38 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                   const SizedBox(height: 12),
                   Row(
                     children: [
+                      // 3. Women Leaders
                       Expanded(
                         child: _MetricCard(
-                          icon: Icons.workspace_premium_rounded,
+                          icon: Icons.female_rounded,
                           iconBg: const Color(0xFFFBECEE),
                           iconColor: const Color(0xFF9E4348),
                           cardBg: const Color(0xFFFDF3F4),
-                          title: 'Lifetime Members',
-                          value: '${membersList.where((m) => m.status != 'PENDING' && (m.memberType.contains('Lifetime') || m.memberType.contains('Trustee'))).length}',
+                          title: 'Women Leaders',
+                          value: '$womenLeadersCount',
+                          isSelected: _filter == _MemberFilter.womenLeaders,
+                          onTap: () => setState(() {
+                            _filter = _MemberFilter.womenLeaders;
+                            _currentPage = 1;
+                          }),
                         ),
                       ),
                       const SizedBox(width: 12),
+
+                      // 4. Young Womens
                       Expanded(
                         child: _MetricCard(
-                          icon: Icons.person_add_alt_1_rounded,
-                          iconBg: const Color(0xFFD8F0DE),
-                          iconColor: const Color(0xFF3E7C4A),
-                          cardBg: const Color(0xFFF2FAF4),
-                          title: 'Pending Requests',
-                          value: '$pendingCount',
+                          icon: Icons.face_3_rounded,
+                          iconBg: const Color(0xFFEFE7FB),
+                          iconColor: const Color(0xFF7B4FD6),
+                          cardBg: const Color(0xFFF8F5FE),
+                          title: 'Young Womens',
+                          value: '$youngWomensCount',
+                          isSelected: _filter == _MemberFilter.youngWomens,
+                          onTap: () => setState(() {
+                            _filter = _MemberFilter.youngWomens;
+                            _currentPage = 1;
+                          }),
                         ),
                       ),
                     ],
@@ -219,9 +272,9 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                     elevation: 6,
                     itemBuilder: (context) => [
                       _buildMemberFilterMenuItem(_MemberFilter.all, 'All Members ($officialCount)', Icons.people_alt_rounded, AppColors.primary),
-                      _buildMemberFilterMenuItem(_MemberFilter.pending, 'Pending Requests ($pendingCount)', Icons.how_to_reg_rounded, const Color(0xFFD97706)),
-                      _buildMemberFilterMenuItem(_MemberFilter.active, 'Active Members ($activeCount)', Icons.check_circle_rounded, const Color(0xFF16A34A)),
-                      _buildMemberFilterMenuItem(_MemberFilter.lifetime, 'Lifetime Members', Icons.workspace_premium_rounded, const Color(0xFF81161B)),
+                      _buildMemberFilterMenuItem(_MemberFilter.pending, 'Pending Requests ($pendingCount)', Icons.person_add_alt_1_rounded, const Color(0xFFD97706)),
+                      _buildMemberFilterMenuItem(_MemberFilter.womenLeaders, 'Women Leaders ($womenLeadersCount)', Icons.female_rounded, const Color(0xFF9E4348)),
+                      _buildMemberFilterMenuItem(_MemberFilter.youngWomens, 'Young Womens ($youngWomensCount)', Icons.face_3_rounded, const Color(0xFF7B4FD6)),
                     ],
                     child: Container(
                       height: 44,
@@ -244,16 +297,10 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.filter_list_rounded,
-                            size: 18,
-                            color: _filter == _MemberFilter.pending ? const Color(0xFFD97706) : AppColors.primary,
-                          ),
-                          const SizedBox(width: 6),
                           Text(
                             _memberFilterLabel(_filter, pendingCount),
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w700,
                               color: _filter == _MemberFilter.pending ? const Color(0xFFD97706) : AppColors.primary,
                             ),
@@ -268,6 +315,7 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),
@@ -281,8 +329,15 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                 children: [
                   RichText(
                     text: TextSpan(
-                      text: _filter == _MemberFilter.pending ? 'Pending Applications ' : 'Members ',
+                      text: _filter == _MemberFilter.pending
+                          ? 'Pending Applications '
+                          : _filter == _MemberFilter.womenLeaders
+                              ? 'Women Leaders '
+                              : _filter == _MemberFilter.youngWomens
+                                  ? 'Young Womens '
+                                  : 'Members ',
                       style: const TextStyle(
+
                         fontFamily: 'PlayfairDisplay',
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -364,91 +419,98 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
                 ],
               ),
             ),
-            // Dynamic Interactive Pagination Footer
+            // Dynamic Centered Professional Pagination Control Footer
             if (totalItems > 0) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const SizedBox(height: 6),
+              Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: const Color(0xFFF1E3DF)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Showing ${totalItems == 0 ? 0 : startIndex + 1}-$endIndex of $totalItems',
-                        style: TextStyle(fontSize: 11.5, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                      // Previous Page Arrow
+                      InkWell(
+                        onTap: currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: currentPage > 1 ? const Color(0xFFF5EBE8) : const Color(0xFFFAFAFA),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.chevron_left_rounded,
+                            size: 17,
+                            color: currentPage > 1 ? const Color(0xFF500913) : Colors.grey.shade300,
+                          ),
+                        ),
                       ),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: currentPage > 1 ? () => setState(() => _currentPage--) : null,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: currentPage > 1 ? const Color(0xFFF5EBE8) : Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.chevron_left_rounded,
-                                size: 18,
-                                color: currentPage > 1 ? const Color(0xFF500913) : Colors.grey.shade400,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          for (int p = 1; p <= totalPages; p++) ...[
-                            InkWell(
-                              onTap: () => setState(() => _currentPage = p),
+                      const SizedBox(width: 6),
+
+                      // Page Numbers
+                      for (int p = 1; p <= totalPages; p++) ...[
+                        InkWell(
+                          onTap: () => setState(() => _currentPage = p),
+                          borderRadius: BorderRadius.circular(8),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: currentPage == p ? const Color(0xFF500913) : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: currentPage == p ? const Color(0xFF500913) : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '$p',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: currentPage == p ? FontWeight.w800 : FontWeight.w600,
-                                    color: currentPage == p ? Colors.white : Colors.grey.shade700,
-                                  ),
-                                ),
-                              ),
                             ),
-                            if (p != totalPages) const SizedBox(width: 4),
-                          ],
-                          const SizedBox(width: 6),
-                          InkWell(
-                            onTap: currentPage < totalPages ? () => setState(() => _currentPage++) : null,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: currentPage < totalPages ? const Color(0xFFF5EBE8) : Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.chevron_right_rounded,
-                                size: 18,
-                                color: currentPage < totalPages ? const Color(0xFF500913) : Colors.grey.shade400,
+                            child: Text(
+                              '$p',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: currentPage == p ? FontWeight.w900 : FontWeight.w600,
+                                color: currentPage == p ? Colors.white : const Color(0xFF500913),
                               ),
                             ),
                           ),
-                        ],
+                        ),
+                        if (p != totalPages) const SizedBox(width: 3),
+                      ],
+                      const SizedBox(width: 6),
+
+                      // Next Page Arrow
+                      InkWell(
+                        onTap: currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: currentPage < totalPages ? const Color(0xFFF5EBE8) : const Color(0xFFFAFAFA),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.chevron_right_rounded,
+                            size: 17,
+                            color: currentPage < totalPages ? const Color(0xFF500913) : Colors.grey.shade300,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ],
-            const SizedBox(height: 30),
+
+            const SizedBox(height: 12),
+
           ],
         ),
       ),
@@ -461,14 +523,13 @@ class _MembersManagementScreenState extends ConsumerState<MembersManagementScree
         return 'All';
       case _MemberFilter.pending:
         return 'Pending ($pendingCount)';
-      case _MemberFilter.active:
-        return 'Active';
-      case _MemberFilter.inactive:
-        return 'Inactive';
-      case _MemberFilter.lifetime:
-        return 'Lifetime';
+      case _MemberFilter.womenLeaders:
+        return 'Women Leaders';
+      case _MemberFilter.youngWomens:
+        return 'Young Womens';
     }
   }
+
 
   PopupMenuItem<_MemberFilter> _buildMemberFilterMenuItem(_MemberFilter val, String label, IconData icon, Color color) {
     final isSelected = _filter == val;
@@ -1171,6 +1232,8 @@ class _MetricCard extends StatelessWidget {
   final Color iconBg;
   final Color iconColor;
   final Color cardBg;
+  final VoidCallback? onTap;
+  final bool isSelected;
 
   const _MetricCard({
     required this.title,
@@ -1179,60 +1242,81 @@ class _MetricCard extends StatelessWidget {
     required this.iconBg,
     required this.iconColor,
     required this.cardBg,
+    this.onTap,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 68,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: const Color(0xFFF1E3DF)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        height: 68,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? cardBg : Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(
+            color: isSelected ? iconColor : const Color(0xFFF1E3DF),
+            width: isSelected ? 1.5 : 1.0,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-            child: Icon(icon, size: 15, color: iconColor),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary, height: 1.0),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 10.5, color: Colors.grey.shade700, fontWeight: FontWeight.w600, height: 1.1),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: isSelected ? iconColor.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.02),
+              blurRadius: isSelected ? 8 : 6,
+              offset: const Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+              child: Icon(icon, size: 15, color: iconColor),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: isSelected ? iconColor : AppColors.primary,
+                      height: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: isSelected ? iconColor : Colors.grey.shade700,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      height: 1.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
 
 
 // ---------------------------------------------------------------------------

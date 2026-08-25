@@ -159,7 +159,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFF3F8FE),
                           title: 'Total Members',
                           value: '$totalMembers',
-                          onTap: () => context.go('${AppConstants.adminMembers}?filter=ALL'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -171,7 +170,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFF2FAF4),
                           title: 'Active Members',
                           value: '$activeMembers',
-                          onTap: () => context.go('${AppConstants.adminMembers}?filter=ACTIVE'),
                         ),
                       ),
                     ],
@@ -187,7 +185,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFFDF3ED),
                           title: 'Upcoming Events',
                           value: '$upcomingEventsCount',
-                          onTap: () => context.go('${AppConstants.adminEvents}?filter=UPCOMING'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -199,7 +196,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           cardBg: const Color(0xFFFCF7EB),
                           title: 'Past Events',
                           value: '$pastEventsCount',
-                          onTap: () => context.go('${AppConstants.adminEvents}?filter=PAST'),
                         ),
                       ),
                     ],
@@ -257,7 +253,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     bg: const Color(0xFFFDEEEF),
                     iconColor: const Color(0xFF500913),
                     label: 'Approve\nMembers',
-                    onTap: () => context.go(AppConstants.adminMembers),
+                    onTap: () => context.go('${AppConstants.adminMembers}?filter=PENDING'),
                   ),
                   const SizedBox(width: 10),
                   _ActionTile(
@@ -838,54 +834,55 @@ class _PendingApprovalsBanner extends ConsumerWidget {
     final members = ref.watch(membersNotifierProvider);
     final pendingCount = members.where((m) => m.status == 'PENDING').length;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: AppColors.maroonGradient,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.groups_2_rounded, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
-                const SizedBox(height: 2),
-                Text(
-                  '$pendingCount ${pendingCount == 1 ? 'member' : 'members'} awaiting approval',
-                  style: const TextStyle(color: Colors.white70, fontSize: 11),
-                ),
-              ],
+    return InkWell(
+      onTap: () => context.go('${AppConstants.adminMembers}?filter=PENDING'),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: AppColors.maroonGradient,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.groups_2_rounded, color: Colors.white, size: 20),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () => context.go('${AppConstants.adminMembers}?filter=PENDING'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.primary,
-              elevation: 0,
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Pending Approvals', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$pendingCount ${pendingCount == 1 ? 'member' : 'members'} awaiting approval',
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text('Review Approvals', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
+                ],
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('Review Approvals', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 14),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -905,8 +902,10 @@ void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
   final organizerController = TextEditingController(text: 'Kathmandu Chapter');
   final descController = TextEditingController();
   final posterUrlController = TextEditingController();
+  final posterFocusNode = FocusNode();
 
   String category = 'Cultural';
+  List<String> categoriesList = ['Cultural', 'Business', 'Youth', 'Social', 'Health'];
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
   String status = 'upcoming';
   String? errorMsg;
@@ -1045,42 +1044,128 @@ void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
                             const SizedBox(height: 14),
                           ],
 
-                          // 1. Event Category Selector
+                          // 1. Event Category Selector (with + Custom Category option)
                           const Text('Event Category *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF1E1615))),
                           const SizedBox(height: 8),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
-                            children: ['Cultural', 'Business', 'Youth', 'Social', 'Health'].map((cat) {
-                              final isSel = category == cat;
-                              return GestureDetector(
-                                onTap: () {
-                                  setModalState(() {
-                                    category = cat;
-                                    posterUrlController.text = presetPosters[cat] ?? posterUrlController.text;
-                                  });
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 150),
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                            children: [
+                              ...categoriesList.map((cat) {
+                                final isSel = category == cat;
+                                return GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      category = cat;
+                                      if (presetPosters.containsKey(cat)) {
+                                        posterUrlController.text = presetPosters[cat]!;
+                                      }
+                                    });
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSel ? const Color(0xFF500913) : const Color(0xFFF7F5F4),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSel ? const Color(0xFF500913) : const Color(0xFFEBE5E1),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      cat,
+                                      style: TextStyle(
+                                        color: isSel ? Colors.white : const Color(0xFF500913),
+                                        fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
-                                  child: Text(
-                                    cat,
-                                    style: TextStyle(
-                                      color: isSel ? Colors.white : const Color(0xFF500913),
-                                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
-                                      fontSize: 12,
+                                );
+                              }),
+
+                              // "+ Add Custom Category" Chip
+                              GestureDetector(
+                                onTap: () {
+                                  final customCatController = TextEditingController();
+                                  showDialog(
+                                    context: ctx,
+                                    builder: (dCtx) => AlertDialog(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                      title: Row(
+                                        children: const [
+                                          Icon(Icons.add_circle_outline_rounded, color: Color(0xFF500913)),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Add Custom Category',
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E1615)),
+                                          ),
+                                        ],
+                                      ),
+                                      content: TextField(
+                                        controller: customCatController,
+                                        autofocus: true,
+                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                        decoration: InputDecoration(
+                                          hintText: 'e.g. Sports, Religious, Welfare...',
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(dCtx),
+                                          child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            final newCat = customCatController.text.trim();
+                                            if (newCat.isNotEmpty) {
+                                              setModalState(() {
+                                                if (!categoriesList.contains(newCat)) {
+                                                  categoriesList.add(newCat);
+                                                }
+                                                category = newCat;
+                                              });
+                                              Navigator.pop(dCtx);
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF500913),
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                          child: const Text('Add Category', style: TextStyle(fontWeight: FontWeight.w700)),
+                                        ),
+                                      ],
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFF5F5),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: const Color(0xFF500913), width: 1.2),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.add_rounded, size: 16, color: Color(0xFF500913)),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Custom',
+                                        style: TextStyle(
+                                          color: Color(0xFF500913),
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
 
@@ -1242,14 +1327,35 @@ void _showCreateEventDialog(BuildContext context, WidgetRef ref) {
                           ),
                           const SizedBox(height: 14),
 
-                          // 7. Poster Image URL Input
+                          // 7. Poster Image URL Input (Auto-select on tap & clear (X) suffix icon)
                           TextField(
                             controller: posterUrlController,
+                            focusNode: posterFocusNode,
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                            onTap: () {
+                              if (posterUrlController.text.isNotEmpty) {
+                                posterUrlController.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: posterUrlController.text.length,
+                                );
+                              }
+                            },
+                            onChanged: (_) => setModalState(() {}),
                             decoration: InputDecoration(
                               labelText: 'Banner / Poster Image URL',
                               hintText: 'https://...',
                               prefixIcon: const Icon(Icons.image_rounded, color: Color(0xFF500913), size: 20),
+                              suffixIcon: posterUrlController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.cancel_rounded, color: Color(0xFF700D15), size: 20),
+                                      tooltip: 'Clear URL',
+                                      onPressed: () {
+                                        setModalState(() {
+                                          posterUrlController.clear();
+                                        });
+                                      },
+                                    )
+                                  : null,
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                             ),

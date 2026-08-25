@@ -31,11 +31,14 @@ class ProfileScreen extends ConsumerWidget {
         title: 'My Profile',
         showBackButton: true,
         actions: [
+          const Center(child: NASNotificationButton()),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: NASColors.primary, size: 20),
             onPressed: () => context.push('${AppConstants.profile}/edit'),
           ),
         ],
+
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

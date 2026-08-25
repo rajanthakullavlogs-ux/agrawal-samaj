@@ -91,6 +91,10 @@ class EventsRepository {
   }
 
   Future<Event?> getEventById(String id) async {
+    // Instant lookup from sample/cached events for zero loading delay
+    for (final e in _sampleEvents) {
+      if (e.id == id) return e;
+    }
     try {
       final data = await _client
           .from('events')
@@ -120,6 +124,20 @@ class EventsRepository {
   }
 
   static final List<Event> _sampleEvents = [
+    Event(
+      id: 'ev-guru',
+      title: 'Guru Purnima Satsang 2026',
+      description:
+          'A spiritual and cultural satsang gathering to honor our Gurus and traditions with bhajans, discourse, and prasad distribution.',
+      category: 'Cultural',
+      eventDate: DateTime(2026, 5, 25),
+      eventTime: '05:00 PM – 8:00 PM',
+      venue: 'Agrawal Samaj Bhawan, Kathmandu',
+      organizedBy: 'Cultural Wing',
+      posterUrl: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
+      status: 'ongoing',
+      createdAt: DateTime.now(),
+    ),
     Event(
       id: 'ev-2',
       title: 'Agrawal Business & Trade Summit 2026',
@@ -173,7 +191,7 @@ class EventsRepository {
       venue: 'Agrawal Bhawan Auditorium, Kathmandu',
       organizedBy: 'Women Wing',
       posterUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
-      status: 'upcoming',
+      status: 'ongoing',
       createdAt: DateTime.now(),
     ),
     Event(

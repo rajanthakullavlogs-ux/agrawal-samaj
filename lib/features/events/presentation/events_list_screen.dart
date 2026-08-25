@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/constants.dart';
-import '../../../shared/models/event.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../data/events_repository.dart';
+import '../data/rsvp_repository.dart';
 
 class _EventItem {
   final String id;
@@ -581,9 +581,25 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
           ElevatedButton(
             onPressed: () {
               if (nameCtrl.text.isNotEmpty) {
+                final attendeeName = nameCtrl.text.trim();
+                final phone = phoneCtrl.text.trim();
+                ref.read(eventRsvpsProvider.notifier).addRsvp(
+                  EventRsvp(
+                    id: 'rsvp-${DateTime.now().millisecondsSinceEpoch}',
+                    eventId: event.id,
+                    eventName: event.title,
+                    userName: attendeeName,
+                    phone: phone.isNotEmpty ? phone : '+977 9800000000',
+                    userType: 'Guest',
+                    registeredAt: DateTime.now(),
+                    eventStatus: event.status == 'past' ? 'past' : 'upcoming',
+                    eventCategory: event.category,
+                    eventDateStr: '${event.month} ${event.day}, ${event.year} • ${event.time}',
+                  ),
+                );
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('RSVP Confirmed for ${nameCtrl.text} at ${event.title}!')),
+                  SnackBar(content: Text('RSVP Confirmed for $attendeeName at ${event.title}!')),
                 );
               }
             },
@@ -1168,19 +1184,26 @@ class _EventsHeaderSection extends StatelessWidget {
                   child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
                 ),
               ),
-              InkWell(
-                onTap: onProfile,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+              Row(
+                children: [
+                  const NASNotificationButton(),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: onProfile,
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
+                    ),
                   ),
-                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF500913), size: 18),
-                ),
+                ],
               ),
+
             ],
           ),
           const SizedBox(height: 16),

@@ -7,6 +7,7 @@ import '../../../core/constants.dart';
 import '../../../shared/models/event.dart';
 import '../../../shared/widgets/widgets.dart';
 import '../data/events_repository.dart';
+import '../data/rsvp_repository.dart';
 
 /// Event Detail Screen — Redesigned matching exact UI spec dynamically populated by Event ID
 class EventDetailScreen extends ConsumerStatefulWidget {
@@ -726,6 +727,20 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
+              ref.read(eventRsvpsProvider.notifier).addRsvp(
+                EventRsvp(
+                  id: 'rsvp-${DateTime.now().millisecondsSinceEpoch}',
+                  eventId: widget.eventId,
+                  eventName: title,
+                  userName: 'Verified Member',
+                  phone: '+977 9841990000',
+                  userType: 'Member',
+                  registeredAt: DateTime.now(),
+                  eventStatus: 'upcoming',
+                  eventCategory: 'Cultural',
+                  eventDateStr: '$date • $venue',
+                ),
+              );
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Successfully registered for "$title"!')),

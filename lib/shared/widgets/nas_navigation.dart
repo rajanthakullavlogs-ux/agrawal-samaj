@@ -4,6 +4,70 @@ import '../../core/constants.dart';
 
 import '../../core/design_tokens.dart';
 
+/// Standardized Notification Bell Button with Red Badge count "3" matching Home Page design.
+class NASNotificationButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const NASNotificationButton({super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        InkWell(
+          onTap: onTap ?? () => context.push(AppConstants.notifications),
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.notifications_none_rounded,
+              color: Color(0xFF500913),
+              size: 18,
+            ),
+          ),
+        ),
+        Positioned(
+          top: -1,
+          right: -1,
+          child: Container(
+            padding: const EdgeInsets.all(2.5),
+            decoration: const BoxDecoration(
+              color: Color(0xFFE53935),
+              shape: BoxShape.circle,
+            ),
+            constraints: const BoxConstraints(
+              minWidth: 14,
+              minHeight: 14,
+            ),
+            child: const Text(
+              '3',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 8.5,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Public site top app bar — fixed, with hamburger menu on mobile and nav links on desktop.
 /// Matches the header from Screen A1 and the nav section of Screen D.
 class NASAppBar extends StatelessWidget implements PreferredSizeWidget {

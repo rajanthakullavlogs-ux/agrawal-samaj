@@ -11,6 +11,8 @@ class _PhotoArchiveItem {
   final String category;
   final String url;
   final String date;
+  final String location;
+  final String description;
 
   const _PhotoArchiveItem({
     required this.id,
@@ -18,6 +20,8 @@ class _PhotoArchiveItem {
     required this.category,
     required this.url,
     required this.date,
+    required this.location,
+    required this.description,
   });
 }
 
@@ -29,6 +33,17 @@ class AllPhotosScreen extends StatefulWidget {
 }
 
 class _AllPhotosScreenState extends State<AllPhotosScreen> {
+  String _selectedCategory = 'All';
+
+  static const List<String> _categories = [
+    'All',
+    'Business',
+    'Cultural',
+    'Social Service',
+    'Youth',
+    'Health',
+  ];
+
   static const List<_PhotoArchiveItem> _photos = [
     _PhotoArchiveItem(
       id: 'ph-1',
@@ -36,6 +51,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Business',
       url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
       date: 'Nov 15, 2026',
+      location: 'Hotel Yak & Yeti, Kathmandu',
+      description: 'Keynote speech session bringing together over 500 business leaders, corporate executives, and young entrepreneurs to discuss trade innovation and economic expansion.',
     ),
     _PhotoArchiveItem(
       id: 'ph-2',
@@ -43,6 +60,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Cultural',
       url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
       date: 'Oct 24, 2026',
+      location: 'Samaj Bhawan, Kamaladi',
+      description: 'Enchanting musical performance during Maharaja Agrasen Jayanti, featuring classical Harmonium, Bhajans, and traditional songs by renowned community artists.',
     ),
     _PhotoArchiveItem(
       id: 'ph-3',
@@ -50,6 +69,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Social Service',
       url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
       date: 'Sep 10, 2026',
+      location: 'Lalitpur Heritage Park',
+      description: 'Youth Wing members actively participating in a green environment drive, planting over 300 native tree saplings across municipal gardens.',
     ),
     _PhotoArchiveItem(
       id: 'ph-4',
@@ -57,6 +78,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Cultural',
       url: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=800&q=80',
       date: 'Aug 18, 2026',
+      location: 'Biratnagar Community Grounds',
+      description: 'Celebratory Teej festival group dance performance organized by Koshi Regional Chapter, showcasing rich cultural heritage and vibrant community spirit.',
     ),
     _PhotoArchiveItem(
       id: 'ph-5',
@@ -64,6 +87,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Health',
       url: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&w=800&q=80',
       date: 'Jul 22, 2026',
+      location: 'Birgunj Chapter Grounds',
+      description: 'Blood donation camp organized in association with Red Cross Society, collecting over 180 units of blood from selfless community volunteers.',
     ),
     _PhotoArchiveItem(
       id: 'ph-6',
@@ -71,6 +96,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Youth',
       url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80',
       date: 'Jun 14, 2026',
+      location: 'National Youth Center',
+      description: 'Mentorship workshop empowering young leaders with career guidance, public speaking, and digital entrepreneurship tools.',
     ),
     _PhotoArchiveItem(
       id: 'ph-7',
@@ -78,6 +105,8 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Social Service',
       url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80',
       date: 'May 08, 2026',
+      location: 'Kathmandu Chapter Office',
+      description: 'Special training session providing financial literacy, investment basics, and micro-business management skills to women members.',
     ),
     _PhotoArchiveItem(
       id: 'ph-8',
@@ -85,12 +114,17 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
       category: 'Business',
       url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
       date: 'Apr 02, 2026',
+      location: 'Hotel Radisson, Kathmandu',
+      description: 'B2B networking evening connecting business owners and entrepreneurs to expand commercial opportunities across Nepal.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final filteredPhotos = _photos;
+    final filteredPhotos = _photos.where((p) {
+      if (_selectedCategory == 'All') return true;
+      return p.category.toLowerCase() == _selectedCategory.toLowerCase();
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F7F5),
@@ -186,7 +220,7 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Unified Section Header: Title + Count + Category Action Dropdown Button
+                    // Unified Section Header: Title + Category Popup Filter Button
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -205,24 +239,117 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          const SizedBox(width: 8),
+
+                          // Popup Menu Filter Button
+                          PopupMenuButton<String>(
+                            initialValue: _selectedCategory,
+                            onSelected: (cat) => setState(() => _selectedCategory = cat),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            color: Colors.white,
+                            elevation: 6,
+                            itemBuilder: (context) => _categories.map((cat) {
+                              final isSel = cat == _selectedCategory;
+                              final labelText = cat == 'All' ? 'All Categories' : cat;
+                              return PopupMenuItem<String>(
+                                value: cat,
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.tune_rounded,
+                                      size: 14,
+                                      color: isSel ? const Color(0xFF700D15) : const Color(0xFF666666),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      labelText,
+                                      style: TextStyle(
+                                        fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                                        color: isSel ? const Color(0xFF700D15) : const Color(0xFF1E1615),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    if (isSel) ...[
+                                      const Spacer(),
+                                      const Icon(Icons.check_rounded, size: 16, color: Color(0xFF700D15)),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF500913),
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF500913).withValues(alpha: 0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.tune_rounded, size: 13, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _selectedCategory == 'All' ? 'All Photos' : _selectedCategory,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: Colors.white),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 14),
 
-                    // 2-Column Photo Grid
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredPhotos.length,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.88,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                    // Empty state or Grid
+                    if (filteredPhotos.isEmpty)
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                        padding: const EdgeInsets.all(24),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE5D5D5)),
                         ),
+                        child: Column(
+                          children: const [
+                            Icon(Icons.photo_library_outlined, size: 40, color: Color(0xFF8C7A75)),
+                            SizedBox(height: 8),
+                            Text(
+                              'No photos found in this category',
+                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: Color(0xFF1E1615)),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: filteredPhotos.length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.88,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+
                         itemBuilder: (context, i) {
                           final photo = filteredPhotos[i];
                           return GestureDetector(
@@ -340,61 +467,18 @@ class _AllPhotosScreenState extends State<AllPhotosScreen> {
   }
 
   void _showZoomableLightbox(BuildContext context, _PhotoArchiveItem photo) {
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: const EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      photo.title,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white),
-                    onPressed: () => Navigator.pop(dialogCtx),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: Container(
-                constraints: const BoxConstraints(maxHeight: 450),
-                child: InteractiveViewer(
-                  minScale: 1.0,
-                  maxScale: 4.0,
-                  child: CachedNetworkImage(
-                    imageUrl: photo.url,
-                    fit: BoxFit.contain,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF700D15)),
-                    ),
-                    errorWidget: (context, url, error) => const Icon(Icons.broken_image, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                '${photo.category} • ${photo.date}',
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ),
-          ],
-        ),
+    showPhotoViewerModal(
+      context,
+      PhotoViewerItem(
+        id: photo.id,
+        title: photo.title,
+        imageUrl: photo.url,
+        category: photo.category,
+        date: photo.date,
+        location: photo.location,
+        description: photo.description,
       ),
     );
   }
+
 }
