@@ -880,11 +880,7 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                             onTap: () async {
                               final picked = await showDateRangePicker(
                                 context: context,
-                                initialDateRange: _selectedDateRange ??
-                                    DateTimeRange(
-                                      start: DateTime(2026, 10, 1),
-                                      end: DateTime(2026, 12, 31),
-                                    ),
+                                initialDateRange: _selectedDateRange,
                                 firstDate: DateTime(2024, 1, 1),
                                 lastDate: DateTime(2030, 12, 31),
                                 builder: (context, child) {
