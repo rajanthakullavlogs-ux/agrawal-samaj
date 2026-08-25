@@ -875,143 +875,156 @@ class _EventsListScreenState extends ConsumerState<EventsListScreen> {
                           ),
                           const SizedBox(height: 10),
 
-                          // Custom Date Range Interactive Selector Box
-                          InkWell(
-                            onTap: () async {
-                              final picked = await showDateRangePicker(
-                                context: context,
-                                initialDateRange: _selectedDateRange,
-                                firstDate: DateTime(2024, 1, 1),
-                                lastDate: DateTime(2030, 12, 31),
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: const ColorScheme.light(
-                                        primary: Color(0xFF700D15),
-                                        onPrimary: Colors.white,
-                                        surface: Colors.white,
-                                        onSurface: Color(0xFF1E1615),
+                          // Custom Date Range Interactive Selector Boxes (Starts With Nothing Selected)
+                          Row(
+                            children: [
+                              // Start Date Box
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: _selectedDateRange?.start ?? DateTime(2026, 10, 1),
+                                      firstDate: DateTime(2024, 1, 1),
+                                      lastDate: DateTime(2030, 12, 31),
+                                      builder: (context, child) => Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: const ColorScheme.light(
+                                            primary: Color(0xFF700D15),
+                                            onPrimary: Colors.white,
+                                            surface: Colors.white,
+                                            onSurface: Color(0xFF1E1615),
+                                          ),
+                                        ),
+                                        child: child!,
+                                      ),
+                                    );
+                                    if (picked != null) {
+                                      setModalState(() {
+                                        final end = _selectedDateRange?.end ?? picked.add(const Duration(days: 30));
+                                        final finalEnd = end.isBefore(picked) ? picked : end;
+                                        _selectedDateRange = DateTimeRange(start: picked, end: finalEnd);
+                                        final shortStart = DateFormat('MMM d').format(picked);
+                                        final shortEnd = DateFormat('MMM d').format(finalEnd);
+                                        _selectedDateRangeLabel = '$shortStart – $shortEnd';
+                                      });
+                                      setState(() {});
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: _selectedDateRange != null ? const Color(0xFF700D15) : const Color(0xFFE2D6D3),
+                                        width: _selectedDateRange != null ? 1.5 : 1.0,
                                       ),
                                     ),
-                                    child: child!,
-                                  );
-                                },
-                              );
-                              if (picked != null) {
-                                final shortStart = DateFormat('MMM d').format(picked.start);
-                                final shortEnd = DateFormat('MMM d').format(picked.end);
-                                setState(() {
-                                  _selectedDateRange = picked;
-                                  _selectedDateRangeLabel = '$shortStart – $shortEnd';
-                                });
-                                if (context.mounted) Navigator.pop(ctx);
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(18),
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: isRangeActive
-                                    ? const Color(0xFF700D15).withValues(alpha: 0.06)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: isRangeActive
-                                      ? const Color(0xFF700D15)
-                                      : const Color(0xFFE2D6D3),
-                                  width: isRangeActive ? 1.5 : 1.0,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'FROM DATE',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w900,
+                                            color: Color(0xFF8C7A75),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          _selectedDateRange != null
+                                              ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.start)
+                                              : 'Select Start Date',
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w800,
+                                            color: _selectedDateRange != null ? const Color(0xFF700D15) : Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.03),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
                               ),
-                              child: Row(
-                                children: [
-                                  // Start Date Box
-                                  Expanded(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: const Color(0xFFE2D6D3)),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF700D15)),
+                              ),
+                              // End Date Box
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: _selectedDateRange?.end ?? DateTime(2026, 10, 1),
+                                      firstDate: DateTime(2024, 1, 1),
+                                      lastDate: DateTime(2030, 12, 31),
+                                      builder: (context, child) => Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: const ColorScheme.light(
+                                            primary: Color(0xFF700D15),
+                                            onPrimary: Colors.white,
+                                            surface: Colors.white,
+                                            onSurface: Color(0xFF1E1615),
+                                          ),
+                                        ),
+                                        child: child!,
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'FROM DATE',
-                                            style: TextStyle(
-                                              fontSize: 9.5,
-                                              fontWeight: FontWeight.w900,
-                                              color: Color(0xFF8C7A75),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            _selectedDateRange != null
-                                                ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.start)
-                                                : 'Select Start',
-                                            style: TextStyle(
-                                              fontSize: 12.5,
-                                              fontWeight: FontWeight.w800,
-                                              color: _selectedDateRange != null
-                                                  ? const Color(0xFF700D15)
-                                                  : const Color(0xFF1E1615),
-                                            ),
-                                          ),
-                                        ],
+                                    );
+                                    if (picked != null) {
+                                      setModalState(() {
+                                        final start = _selectedDateRange?.start ?? picked.subtract(const Duration(days: 30));
+                                        final finalStart = start.isAfter(picked) ? picked : start;
+                                        _selectedDateRange = DateTimeRange(start: finalStart, end: picked);
+                                        final shortStart = DateFormat('MMM d').format(finalStart);
+                                        final shortEnd = DateFormat('MMM d').format(picked);
+                                        _selectedDateRangeLabel = '$shortStart – $shortEnd';
+                                      });
+                                      setState(() {});
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: _selectedDateRange != null ? const Color(0xFF700D15) : const Color(0xFFE2D6D3),
+                                        width: _selectedDateRange != null ? 1.5 : 1.0,
                                       ),
                                     ),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8),
-                                    child: Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF700D15)),
-                                  ),
-                                  // End Date Box
-                                  Expanded(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: const Color(0xFFE2D6D3)),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'TO DATE',
-                                            style: TextStyle(
-                                              fontSize: 9.5,
-                                              fontWeight: FontWeight.w900,
-                                              color: Color(0xFF8C7A75),
-                                            ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'TO DATE',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w900,
+                                            color: Color(0xFF8C7A75),
                                           ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            _selectedDateRange != null
-                                                ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)
-                                                : 'Select End',
-                                            style: TextStyle(
-                                              fontSize: 12.5,
-                                              fontWeight: FontWeight.w800,
-                                              color: _selectedDateRange != null
-                                                  ? const Color(0xFF700D15)
-                                                  : const Color(0xFF1E1615),
-                                            ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          _selectedDateRange != null
+                                              ? DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)
+                                              : 'Select End Date',
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w800,
+                                            color: _selectedDateRange != null ? const Color(0xFF700D15) : Colors.grey.shade600,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                           const SizedBox(height: 22),
 
