@@ -241,7 +241,7 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
               ),
             ),
 
-            // Quick Action Info Grid
+            // Direct Contact Details (Full Un-truncated Information)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -252,54 +252,51 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF500913)),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _quickActionCard(
-                          icon: Icons.phone_in_talk_rounded,
-                          title: 'Call Us',
-                          subtitle: '+977 1-4220000',
-                          color: const Color(0xFF1565C0),
-                          bgColor: const Color(0xFFE3F2FD),
-                          onTap: () => _makePhoneCall('+97714220000'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _quickActionCard(
-                          icon: Icons.mail_rounded,
-                          title: 'Email Us',
-                          subtitle: 'info@agrawalsamaj.org',
-                          color: const Color(0xFFE8622C),
-                          bgColor: const Color(0xFFFBE0D2),
-                          onTap: () => _sendEmail('info@nepalagrawalsamaj.org'),
-                        ),
-                      ),
-                    ],
+
+                  // Phone Card
+                  _fullWidthContactCard(
+                    icon: Icons.phone_in_talk_rounded,
+                    title: 'Phone Numbers',
+                    value: '+977 1-4220000  •  +977 9851000000',
+                    actionLabel: 'Call',
+                    color: const Color(0xFF1565C0),
+                    bgColor: const Color(0xFFE3F2FD),
+                    onTap: () => _makePhoneCall('+97714220000'),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _quickActionCard(
-                          icon: Icons.location_on_rounded,
-                          title: 'Headquarters',
-                          subtitle: 'Kamaladi, Kathmandu',
-                          color: const Color(0xFFD64F64),
-                          bgColor: const Color(0xFFFDECEF),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _quickActionCard(
-                          icon: Icons.access_time_filled_rounded,
-                          title: 'Office Hours',
-                          subtitle: 'Sun-Fri 9AM - 6PM',
-                          color: const Color(0xFFC4901E),
-                          bgColor: const Color(0xFFFCF7EB),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 10),
+
+                  // Email Card
+                  _fullWidthContactCard(
+                    icon: Icons.mail_rounded,
+                    title: 'Email Address',
+                    value: 'info@nepalagrawalsamaj.org',
+                    actionLabel: 'Email',
+                    color: const Color(0xFFE8622C),
+                    bgColor: const Color(0xFFFBE0D2),
+                    onTap: () => _sendEmail('info@nepalagrawalsamaj.org'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Location Card
+                  _fullWidthContactCard(
+                    icon: Icons.location_on_rounded,
+                    title: 'Central Office Location',
+                    value: 'Agrawal Bhawan, Kamaladi, Kathmandu, Nepal',
+                    actionLabel: 'Map',
+                    color: const Color(0xFFD64F64),
+                    bgColor: const Color(0xFFFDECEF),
+                    onTap: () => _makePhoneCall('+97714220000'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Office Hours Card
+                  _fullWidthContactCard(
+                    icon: Icons.access_time_filled_rounded,
+                    title: 'Office Operating Hours',
+                    value: 'Sunday – Friday: 9:00 AM – 6:00 PM (Sat Closed)',
+                    actionLabel: 'Open',
+                    color: const Color(0xFFC4901E),
+                    bgColor: const Color(0xFFFCF7EB),
                   ),
                 ],
               ),
@@ -471,10 +468,11 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
     );
   }
 
-  Widget _quickActionCard({
+  Widget _fullWidthContactCard({
     required IconData icon,
     required String title,
-    required String subtitle,
+    required String value,
+    required String actionLabel,
     required Color color,
     required Color bgColor,
     VoidCallback? onTap,
@@ -483,12 +481,12 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
@@ -501,29 +499,58 @@ class _ContactScreenState extends ConsumerState<ContactScreen> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-                child: Icon(icon, color: color, size: 16),
+                child: Icon(icon, color: color, size: 18),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                      title.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textSecondary,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
-                      subtitle,
-                      style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF500913)),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      value,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF500913),
+                        height: 1.3,
+                      ),
                     ),
                   ],
                 ),
               ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: color.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        actionLabel,
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w900, color: color),
+                      ),
+                      const SizedBox(width: 3),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 10, color: color),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
