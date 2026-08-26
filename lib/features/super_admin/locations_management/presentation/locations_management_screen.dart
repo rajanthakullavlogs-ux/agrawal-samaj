@@ -112,59 +112,66 @@ class _HeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(16),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Locations Overview',
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                     color: Colors.white,
+                    letterSpacing: -0.2,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
-                  'Monitor and oversee all branches\nacross Nepal.',
+                  'Monitor and oversee all branches across Nepal.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white70,
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
+                    height: 1.3,
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        Positioned(
-          bottom: -16,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: const Icon(Icons.location_city_rounded, color: AppColors.primary, size: 22),
+          const SizedBox(width: 14),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+            ),
+            child: const Icon(
+              Icons.location_city_rounded,
+              color: Colors.white,
+              size: 24,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -180,7 +187,10 @@ class _OverviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Overview', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+        const Text(
+          'Overview',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.primary),
+        ),
         const SizedBox(height: 12),
         Row(
           children: const [
@@ -189,25 +199,22 @@ class _OverviewSection extends StatelessWidget {
                 icon: Icons.account_balance_rounded,
                 value: '24',
                 label: 'Total Branches',
-                trend: '↑ 2 this month',
               ),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: 10),
             Expanded(
               child: _OverviewCard(
                 icon: Icons.location_on_rounded,
                 value: '77',
                 label: 'Districts Covered',
-                trend: '↑ 5 this month',
               ),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: 10),
             Expanded(
               child: _OverviewCard(
-                icon: Icons.groups_rounded,
-                value: '18',
+                icon: Icons.map_rounded,
+                value: '7',
                 label: 'Provinces Covered',
-                trend: '↑ 1 this month',
               ),
             ),
           ],
@@ -221,37 +228,63 @@ class _OverviewCard extends StatelessWidget {
   final IconData icon;
   final String value;
   final String label;
-  final String trend;
 
-  const _OverviewCard({required this.icon, required this.value, required this.label, required this.trend});
+  const _OverviewCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))],
+        border: Border.all(color: const Color(0xFFE2D6D3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF500913).withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
+            child: Icon(icon, color: AppColors.primary, size: 20),
           ),
-          const SizedBox(height: 16),
-          Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary)),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: AppColors.primary,
+              height: 1.1,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 10, color: Colors.grey.shade800, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 12),
-          Text(trend, style: const TextStyle(fontSize: 9, color: AppColors.primary, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -484,18 +517,26 @@ class _BranchesNeedingAttention extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Branches Needing Attention', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
-            Row(
-              children: const [
-                Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
-              ],
+            InkWell(
+              onTap: () => _showAllBranchesAttentionModal(context),
+              borderRadius: BorderRadius.circular(6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Row(
+                  children: const [
+                    Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                    SizedBox(width: 2),
+                    Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primary),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const _AttentionTile(title: 'Dolakha Branch', subtitle: 'No update for 65 days'),
-        const _AttentionTile(title: 'Rukum Branch', subtitle: 'No update for 48 days'),
-        const _AttentionTile(title: 'Bajhang Branch', subtitle: 'No update for 40 days'),
+        const _AttentionTile(title: 'Dolakha Branch', subtitle: 'No update for 65 days', lastUpdated: 'Jun 22, 2026'),
+        const _AttentionTile(title: 'Rukum Branch', subtitle: 'No update for 48 days', lastUpdated: 'Jul 09, 2026'),
+        const _AttentionTile(title: 'Bajhang Branch', subtitle: 'No update for 40 days', lastUpdated: 'Jul 17, 2026'),
       ],
     );
   }
@@ -504,8 +545,9 @@ class _BranchesNeedingAttention extends StatelessWidget {
 class _AttentionTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String lastUpdated;
 
-  const _AttentionTile({required this.title, required this.subtitle});
+  const _AttentionTile({required this.title, required this.subtitle, required this.lastUpdated});
 
   @override
   Widget build(BuildContext context) {
@@ -525,7 +567,7 @@ class _AttentionTile extends StatelessWidget {
               children: [
                 Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
                 const SizedBox(height: 2),
-                Text(subtitle, style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+                Text('$subtitle • Last: $lastUpdated', style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
               ],
             ),
           ),
@@ -536,6 +578,355 @@ class _AttentionTile extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           const Icon(Icons.chevron_right_rounded, color: AppColors.primary, size: 16),
+        ],
+      ),
+    );
+  }
+}
+
+void _showAllBranchesAttentionModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => const _AllBranchesAttentionSheet(),
+  );
+}
+
+class _AllBranchesAttentionSheet extends StatefulWidget {
+  const _AllBranchesAttentionSheet();
+
+  @override
+  State<_AllBranchesAttentionSheet> createState() => _AllBranchesAttentionSheetState();
+}
+
+class _AllBranchesAttentionSheetState extends State<_AllBranchesAttentionSheet> {
+  String _selectedFilter = 'All';
+
+  final List<Map<String, dynamic>> _branchesStatusList = [
+    {
+      'name': 'Dolakha Branch',
+      'province': 'Bagmati Province',
+      'admin': 'Ramesh Agrawal',
+      'phone': '+977 9851099887',
+      'status': 'Outdated',
+      'lastUpdated': 'Jun 22, 2026',
+      'daysAgo': '65 days ago',
+      'color': const Color(0xFFC62828),
+      'bg': const Color(0xFFFFEBEE),
+    },
+    {
+      'name': 'Rukum Branch',
+      'province': 'Karnali Province',
+      'admin': 'Sunil Agrawal',
+      'phone': '+977 9858011223',
+      'status': 'Outdated',
+      'lastUpdated': 'Jul 09, 2026',
+      'daysAgo': '48 days ago',
+      'color': const Color(0xFFC62828),
+      'bg': const Color(0xFFFFEBEE),
+    },
+    {
+      'name': 'Bajhang Branch',
+      'province': 'Sudurpashchim Province',
+      'admin': 'Dipendra Agrawal',
+      'phone': '+977 9857022334',
+      'status': 'Needs Update',
+      'lastUpdated': 'Jul 17, 2026',
+      'daysAgo': '40 days ago',
+      'color': const Color(0xFFE65100),
+      'bg': const Color(0xFFFFF3E0),
+    },
+    {
+      'name': 'Dharan Branch',
+      'province': 'Koshi Province',
+      'admin': 'Anil Agrawal',
+      'phone': '+977 9852033445',
+      'status': 'Needs Update',
+      'lastUpdated': 'Jul 28, 2026',
+      'daysAgo': '29 days ago',
+      'color': const Color(0xFFE65100),
+      'bg': const Color(0xFFFFF3E0),
+    },
+    {
+      'name': 'Kathmandu Branch',
+      'province': 'Bagmati Province',
+      'admin': 'Rajesh Agrawal',
+      'phone': '+977 9851000000',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 25, 2026',
+      'daysAgo': '1 day ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+    {
+      'name': 'Pokhara Branch',
+      'province': 'Gandaki Province',
+      'admin': 'Bishal Agrawal',
+      'phone': '+977 9856011111',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 24, 2026',
+      'daysAgo': '2 days ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+    {
+      'name': 'Chitwan Branch',
+      'province': 'Bagmati Province',
+      'admin': 'Manish Agrawal',
+      'phone': '+977 9855022222',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 20, 2026',
+      'daysAgo': '6 days ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+    {
+      'name': 'Butwal Branch',
+      'province': 'Lumbini Province',
+      'admin': 'Suresh Agrawal',
+      'phone': '+977 9857033333',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 18, 2026',
+      'daysAgo': '8 days ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+    {
+      'name': 'Biratnagar Branch',
+      'province': 'Koshi Province',
+      'admin': 'Kamal Agrawal',
+      'phone': '+977 9852044444',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 15, 2026',
+      'daysAgo': '11 days ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+    {
+      'name': 'Nepalgunj Branch',
+      'province': 'Lumbini Province',
+      'admin': 'Prakash Agrawal',
+      'phone': '+977 9858055555',
+      'status': 'Updated',
+      'lastUpdated': 'Aug 12, 2026',
+      'daysAgo': '14 days ago',
+      'color': const Color(0xFF2E7D32),
+      'bg': const Color(0xFFE8F5E9),
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _branchesStatusList.where((b) {
+      if (_selectedFilter == 'All') return true;
+      if (_selectedFilter == 'Needs Attention') return b['status'] == 'Outdated' || b['status'] == 'Needs Update';
+      return b['status'] == _selectedFilter;
+    }).toList();
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.88,
+      decoration: const BoxDecoration(
+        color: Color(0xFFFAFAFA),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, -4)),
+        ],
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4.5,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD6C7C2),
+                borderRadius: BorderRadius.circular(2.5),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Header Row with Title on Left and BACK Button in TOP RIGHT CORNER
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.info_rounded, color: AppColors.primary, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Branch Update Status',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.primary),
+                      ),
+                      Text(
+                        'Complete update logs and activity status',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                // BACK BUTTON IN TOP RIGHT CORNER
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_back_rounded, color: AppColors.primary, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Filter Pills Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: ['All', 'Needs Attention', 'Updated', 'Outdated'].map((filter) {
+                final isSel = filter == _selectedFilter;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(filter),
+                    selected: isSel,
+                    onSelected: (val) {
+                      if (val) setState(() => _selectedFilter = filter);
+                    },
+                    selectedColor: AppColors.primary,
+                    backgroundColor: Colors.white,
+                    labelStyle: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                      color: isSel ? Colors.white : AppColors.primary,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSel ? AppColors.primary : Colors.grey.shade300,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const Divider(height: 24),
+
+          // Branch List
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              itemCount: filtered.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final b = filtered[index];
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2D6D3)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 18),
+                              const SizedBox(width: 6),
+                              Text(
+                                b['name'] as String,
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: b['bg'] as Color,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              b['status'] as String,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w800,
+                                color: b['color'] as Color,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Province: ${b['province']} • Admin: ${b['admin']}',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFAFAFA),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.access_time_rounded, size: 14, color: AppColors.primary),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  'Last Updated: ',
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.primary),
+                                ),
+                                Text(
+                                  b['lastUpdated'] as String,
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              b['daysAgo'] as String,
+                              style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

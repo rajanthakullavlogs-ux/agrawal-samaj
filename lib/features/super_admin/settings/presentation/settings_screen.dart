@@ -18,6 +18,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _requireBranchApproval = true;
   bool _enableEmailNotifications = true;
   bool _enableMaintenanceMode = false;
+  bool _allowBranchBroadcasts = true;
+  bool _enableAutoBackups = true;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _enableMemberRegistrations,
                     onChanged: (v) => setState(() => _enableMemberRegistrations = v),
                   ),
-                  const Divider(height: 1),
+                  const Divider(height: 1, color: Color(0xFFE2D6D3)),
                   _switchTile(
                     title: 'Require Chapter Admin Approval',
                     subtitle: 'Registrations must be vetted by branch admins before active status',
@@ -68,12 +70,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'System & Security Settings',
                 children: [
                   _switchTile(
-                    title: 'Global Email Notifications',
-                    subtitle: 'Send automated email updates for events & approvals',
+                    title: 'Global Email & SMS Notifications',
+                    subtitle: 'Send automated updates for events & approvals',
                     value: _enableEmailNotifications,
                     onChanged: (v) => setState(() => _enableEmailNotifications = v),
                   ),
-                  const Divider(height: 1),
+                  const Divider(height: 1, color: Color(0xFFE2D6D3)),
+                  _switchTile(
+                    title: 'Allow Branch Notice Broadcasts',
+                    subtitle: 'Permit local branch admins to dispatch broadcast notices',
+                    value: _allowBranchBroadcasts,
+                    onChanged: (v) => setState(() => _allowBranchBroadcasts = v),
+                  ),
+                  const Divider(height: 1, color: Color(0xFFE2D6D3)),
+                  _switchTile(
+                    title: 'Automated Daily Cloud Backups',
+                    subtitle: 'Snapshot member & financial database at 00:00 UTC',
+                    value: _enableAutoBackups,
+                    onChanged: (v) => setState(() => _enableAutoBackups = v),
+                  ),
+                  const Divider(height: 1, color: Color(0xFFE2D6D3)),
                   _switchTile(
                     title: 'Maintenance Mode',
                     subtitle: 'Temporarily lock public site for database maintenance',
@@ -94,19 +110,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFE3EEFD),
-                      child: Icon(Icons.security_rounded, color: Color(0xFF2E6FE0)),
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                      child: const Icon(Icons.security_rounded, color: AppColors.primary, size: 22),
                     ),
-                    title: const Text('Manage Admin Roles & Keys', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-                    subtitle: const Text('Assign super admin, location admin, and moderator roles', style: TextStyle(fontSize: 11)),
-                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                    title: const Text('Manage Admin Roles & Keys', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.textPrimary)),
+                    subtitle: const Text('Assign super admin, location admin, and moderator roles', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    trailing: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.08), shape: BoxShape.circle),
+                      child: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primary),
+                    ),
                     onTap: () => _showRbacModal(context),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Save Settings CTA
             Padding(
@@ -114,16 +134,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Global Super Admin settings updated successfully!')),
+                    SnackBar(
+                      content: Row(
+                        children: const [
+                          Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                          SizedBox(width: 10),
+                          Text('Global Super Admin settings saved successfully!', style: TextStyle(fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                      backgroundColor: AppColors.primary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   );
                 },
-                icon: const Icon(Icons.save_rounded, size: 18),
-                label: const Text('Save System Configurations', style: TextStyle(fontWeight: FontWeight.w700)),
+                icon: const Icon(Icons.save_rounded, size: 20),
+                label: const Text('Save System Configurations', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                  elevation: 3,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),
@@ -267,34 +299,62 @@ class _HeroBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFCEEE4), Color(0xFFFBE3D3)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.lg),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Global Settings ⚙️',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text('Configure nationwide security policies, registration rules, RBAC admin permissions, and site maintenance.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.35)),
+                const Text(
+                  'Global Settings',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Configure nationwide security policies, registration rules, RBAC admin permissions, and site maintenance.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 14),
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.settings_suggest_rounded, color: AppColors.primary, size: 32),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+            ),
+            child: const Icon(
+              Icons.settings_suggest_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
         ],
       ),

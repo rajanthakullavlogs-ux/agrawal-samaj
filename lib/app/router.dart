@@ -250,39 +250,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Super Admin Routes ─────────────────────────────────
       GoRoute(
         path: AppConstants.superAdminDashboard,
-        pageBuilder: (_, state) {
-          final isReverse = _superAdminLastTabIndex > 0;
-          _superAdminLastTabIndex = 0;
-          return _superAdminTransitionPage(const SuperAdminDashboardScreen(), isReverse: isReverse, key: state.pageKey);
-        },
+        pageBuilder: (_, _) => const NoTransitionPage(child: SuperAdminDashboardScreen()),
       ),
       GoRoute(
         path: AppConstants.superAdminAnalytics,
-        pageBuilder: (_, state) {
-          final isReverse = _superAdminLastTabIndex > 1;
-          _superAdminLastTabIndex = 1;
-          return _superAdminTransitionPage(const MemberAnalyticsScreen(), isReverse: isReverse, key: state.pageKey);
-        },
+        pageBuilder: (_, _) => const NoTransitionPage(child: MemberAnalyticsScreen()),
       ),
       GoRoute(
         path: AppConstants.superAdminLocations,
-        pageBuilder: (_, state) {
-          final isReverse = _superAdminLastTabIndex > 2;
-          _superAdminLastTabIndex = 2;
-          return _superAdminTransitionPage(const LocationsManagementScreen(), isReverse: isReverse, key: state.pageKey);
-        },
+        pageBuilder: (_, _) => const NoTransitionPage(child: LocationsManagementScreen()),
       ),
       GoRoute(
         path: AppConstants.superAdminEvents,
-        pageBuilder: (_, state) {
-          final isReverse = _superAdminLastTabIndex > 3;
-          _superAdminLastTabIndex = 3;
-          return _superAdminTransitionPage(const CentralizedEventsScreen(), isReverse: isReverse, key: state.pageKey);
-        },
+        pageBuilder: (_, _) => const NoTransitionPage(child: CentralizedEventsScreen()),
       ),
       GoRoute(
         path: AppConstants.superAdminGallery,
-        builder: (_, _) => const CentralizedGalleryScreen(), // This is not in the standard nav bar flow requested by user. Let's keep it as is.
+        builder: (_, _) => const CentralizedGalleryScreen(),
       ),
       GoRoute(
         path: AppConstants.superAdminComingSoon,
@@ -290,11 +274,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppConstants.superAdminSettings,
-        pageBuilder: (_, state) {
-          final isReverse = _superAdminLastTabIndex > 4;
-          _superAdminLastTabIndex = 4;
-          return _superAdminTransitionPage(const SettingsScreen(), isReverse: isReverse, key: state.pageKey);
-        },
+        pageBuilder: (_, _) => const NoTransitionPage(child: SettingsScreen()),
       ),
     ],
   );
